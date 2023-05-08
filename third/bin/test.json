@@ -1,0 +1,46 @@
+[
+    {
+        "address": "",
+        "bus_type": 0,
+        "control_port": "",
+        "control_type": 0,
+        "device_id": "0",
+        "ip": "",
+        "rfm2g_id": "",
+        "send_port": "",
+        "type": "产品0"
+    },
+    {
+        "address": "",
+        "bus_type": 0,
+        "control_port": "",
+        "control_type": 0,
+        "device_id": "1",
+        "ip": "",
+        "rfm2g_id": "",
+        "send_port": "",
+        "type": "产品1"
+    },
+    {
+        "address": "",
+        "bus_type": 0,
+        "control_port": "",
+        "control_type": 0,
+        "device_id": "2",
+        "ip": "",
+        "rfm2g_id": "",
+        "send_port": "",
+        "type": "产品2"
+    },
+    {
+        "address": "",
+        "bus_type": 0,
+        "control_port": "",
+        "control_type": 0,
+        "device_id": "3",
+        "ip": "",
+        "rfm2g_id": "",
+        "send_port": "",
+        "type": "产品3"
+    }
+]

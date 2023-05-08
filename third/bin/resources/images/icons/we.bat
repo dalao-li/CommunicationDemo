@@ -1,0 +1,1 @@
+font-awesome-to-png.py --color white --size 64 ALL

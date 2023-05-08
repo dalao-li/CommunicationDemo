@@ -1,0 +1,256 @@
+[
+    {
+        "bus": 0,
+        "bus_type": "udp",
+        "id": "11",
+        "name": "test1",
+        "values": [
+            {
+                "amp": 0,
+                "desc": "描述",
+                "dim": 1,
+                "mask": "0xFF",
+                "name": "工程值0",
+                "offset": 0,
+                "order": 0,
+                "size": 1,
+                "type": 0
+            },
+            {
+                "amp": 0,
+                "desc": "枚举测试",
+                "dim": 1,
+                "mask": "0xff",
+                "name": "枚举测试14",
+                "offset": 1,
+                "order": 0,
+                "size": 1,
+                "type": 0
+            },
+            {
+                "amp": 0,
+                "desc": "布尔测试",
+                "dim": 1,
+                "mask": "0xff",
+                "name": "布尔测试15",
+                "offset": 2,
+                "order": 0,
+                "size": 1,
+                "type": 0
+            },
+            {
+                "amp": 0,
+                "desc": "描述",
+                "dim": 1,
+                "mask": "0xFF",
+                "name": "工程值0",
+                "offset": 3,
+                "order": 0,
+                "size": 1,
+                "type": 0
+            }
+        ]
+    },
+    {
+        "bus": 0,
+        "bus_type": "udp",
+        "desc": "Src: 多功能控制显示单元1,Dst: 无线电导航监视处理机",
+        "id": "15",
+        "name": "test2",
+        "values": [
+            {
+                "amp": 0,
+                "desc": "敌我识别应答机开关",
+                "dim": 1,
+                "mask": "0x1",
+                "max": 1,
+                "max_valve": 1,
+                "meaning": {
+                    "0": "关",
+                    "1": "开"
+                },
+                "min": 0,
+                "min_valve": 0,
+                "name": "敌我识别应答机开关2",
+                "offset": 0,
+                "order": 0,
+                "size": 1,
+                "type": 0
+            },
+            {
+                "amp": 0,
+                "desc": "布尔测试",
+                "dim": 1,
+                "mask": "0xff",
+                "meaning": {
+                },
+                "name": "布尔测试",
+                "offset": 1,
+                "order": 0,
+                "size": 1,
+                "type": 0
+            }
+        ]
+    },
+    {
+        "bus": 0,
+        "bus_type": "udp",
+        "id": "32",
+        "name": "载荷2",
+        "values": [
+            {
+                "amp": 0,
+                "desc": "描述",
+                "dim": 1,
+                "mask": "0xFFFFFFFF",
+                "name": "工程值0",
+                "offset": 4,
+                "order": 1,
+                "size": 4,
+                "type": 3
+            }
+        ]
+    },
+    {
+        "bus": 0,
+        "bus_type": "udp",
+        "id": "87",
+        "name": "test3",
+        "values": [
+            {
+                "amp": 0,
+                "desc": "描述",
+                "dim": 1,
+                "mask": "0xFFFFFFFF",
+                "name": "Double类型",
+                "offset": 0,
+                "order": 0,
+                "size": 4,
+                "type": 2
+            }
+        ]
+    },
+    {
+        "bus": 0,
+        "bus_type": "udp",
+        "id": "99",
+        "name": "载荷4",
+        "values": [
+            {
+                "amp": 0,
+                "desc": "描述",
+                "dim": 1,
+                "mask": "0xFFFFFFFF",
+                "name": "字符串",
+                "offset": 0,
+                "order": 0,
+                "size": 4,
+                "type": 3
+            },
+            {
+                "amp": 0,
+                "desc": "描述",
+                "dim": 1,
+                "mask": "0xFF",
+                "name": "整数",
+                "offset": 4,
+                "order": 0,
+                "size": 1,
+                "type": 0
+            },
+            {
+                "amp": 0,
+                "desc": "描述",
+                "dim": 1,
+                "mask": "0xFFFFFFFF",
+                "name": "Float类型",
+                "offset": 5,
+                "order": 0,
+                "size": 4,
+                "type": 1
+            },
+            {
+                "amp": 0,
+                "desc": "描述",
+                "dim": 1,
+                "mask": "0xFFFFFFFFFFFFFFFF",
+                "name": "Double类型0",
+                "offset": 9,
+                "order": 0,
+                "size": 8,
+                "type": 2
+            },
+            {
+                "amp": 0,
+                "desc": "描述",
+                "dim": 1,
+                "mask": "0xFFFF",
+                "name": "整数大端",
+                "offset": 17,
+                "order": 1,
+                "size": 2,
+                "type": 0
+            },
+            {
+                "amp": 0,
+                "desc": "描述",
+                "dim": 1,
+                "mask": "0xFFFF",
+                "name": "整数小端",
+                "offset": 19,
+                "order": 0,
+                "size": 2,
+                "type": 0
+            }
+        ]
+    },
+    {
+        "bus": 0,
+        "bus_type": "udp",
+        "id": "1",
+        "name": "设备载荷测试",
+        "values": [
+            {
+                "amp": 0,
+                "desc": "描述",
+                "dim": 1,
+                "mask": "0xFFFFFFFF",
+                "name": "工程值0",
+                "offset": 0,
+                "order": 0,
+                "size": 4,
+                "type": 0
+            },
+            {
+                "amp": 0,
+                "desc": "描述",
+                "dim": 1,
+                "mask": "0xFFFFFFFF",
+                "name": "工程值0",
+                "offset": 4,
+                "order": 0,
+                "size": 4,
+                "type": 0
+            }
+        ]
+    },
+    {
+        "bus": 0,
+        "bus_type": "udp",
+        "id": "565955",
+        "name": "载荷6",
+        "values": [
+            {
+                "amp": 0,
+                "desc": "描述",
+                "dim": 1,
+                "mask": "0xFFFFFFFF",
+                "name": "工程值0",
+                "offset": 0,
+                "order": 0,
+                "size": 4,
+                "type": 0
+            }
+        ]
+    }
+]
