@@ -65,7 +65,7 @@ ListView {
             onClicked: {
                 var info = {
                     "name": "载荷" + String(root.payloads.length),
-                    "id": "icd_" + String(generateId()),
+                    "id": generateId(),
                     "bus": 0,
                     "bus_type": "udp",
                     "values": []
@@ -158,15 +158,30 @@ ListView {
         }
     }
 
-    function savePayload( path ){
-        console.log("root.payloads---"+JSON.stringify(root.payloads))
-        Excutor.query({"command":"write",
-                           content:Excutor.formatJSON(JSON.stringify(root.payloads)),
-                           path:path})
-    }
-
     function savePayloadsInfo(path) {
-        console.log(JSON.stringify(payloads))
+        // 处理meaning
+        for (var i in payloads) {
+            var values = payloads[i].values
+            console.log("处理前, ", JSON.stringify(values))
+
+
+            for (var j in values) {
+                var resMean = {}
+                console.log("处理枚举, ", JSON.stringify(values[j].meaning))
+                var meanList = values[j].meaning
+                for (var k in meanList) {
+                    var name = meanList[k].enumname
+                    var data = meanList[k].enumdata
+                    resMean[name] = data
+                }
+
+                console.log("处理后, ", JSON.stringify(resMean))
+                payloads[i].values[j].meaning = resMean
+            }
+
+        }
+
+        console.log("保存ICD", JSON.stringify(payloads))
         Excutor.query({"command": "write",
                           content: Excutor.formatJSON(JSON.stringify(payloads)),
                           path: path})

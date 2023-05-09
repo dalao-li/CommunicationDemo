@@ -15,7 +15,9 @@ Item {
 
     AwesomeIcon {
         id: add
-        anchors.verticalCenter: parent.verticalCenter
+        anchors {
+            verticalCenter: parent.verticalCenter
+        }
         size: 20
         name: "plus"
         color: "black"
@@ -23,7 +25,6 @@ Item {
         MouseArea {
             anchors.fill: parent
             onClicked: {
-                //console.log("-------index11--------")
                 root.clicked(-1)
             }
         }

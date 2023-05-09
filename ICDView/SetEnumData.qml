@@ -199,6 +199,7 @@ Window {
     function setEunmInfos(enumInfos) {
         //将已经保存的枚举值重新输入子界面
         for (var i = 0; i < enumInfos.length; i++) {
+            console.log("将已经保存的枚举值重新输入子界面", enumInfos[i])
             table.model.insert(i, enumInfos[i])
         }
     }
@@ -216,7 +217,7 @@ Window {
             break
         case 1:
             //enumdata
-            enuminfo.enumdata = Number(value)
+            enuminfo.enumdata = value
             table.model.setProperty(index, "enumdata", value)
             break
         }

@@ -22,7 +22,6 @@ Window {
     signal enumSave
 
     Item {
-        //        id:root
         anchors {
             fill: parent
         }
@@ -103,7 +102,6 @@ Window {
                     property var validColumn: styleData.column === 0 || styleData.column === 1 || styleData.column === 2 || styleData.column === 3
 
                     visible: validColumn
-                    // text: styleData.column === 0  ? "名称" : "数值"
 
                     text: styleData.value
 
@@ -124,7 +122,7 @@ Window {
                 visible: true
                 role: "value"
                 title: "取值"
-                width: 350
+                width: 200
             }
 
             TableViewColumn {
@@ -132,7 +130,7 @@ Window {
                 visible: true
                 role: "showInfo"
                 title: "信息"
-                width: 350
+                width: 200
             }
 
             TableViewColumn {
@@ -140,7 +138,7 @@ Window {
                 visible: true
                 role: "icon"
                 title: "图标"
-                width: 350
+                width: 200
             }
 
             TableViewColumn {
@@ -148,7 +146,7 @@ Window {
                 visible: true
                 role: "color"
                 title: "颜色"
-                width: 350
+                width: 200
             }
 
             model: ListModel {
@@ -205,12 +203,13 @@ Window {
     function addEnum(row) //添加枚举值
     {
         var info = {
-            "enumname": "",
-            "enumdata": ""
+            "value": "",
+            "showinfo": "",
+            "icon": "",
+            "color": ""
         }
         root.enumInfos.push(info)
         table.model.insert(row + 1, info)
-        //root.itemChanged()
     }
 
     function setEunmInfos(enumInfos) {
@@ -227,16 +226,26 @@ Window {
         var enuminfo = root.enumInfos[index]
         switch (column) {
         case 0:
-            //enumname
-            enuminfo.enumname = value
-            table.model.setProperty(index, "enumname", value)
+            // value
+            enuminfo.value = value
+            table.model.setProperty(index, "value", value)
             break
         case 1:
-            //enumdata
-            enuminfo.enumdata = Number(value)
-            table.model.setProperty(index, "enumdata", value)
+            // showinfo
+            enuminfo.showinfo = value
+            table.model.setProperty(index, "showinfo", value)
+            break
+
+        case 2:
+            enuminfo.icon = value
+            table.model.setProperty(index, "icon", value)
+            break
+        case 3:
+            enuminfo.color = value
+            table.model.setProperty(index, "color", value)
             break
         }
+
         //        root.itemChanged()
     }
 }

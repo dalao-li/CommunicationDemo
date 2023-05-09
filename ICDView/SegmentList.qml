@@ -216,8 +216,9 @@ Item {
                         win.show()
                         win.rootPage = root
 
-                        if (segments[styleData.row].meaning !== "") {
+                        if (segments[styleData.row].meaning) {
                             //存在枚举值
+                            console.log("存在枚举", JSON.stringify(segments[styleData.row].meaning))
                             win.setEunmInfos(segments[styleData.row].meaning)
                         }
                     }
@@ -468,14 +469,8 @@ Item {
 
     function getEnumdata(meaning) {
         // 修改枚举JSON值为 {枚举值:枚举名}
-        var res = {}
-        for(var i in meaning) {
-            console.log(meaning[i].enumdata, meaning[i].enumname )
-            res[meaning[i].enumdata.toString()] = meaning[i].enumname
-        }
-        segments[table.currentRow].meaning = res
-        // console.log(JSON.stringify(res))
-        // console.log("====================="+JSON.stringify(segments[table.currentRow].meaning))
+        console.log("保存枚举", JSON.stringify(meaning))
+        segments[table.currentRow].meaning = meaning
     }
 
     // 加载列表数据

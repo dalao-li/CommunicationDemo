@@ -86,7 +86,7 @@ Item {
                     if (validColumn) {
                         return styleData.value
                     }
-                    return ""
+                    return qsTr("")
                 }
 
                 horizontalAlignment: Text.AlignHCenter
@@ -119,8 +119,6 @@ Item {
                     if (!visible) {
                         return
                     }
-
-                    // console.log(">>>>>>>>>", mainWindow.gICDInfoList[currentIndex].icd_id)
                     root.setValue(styleData.row, styleData.column, mainWindow.gICDInfoList[currentIndex].icd_id)
                 }
             }
@@ -169,14 +167,15 @@ Item {
 
                 onClicked: {
                     var component = Qt.createComponent("DeviceStatusEnumData.qml")
-                    console.debug("Error:"+ component.errorString() );
+                    //console.debug("Error:"+ component.errorString() );
                     if (component.status === Component.Ready) {
                         var win = component.createObject()
                         win.show()
                         win.rootPage = root
 
-                        if (segments[styleData.row].status_list !== "") {
+                        if (segments[styleData.row].status_list) {
                             //存在枚举值
+                            console.log("存在枚举", JSON.stringify(segments[styleData.row].status_list))
                             win.setEunmInfos(segments[styleData.row].status_list)
                         }
                     }
@@ -354,13 +353,7 @@ Item {
     }
 
     function getEnumdata(meaning) {
-        // 修改枚举JSON值为 {枚举值:枚举名}
-        var res = {}
-        for(var i in meaning) {
-            console.log(meaning[i].enumdata, meaning[i].enumname )
-            res[meaning[i].enumdata.toString()] = meaning[i].enumname
-        }
-        segments[table.currentRow].status_list = res
+        segments[table.currentRow].status_list = meaning
     }
 
     // 加载列表数据
