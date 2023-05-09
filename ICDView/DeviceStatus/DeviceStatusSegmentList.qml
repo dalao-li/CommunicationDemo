@@ -169,15 +169,16 @@ Item {
 
                 onClicked: {
                     var component = Qt.createComponent("DeviceStatusEnumData.qml")
+                    console.debug("Error:"+ component.errorString() );
                     if (component.status === Component.Ready) {
                         var win = component.createObject()
                         win.show()
                         win.rootPage = root
 
-//                        if (segments[styleData.row].status_list !== "") {
-//                            // 存在枚举值
-//                            win.setEunmInfos(segments[styleData.row].status_list)
-//                        }
+                        if (segments[styleData.row].status_list !== "") {
+                            //存在枚举值
+                            win.setEunmInfos(segments[styleData.row].status_list)
+                        }
                     }
                 }
             }
@@ -359,7 +360,7 @@ Item {
             console.log(meaning[i].enumdata, meaning[i].enumname )
             res[meaning[i].enumdata.toString()] = meaning[i].enumname
         }
-        segments[table.currentRow].meaning = res
+        segments[table.currentRow].status_list = res
     }
 
     // 加载列表数据

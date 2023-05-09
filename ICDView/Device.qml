@@ -57,23 +57,51 @@ ColumnLayout {
                     }
 
                     var d = {}
-
                     if (["control_type", "bus_type"].includes(id)) {
                         d[id] = Number(value)
                     }
                     if (id === "icd_info") {
-                        if (value["opeator"] === "add") {
-                            var addValue = []
-                            if (value["type"] === "input") {
-                                addValue = deviceList.model[deviceList.currentIndex].input_icd
-                                addValue.push(value["icd_id"])
+                        var v = JSON.parse(value)
+                        var addValue = []
+                        if (v["opeator"] === "add") {
+
+                            if (v["type"] === "input") {
+                                addValue = root.devices[deviceList.currentIndex].input_icd
+
+                                addValue.push(v["icd_id"])
                                 d["input_icd"] = addValue
+                                console.log("======================>", d["input_icd"])
                             }
 
-                            if (value["type"] === "ouput") {
-                                addValue = deviceList.model[deviceList.currentIndex].ouput_icd
-                                addValue.push(value["icd_id"])
+                            if (v["type"] === "ouput") {
+                                addValue = root.devices[deviceList.currentIndex].input_icd
+                                addValue.push(v["icd_id"])
                                 d["ouput_icd"] = addValue
+                            }
+                        }
+
+                        if (v["opeator"] === "del") {
+                            var newList = []
+                            if (v["type"] === "input") {
+                                addValue = root.devices[deviceList.currentIndex].input_icd
+                                for (var i = 0; i < addValue.length; ++i) {
+                                    if (addValue[i] !== v["icd_id"]) {
+                                        newList.push(addValue[i])
+                                    }
+                                }
+
+                                d["input_icd"] = newList
+                            }
+
+                            if (v["type"] === "ouput") {
+                                addValue = root.devices[deviceList.currentIndex].input_icd
+                                for (var i = 0; i < addValue.length; ++i) {
+                                    if (addValue[i] !== v["icd_id"]) {
+                                        newList.push(addValue[i])
+                                    }
+                                }
+
+                                d["ouput_icd"] = newList
                             }
                         }
                     }
@@ -90,6 +118,7 @@ ColumnLayout {
 
     // 获取产品
     function getDevice(index) {
+        console.log("----------->", JSON.stringify(root.devices[index]))
         return root.devices[index]
     }
 }

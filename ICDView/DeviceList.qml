@@ -279,6 +279,28 @@ ListView {
 
         devicesJSON["monitor_device_type"] = dataList
 
+        var res = {}
+        // 增加设置ICD信息
+        for (var j in data) {
+            var device_id = data[j].device_id
+            var inputICDList = data[j].input_icd
+            var ouputICDList = data[j].ouput_icd
+
+            var deviceICD = []
+            // 处理input icd
+            for (var a in inputICDList) {
+                deviceICD.push({"icd_id": inputICDList[a], "type": "input"})
+            }
+            for (var b in ouputICDList) {
+                deviceICD.push({"icd_id": inputICDList[b], "type": "ouput"})
+            }
+            res[device_id] = deviceICD
+        }
+
+        console.log("------------->", JSON.stringify(res))
+
+        devicesJSON["DeviceICDList"] = res
+
         Excutor.query({"command": "write",
                           content: Excutor.formatJSON(JSON.stringify(devicesJSON)),
                           path: path})

@@ -19,6 +19,7 @@ Item {
     property var _INPUT_ICD_NAME_COLUMN: 1
     property var _OUPUT_ICD_COLUMN: 2
     property var _OUPUT_ICD_NAME_COLUMN: 3
+    property var _ICD_ID_COLUMN: 4
 
     // 标题
     Rectangle {
@@ -279,7 +280,7 @@ Item {
                     margins: 1
                 }
 
-                property var validColumn: [_INPUT_ICD_NAME_COLUMN, _OUPUT_ICD_NAME_COLUMN].includes(styleData.column)
+                property var validColumn: [_INPUT_ICD_NAME_COLUMN, _OUPUT_ICD_NAME_COLUMN, _ICD_ID_COLUMN].includes(styleData.column)
 
                 visible: validColumn
 
@@ -311,18 +312,42 @@ Item {
                     console.log("行:", styleData.row, "列:", styleData.column, "check", checked)
                     if (root.device) {
                         // 如果是勾选
+                        var icdID = mainWindow.gICDInfoList[styleData.row].icd_id
                         if (checked) {
                             // 判断是input 还是 ouput
+
                             if (styleData.column === _INPUT_ICD_COLUMN) {
-                                root.device.input_icd.push(table.model[styleData.row].inputICD)
-                                root.itemChanged("icd_info", {"opeator": "add", "type":"input", "icd_id": table.model[styleData.row].inputICD})
+                                root.device.input_icd.push(icdID)
+                                root.itemChanged("icd_info", JSON.stringify({"opeator": "add", "type": "input", "icd_id": icdID}))
                             }
 
                             if (styleData.column === _OUPUT_ICD_COLUMN) {
-                                root.device.input_icd.push(table.model[styleData.row].ouputICD)
-                                root.itemChanged("icd_info", {"opeator": "add", "type":"ouput", "icd_id": table.model[styleData.row].ouputICD})
+                                root.device.ouput_icd.push(icdID)
+                                root.itemChanged("icd_info", JSON.stringify({"opeator": "add", "type": "ouput", "icd_id": icdID}))
+                            }
+                        }
+
+                        if (!checked) {
+                            var newList = []
+                            if (styleData.column === _INPUT_ICD_COLUMN) {
+                                for (var i = 0; i < root.device.input_icd.length; ++i) {
+                                    if (root.device.input_icd[i] !== icdID) {
+                                        newList.push(root.device.input_icd[i])
+                                    }
+                                }
+                                root.device.input_icd = newList
+                                root.itemChanged("icd_info", JSON.stringify({"opeator": "del", "type": "input", "icd_id": icdID}))
                             }
 
+                            if (styleData.column === _OUPUT_ICD_COLUMN) {
+                                for (var i = 0; i < root.device.ouput_icd.length; ++i) {
+                                    if (root.device.input_icd[i] !== icdID) {
+                                        newList.push(root.device.ouput_icd[i])
+                                    }
+                                }
+                                root.device.ouput_icd = newList
+                                root.itemChanged("icd_info", JSON.stringify({"opeator": "del", "type": "ouput", "icd_id": icdID}))
+                            }
                         }
                     }
                 }
@@ -362,18 +387,10 @@ Item {
         }
 
         TableViewColumn {
-            id: input
-            visible: false
-            role: "inputICD"
-            title: "输入选择"
-            width: 160
-        }
-
-        TableViewColumn {
-            id: ouput
-            visible: false
-            role: "ouputICD"
-            title: "ICD名称"
+            id: icdValue
+            visible: table.columsVisible[4]
+            role: "icdValue"
+            title: "ICD id"
             width: 80
         }
 
@@ -432,13 +449,12 @@ Item {
         for (var i in mainWindow.gICDInfoList) {
             // console.log("---------->", JSON.stringify(mainWindow.gICDInfoList[i]))
             table.model.append({
-                                   // "isInput": false,
+                                   "isInput": false,
                                    "inputICDName": mainWindow.gICDInfoList[i].name,
-                                   // "isOuput": false,
+                                   "isOuput": false,
                                    "ouputICDName": mainWindow.gICDInfoList[i].name,
 
-                                   "inputICD": mainWindow.gICDInfoList[i].icd_icd,
-                                   "ouputICD": mainWindow.gICDInfoList[i].icd_icd
+                                   "icdValue": mainWindow.gICDInfoList[i].icd_id,
                                })
         }
     }

@@ -1,8 +1,8 @@
 import QtQuick 2.5
 import DesktopControls 0.1
 import QtQuick.Dialogs 1.2
-
 import "../"
+
 
 ListView {
     property var status : []
@@ -12,6 +12,22 @@ ListView {
     implicitWidth: 200
 
     model: ListModel {}
+
+    // 另存为文件
+    FileDialog {
+        id: newfileDialog
+        title: "Please choose a file"
+
+        selectExisting: false
+        nameFilters: ["json files (*.json)", "All files (*)"]
+        onAccepted: {
+            var path = String(newfileDialog.fileUrls).substring(8)
+            saveDeviceInfo(path)
+        }
+        onRejected: {
+            console.log("Canceled")
+        }
+    }
 
     // 表头部分
     header: Rectangle {
@@ -143,5 +159,18 @@ ListView {
 
     function generateTypeID() {
         return root.status.length + 1
+    }
+
+    function saveDeviceInfo(path) {
+        var data = root.status
+        var dataList = []
+        // 处理JSON
+        for (var i in data) {
+            dataList.push(data[i])
+        }
+
+        Excutor.query({"command": "write",
+                          content: Excutor.formatJSON(JSON.stringify(dataList)),
+                          path: path})
     }
 }

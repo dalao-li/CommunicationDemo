@@ -4,6 +4,7 @@ import QtQuick.Window 2.0
 import QtQuick.Layouts 1.1
 import QtQuick.Controls 1.4
 import DesktopControls 0.1 as Desktop
+import "../"
 
 Window {
     id: root
@@ -99,7 +100,7 @@ Window {
                         margins: 1
                     }
 
-                    property var validColumn: styleData.column === 0 || styleData.column === 1
+                    property var validColumn: styleData.column === 0 || styleData.column === 1 || styleData.column === 2 || styleData.column === 3
 
                     visible: validColumn
                     // text: styleData.column === 0  ? "名称" : "数值"
