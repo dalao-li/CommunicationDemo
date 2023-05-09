@@ -9,7 +9,8 @@ Item {
     id: root
 
     property var segments: []
-    property var __deviceID
+    property var canUseICD : []
+    property var _deviceID
 
     signal itemChanged(string id, string value)
 
@@ -121,34 +122,22 @@ Item {
                     if (!visible) {
                         return
                     }
-                    root.setValue(styleData.row, styleData.column, mainWindow.gICDInfoList[currentIndex].icd_id)
+                    console.log("注意", styleData.value)
+                    root.setValue(styleData.row, styleData.column, String(gICDInfoList[currentIndex].icd_id))
                 }
-            }
 
-            Binding {
-                target: typeBox
-                property: "model"
-                value: {
-                    // 获取device_id下的input_icd
-                    var icdIDRes = []
-                    for (var i in mainWindow.gDeviceInfoAndICD) {
-                        if (mainWindow.gDeviceInfoAndICD[i].id === __deviceID) {
-                            icdIDRes =  mainWindow.gDeviceInfoAndICD[i].input_icd
-                            break
-                        }
-                    }
-
-                    // 将input_icd转换为icd名称
+                model: {
                     var icdNameList = []
-                    for (var i in icdIDRes) {
+                    for (var i in canUseICD) {
                         for (var j in gICDInfoList) {
-                            if (icdIDRes[i] === gICDInfoList[j].icd_id) {
+                            if (String(canUseICD[i]) === String(gICDInfoList[j].icd_id)) {
+
                                 icdNameList.push(gICDInfoList[j])
                                 break
                             }
                         }
                     }
-                    console.log("当前可选ICD", JSON.stringify(icdNameList))
+                    // console.log("当前可选ICD", JSON.stringify(icdNameList))
                     return icdNameList
                 }
             }
@@ -191,7 +180,7 @@ Item {
 
                 onClicked: {
                     var component = Qt.createComponent("DeviceStatusEnumData.qml")
-                    //console.debug("Error:"+ component.errorString() );
+                    // console.debug("Error:"+ component.errorString() );
                     if (component.status === Component.Ready) {
                         var win = component.createObject()
                         win.show()
@@ -382,8 +371,18 @@ Item {
 
     // 加载列表数据
     function load(values) {
-        __deviceID = values.device_id
-        console.log("加载DeviceStatusSegment数据,", JSON.stringify(values))
+        _deviceID = values.device_id
+        for (var i = 0; i < mainWindow.gDeviceInfoAndICD.length; ++i) {
+            if (values.device_id === mainWindow.gDeviceInfoAndICD[i].id) {
+                canUseICD = mainWindow.gDeviceInfoAndICD[i].input_icd
+                //idList.currentIndex = i
+                break
+            }
+        }
+
+        console.log("加载DeviceStatusSegment数据,", JSON.stringify(values), "可选ICD", canUseICD)
+
+
         batchAdd.enabled = true
 
         table.model.clear()
@@ -393,7 +392,7 @@ Item {
         for (var i in segments) {
             table.model.append({
                                    "type_id": segments[i].type_id,
-                                   "bind_icd": String(segments[i].bind_icd),
+                                   "bind_icd": segments[i].bind_icd,
                                    "field_index": segments[i].field_index,
                                    "type": segments[i].type,
                                    "type_name": segments[i].type_name,
@@ -419,7 +418,7 @@ Item {
         case __BIND_ICD_COLUMN:
             segment.bind_icd = value
             console.log("bind_icd修改为", value)
-            table.model.setProperty(index, "bind_icd", value)
+            table.model.setProperty(index, "bind_icd", String(value))
             break
         case __FIELD_INDEX_COLUMN:
             segment.field_index = value

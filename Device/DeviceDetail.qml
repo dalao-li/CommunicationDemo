@@ -338,7 +338,6 @@ Item {
                             root.device.input_icd.push(line.icdValue)
                             // console.log("发送修改信号")
                             root.itemChanged("icd_info", JSON.stringify({"opeator": "add", "type": "input", "icd_id": line.icdValue}))
-                            return
                         }
 
                         else {
@@ -353,13 +352,15 @@ Item {
                         }
 
                         // 修改gDeviceInfoAndICD中的值
-                        for (var j in mainWindow.gDeviceInfoAndICD) {
-                            if (mainWindow.gDeviceInfoAndICD[j].id === root.device.device_id) {
+                        // console.log("原始gDeviceInfoAndICD", JSON.stringify(gDeviceInfoAndICD))
+                        for (var j in gDeviceInfoAndICD) {
+                            if (gDeviceInfoAndICD[j].id === root.device.device_id) {
                                 console.log("发出信号")
-                                mainWindow.gDeviceInfoAndICD[j].input_icd = root.device.input_icd
+                                gDeviceInfoAndICD[j].input_icd = root.device.input_icd
                                 break
                             }
                         }
+                        // console.log("修改后gDeviceInfoAndICD", JSON.stringify(gDeviceInfoAndICD))
                     }
                 }
             }

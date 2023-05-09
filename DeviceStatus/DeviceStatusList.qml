@@ -48,9 +48,7 @@ ListView {
             MouseArea {
                 anchors.fill: parent
                 onClicked: {
-                    //var full = Excutor.query({"apppath": ""})+"/config/icd.payloads"
                     newfileDialog.open()
-                    //root.savePayload(path)
                 }
             }
         }
@@ -86,12 +84,9 @@ ListView {
 
     highlight: Rectangle {
         id: rowDelegate
-
         color: Qt.darker(Theme.current.accent, 1.5)
-
         Row {
             spacing: 3
-
             anchors {
                 right: parent.right
                 rightMargin: 10
@@ -120,38 +115,13 @@ ListView {
             // 实现高亮效果
             mouse.accepted = false
             var index = root.indexAt(mouse.x, mouse.y - headerItem.height)
-            if( index > -1 ) {
+            if(index > -1) {
                 root.currentIndex = index
             }
         }
         onReleased: mouse.accepted = false
         onDoubleClicked: mouse.accepted = false
         onPressAndHold: mouse.accepted = false
-    }
-
-    // 用于生成ID
-    function contains(id) {
-        for (var i = 0; i < root.status.length; ++i) {
-            if (root.status[i].type_id === id) {
-                return true
-            }
-
-            return false
-        }
-    }
-
-    // 生成ID
-    function generateId() {
-        var i = root.status.length
-        while(i++) {
-            if (!contains(i)) {
-                return i
-            }
-        }
-    }
-
-    function generateTypeID() {
-        return root.status.length + 1
     }
 
     // 导出

@@ -15,7 +15,6 @@ ColumnLayout {
 
         // 侧边栏
         Rectangle {
-            // 水平布局, 设置组件宽度
             implicitWidth: 200
             Layout.fillHeight: true
             color: "#f0f0f0"
@@ -31,9 +30,8 @@ ColumnLayout {
                     if (deviceStatusList.currentIndex < 0) {
                         return
                     }
-                    // 获取侧边栏对应索引的数据
-                    var s = getStatusValue(deviceStatusList.currentIndex)
 
+                    var s = root.status[deviceStatusList.currentIndex]
                     deviceStatusDetail.load(s)
                     deviceStatusSegment.load(s)
                 }
@@ -70,7 +68,6 @@ ColumnLayout {
 
                     if (id === "device_id") {
                         d["device_id"] = value
-                        console.log("修改id信号接受,", value)
                     }
                     deviceStatusList.model.set(deviceStatusList.currentIndex, d)
                 }
@@ -87,9 +84,5 @@ ColumnLayout {
                 }
             }
         }
-    }
-
-    function getStatusValue(index) {
-        return root.status[index]
     }
 }

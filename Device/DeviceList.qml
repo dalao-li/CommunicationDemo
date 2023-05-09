@@ -95,7 +95,7 @@ ListView {
 
                 root.model.append(info)
 
-                console.log("add DeviceList 数据", JSON.stringify(root.devices))
+               //  console.log("add DeviceList 数据", JSON.stringify(root.devices))
                 mainWindow.gDeviceInfoAndICD.push({"type": info.type, "id": info.device_id, "input_icd":[]})
             }
 

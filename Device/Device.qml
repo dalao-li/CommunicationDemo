@@ -70,7 +70,7 @@ ColumnLayout {
                         var v = JSON.parse(value)
 
                         if (v["type"] === "input") {
-                            console.log("....", root.devices[deviceList.currentIndex].input_icd)
+                            // console.log("....", root.devices[deviceList.currentIndex].input_icd)
                             d["input_icd"] = root.devices[deviceList.currentIndex].input_icd
                             // console.log("传递过来, ", JSON.stringify(d["input_icd"]))
 

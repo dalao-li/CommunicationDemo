@@ -6,10 +6,9 @@ Item {
     id: root
 
     property int defaultHeight: 60
+    property var statusDetailValue
 
     height: defaultHeight
-
-    property var statusDetailValue
 
     // 修改信号
     signal itemChanged(string id, string value)
@@ -130,15 +129,18 @@ Item {
 
 
     function load(value) {
-        console.log("DeviceStatusDetail 加载数据", JSON.stringify(value))
-        statusDetailValue = value
-
+        var canUseICD = []
         for (var i = 0; i < mainWindow.gDeviceInfoAndICD.length; ++i) {
             if (value.device_id === mainWindow.gDeviceInfoAndICD[i].id) {
+                // console.log("切换选项卡", JSON.stringify(mainWindow.gDeviceInfoAndICD[i]))
+                canUseICD = mainWindow.gDeviceInfoAndICD[i].input_icd
                 idList.currentIndex = i
                 break
             }
         }
+
+        console.log("DeviceStatusDetail 加载数据", JSON.stringify(value), " 可选ICD", canUseICD)
+        statusDetailValue = value
 
         typeName.text = value.type_name
         descTextField.text = value.desc

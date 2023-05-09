@@ -4,7 +4,7 @@ import QtQuick.Window 2.0
 import QtQuick.Layouts 1.1
 import QtQuick.Controls 1.4
 import DesktopControls 0.1 as Desktop
-import "../"
+import "../Button"
 
 Window {
     id: root
