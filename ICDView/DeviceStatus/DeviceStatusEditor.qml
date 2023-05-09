@@ -35,7 +35,7 @@ ColumnLayout {
                     var s = getStatusValue(deviceStatusList.currentIndex)
 
                     deviceStatusDetail.load(s)
-                    deviceStatusSegment.load(s.monitor_status)
+                    deviceStatusSegment.load(s)
                 }
             } // DeviceStatusList end
         }
@@ -59,21 +59,20 @@ ColumnLayout {
                         return
                     }
 
+                    var d = {}
                     if (id === "type_name") {
-                        deviceStatusList.model.set(deviceStatusList.currentIndex, {"type_name": value})
+                        d["type_name"] = value
                     }
 
                     if (id === "desc") {
-                        deviceStatusList.model.set(deviceStatusList.currentIndex, {"desc": value})
+                        d["desc"] = value
                     }
 
-                    if (id === "device") {
-                        // var deviceValue = deviceIDComboxValue[Number(value)]
-                        // console.log("----->", JSON.stringify(deviceValue))
-                        deviceStatusList.model.set(deviceStatusList.currentIndex, {"device": value})
-
-                        console.log("->", JSON.stringify(deviceStatusList))
+                    if (id === "device_id") {
+                        d["device_id"] = value
+                        console.log("修改id信号接受,", value)
                     }
+                    deviceStatusList.model.set(deviceStatusList.currentIndex, d)
                 }
             }
 

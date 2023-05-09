@@ -114,9 +114,7 @@ ListView {
                     // 将信息添加入model
                     root.model.append(info)
 
-                    mainWindow.deviceIDComboxValue.push({"type": info.type, "device_id": info.device_id})
-
-                    console.log("add", JSON.stringify(mainWindow.deviceIDComboxValue))
+                    mainWindow.gDeviceInfoAndICD.push({"type": info.type, "id": info.device_id, "input_icd":[]})
                 }
             }
         } // BatchAddButton end
@@ -161,7 +159,7 @@ ListView {
                     root.devices.splice(root.currentIndex, 1)
                     root.model.remove(root.currentIndex, 1)
 
-                    mainWindow.deviceIDComboxValue.splice(root.currentIndex, 1)
+                    mainWindow.gDeviceInfoAndICD.splice(root.currentIndex, 1)
                 }
             }
         }
@@ -240,7 +238,7 @@ ListView {
             }
 
             // 将设备名与id写入全局device列表
-            mainWindow.deviceIDComboxValue.push({"type": data[i].type, "id": data[i].device_id})
+            mainWindow.gDeviceInfoAndICD.push({"type": data[i].type, "id": data[i].device_id, "input_icd": []})
 
             root.devices.push(info)
             // 将信息添加入model

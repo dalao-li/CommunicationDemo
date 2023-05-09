@@ -1,7 +1,6 @@
 import QtQuick 2.5
 import QtQuick.Controls 1.4
 import QtQuick.Dialogs 1.2
-
 import Qt.labs.settings 1.0
 import DesktopControls 0.1 as Desktop
 
@@ -81,6 +80,14 @@ Item {
                 if (root.device) {
                     root.device.type = text
                     root.itemChanged("type", text)
+
+                    // 修改gDeviceInfoAndICD中的值
+                    for (var i in mainWindow.gDeviceInfoAndICD) {
+                        if (mainWindow.gDeviceInfoAndICD[i].id === root.device.device_id) {
+                            mainWindow.gDeviceInfoAndICD[i].type = text
+                            break
+                        }
+                    }
                 }
             }
         }
@@ -94,7 +101,21 @@ Item {
             id: deviceID
             width: 300
             height: 25
-            // enabled: false
+            onTextChanged: {
+                if (root.device) {
+
+                    // 修改gDeviceInfoAndICD中的值
+                    for (var i in mainWindow.gDeviceInfoAndICD) {
+                        if (mainWindow.gDeviceInfoAndICD[i].id === root.device.device_id) {
+                            mainWindow.gDeviceInfoAndICD[i].id = text
+                            break
+                        }
+                    }
+
+                    root.device.device_id = text
+                    root.itemChanged("device_id", text)
+                }
+            }
 
         }
 
@@ -303,14 +324,8 @@ Item {
                 }
 
                 checked: {
-                    var nowICDId = table.model.get(styleData.row).icdValue
-
-                    for (var i in device) {
-                        if (device[i].input_icd === nowICDId) {
-                            return true
-                        }
-                        return false
-                    }
+                    //console.log("输入选择," ,table.model.get(styleData.row).isOuputCheck)
+                    return table.model.get(styleData.row).isInputCheck
                 }
 
                 property var validColumn: [_INPUT_ICD_COLUMN].includes(styleData.column)
@@ -318,8 +333,6 @@ Item {
                 visible: validColumn
 
                 onCheckedChanged: {
-                    console.log("click, ", JSON.stringify(table.model.get(styleData.row)))
-                    console.log("行:", styleData.row, "列:", styleData.column, "check", checked)
                     if (root.device) {
                         // 如果是勾选
                         var icdID = table.model.get(styleData.row).icdValue
@@ -338,6 +351,14 @@ Item {
                             root.device.input_icd = newList
                             root.itemChanged("icd_info", JSON.stringify({"opeator": "del", "type": "input", "icd_id": icdID}))
                         }
+
+                        // 修改gDeviceInfoAndICD中的值
+                        for (var i in mainWindow.gDeviceInfoAndICD) {
+                            if (mainWindow.gDeviceInfoAndICD[i].id === root.device.device_id) {
+                                mainWindow.gDeviceInfoAndICD[i].input_icd = root.device.input_icd
+                                break
+                            }
+                        }
                     }
                 }
             }
@@ -354,13 +375,8 @@ Item {
                 visible: validColumn
 
                 checked: {
-                    var nowICDId = table.model.get(styleData.row).icdValue
-                    for (var i in device) {
-                        if (device[i].ouput_icd === nowICDId) {
-                            return true
-                        }
-                        return false
-                    }
+                    //console.log("输出选择," ,table.model.get(styleData.row).isOuputCheck)
+                    return table.model.get(styleData.row).isOuputCheck
                 }
 
                 onCheckedChanged: {
@@ -455,17 +471,11 @@ Item {
                 border.color: Desktop.Theme.current.section
             }
         } // end of rowDelegate
-
-
-        //        Binding {
-        //            target: table
-        //            property: "model"
-        //            value: mainWindow.gICDInfoList
         //        }
     } // end of TableView
 
     function load(value) {
-        console.log("===>", JSON.stringify(value))
+        // console.log("===>", JSON.stringify(value))
         device = value
 
         type.text = value.type
@@ -482,27 +492,28 @@ Item {
 
         table.model.clear()
         for (var i in mainWindow.gICDInfoList) {
-
+            var nowLineICDId = mainWindow.gICDInfoList[i].icd_id
+            var nowLineICDName = mainWindow.gICDInfoList[i].name
             var d = {
-                "aaa": (()=> {
+                "isInputCheck": (()=> {
                                    for (var j in value.input_icd) {
-                                       if (value.input_icd[j] === mainWindow.gICDInfoList[i].icd_id) {
+                                       if (value.input_icd[j] === nowLineICDId) {
                                            return true
                                        }
                                    }
                                    return false
                                })(),
-                "inputICDName": mainWindow.gICDInfoList[i].name,
-                "bbb": (()=> {
+                "inputICDName": nowLineICDName,
+                "isOuputCheck": (()=> {
                                    for (var j in value.ouput_icd) {
-                                       if (value.ouput_icd[j] === mainWindow.gICDInfoList[i].icd_id) {
+                                       if (value.ouput_icd[j] === nowLineICDId) {
                                            return true
                                        }
                                    }
                                    return false
                                })(),
-                "ouputICDName": mainWindow.gICDInfoList[i].name,
-                "icdValue": mainWindow.gICDInfoList[i].icd_id,
+                "ouputICDName": nowLineICDName,
+                "icdValue": nowLineICDId,
             }
             table.model.append(d)
         }

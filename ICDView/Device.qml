@@ -64,44 +64,27 @@ ColumnLayout {
                         var v = JSON.parse(value)
                         var addValue = []
                         if (v["opeator"] === "add") {
-
                             if (v["type"] === "input") {
                                 addValue = root.devices[deviceList.currentIndex].input_icd
-
-                                addValue.push(v["icd_id"])
                                 d["input_icd"] = addValue
-                                console.log("======================>", d["input_icd"])
                             }
 
                             if (v["type"] === "ouput") {
-                                addValue = root.devices[deviceList.currentIndex].input_icd
-                                addValue.push(v["icd_id"])
+                                addValue = root.devices[deviceList.currentIndex].ouput_icd
+                               // addValue.push(v["icd_id"])
                                 d["ouput_icd"] = addValue
                             }
                         }
 
                         if (v["opeator"] === "del") {
-                            var newList = []
                             if (v["type"] === "input") {
                                 addValue = root.devices[deviceList.currentIndex].input_icd
-                                for (var i = 0; i < addValue.length; ++i) {
-                                    if (addValue[i] !== v["icd_id"]) {
-                                        newList.push(addValue[i])
-                                    }
-                                }
-
-                                d["input_icd"] = newList
+                                d["input_icd"] = addValue
                             }
 
                             if (v["type"] === "ouput") {
-                                addValue = root.devices[deviceList.currentIndex].input_icd
-                                for (var i = 0; i < addValue.length; ++i) {
-                                    if (addValue[i] !== v["icd_id"]) {
-                                        newList.push(addValue[i])
-                                    }
-                                }
-
-                                d["ouput_icd"] = newList
+                                addValue = root.devices[deviceList.currentIndex].ouput_icd
+                                d["ouput_icd"] = addValue
                             }
                         }
                     }
@@ -118,7 +101,7 @@ ColumnLayout {
 
     // 获取产品
     function getDevice(index) {
-        console.log("----------->", JSON.stringify(root.devices[index]))
+        // console.log("----------->", JSON.stringify(root.devices[index]))
         return root.devices[index]
     }
 }

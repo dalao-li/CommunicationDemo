@@ -76,11 +76,10 @@ Item {
 
             onCurrentIndexChanged: {
                 if (root.statusDetailValue) {
-                    // console.log(">>>", JSON.stringify(mainWindow.deviceIDComboxValue))
-                    var _type = mainWindow.deviceIDComboxValue[currentIndex].type
-                    var _id =  mainWindow.deviceIDComboxValue[currentIndex].id
-                    // console.log(">", _type, _id)
-                    root.itemChanged("device", {"type": _type, "id": _id})
+                    var _id =  mainWindow.gDeviceInfoAndICD[currentIndex].id
+                    root.statusDetailValue.device_id = _id
+                    // console.log("修改信号发送", _id)
+                    root.itemChanged("device_id", _id)
                 }
             }
         }
@@ -88,7 +87,7 @@ Item {
         Binding {
             target: idList
             property: "model"
-            value: mainWindow.deviceIDComboxValue
+            value: mainWindow.gDeviceInfoAndICD
         }
 
         Label {
@@ -131,17 +130,15 @@ Item {
 
 
     function load(value) {
+        console.log("DeviceStatusDetail 加载数据", JSON.stringify(value))
         statusDetailValue = value
 
-        // 加载combox
-//        console.log("--->", JSON.stringify(idList.model))
-//        for (var i = 0; i < idList.model.length; ++i) {
-//            if (idList.model[i].id === value.device.id) {
-//                console.log("------------>", i )
-//                idList.currentIndex = i
-//                break
-//            }
-//        }
+        for (var i = 0; i < mainWindow.gDeviceInfoAndICD.length; ++i) {
+            if (value.device_id === mainWindow.gDeviceInfoAndICD[i].id) {
+                idList.currentIndex = i
+                break
+            }
+        }
 
         typeName.text = value.type_name
         descTextField.text = value.desc

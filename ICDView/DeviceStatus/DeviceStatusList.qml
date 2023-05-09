@@ -66,13 +66,8 @@ ListView {
                     "type_name": "状态" + String(root.status.length),
                     "desc": "",
                     "monitor_status": [],
-                    "device": {
-                        "type": "",
-                        "id": ""
-                    }
+                    "device_id": mainWindow.gDeviceInfoAndICD[0].id
                 }
-
-                // console.log("=>", JSON.stringify(info))
                 root.status.push(info)
 
                 // 将信息添加入model
@@ -113,8 +108,6 @@ ListView {
                 onClicked: {
                     root.status.splice(root.currentIndex, 1)
                     root.model.remove(root.currentIndex, 1)
-
-                    // Excutor.query({"command":"remove_payload", "index":root.currentIndex })
                 }
             }
         }
@@ -161,12 +154,18 @@ ListView {
         return root.status.length + 1
     }
 
+    // 导出
     function saveDeviceInfo(path) {
         var data = root.status
         var dataList = []
         // 处理JSON
         for (var i in data) {
-            dataList.push(data[i])
+            var res = {}
+            res["id"] = data[i].device_id
+            res["type_name"] = data[i].type_name
+            res["desc"] = data[i].desc
+            res["monitor_status"] = data[i].monitor_status
+            dataList.push(res)
         }
 
         Excutor.query({"command": "write",

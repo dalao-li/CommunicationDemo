@@ -76,6 +76,7 @@ ListView {
                 root.model.append({"name": info.name})
 
                 gICDInfoList.push({"name": info.name, "icd_id": info.id})
+                console.log("增加icd信息,", JSON.stringify(gICDInfoList))
             }
         } // BatchAddButton end
     } // header end
@@ -151,10 +152,11 @@ ListView {
     // 生成ID
     function generateId() {
         var i = root.payloads.length
-        while(i++) {
+        while(i) {
             if (!contains(String(i))) {
                 return i
             }
+            i++
         }
     }
 

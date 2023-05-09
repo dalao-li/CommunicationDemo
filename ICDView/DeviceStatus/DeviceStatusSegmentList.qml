@@ -8,6 +8,7 @@ Item {
     id: root
 
     property var segments: []
+    property var __deviceID
 
     signal itemChanged(string id, string value)
 
@@ -126,7 +127,29 @@ Item {
             Binding {
                 target: typeBox
                 property: "model"
-                value: mainWindow.gICDInfoList
+                value: {
+                    // 获取device_id下的input_icd
+                    var icdIDRes = []
+                    for (var i in mainWindow.gDeviceInfoAndICD) {
+                        if (mainWindow.gDeviceInfoAndICD[i].id === __deviceID) {
+                            icdIDRes =  mainWindow.gDeviceInfoAndICD[i].input_icd
+                            break
+                        }
+                    }
+
+                    // 将input_icd转换为icd名称
+                    var icdNameList = []
+                    for (var i in icdIDRes) {
+                        for (var j in gICDInfoList) {
+                            if (icdIDRes[i] === gICDInfoList[j].icd_id) {
+                                icdNameList.push(gICDInfoList[j])
+                                break
+                            }
+                        }
+                    }
+                    console.log("当前可选ICD", JSON.stringify(icdNameList))
+                    return icdNameList
+                }
             }
 
             // 大小
@@ -358,22 +381,24 @@ Item {
 
     // 加载列表数据
     function load(values) {
+        __deviceID = values.device_id
+        console.log("加载DeviceStatusSegment数据,", JSON.stringify(values))
         batchAdd.enabled = true
 
         table.model.clear()
 
-        segments = values
+        segments = values.monitor_status
 
-        for (var i in values) {
+        for (var i in segments) {
             table.model.append({
-                                   "type_id": values[i].type_id,
-                                   "bind_icd": values[i].bind_icd,
-                                   "field_index": values[i].field_index,
-                                   "type": values[i].type,
-                                   "type_name": values[i].type_name,
-                                   "status_type": values[i].status_type,
-                                   "desc": values[i].desc,
-                                   "status_list": values[i].status_list,
+                                   "type_id": segments[i].type_id,
+                                   "bind_icd": String(segments[i].bind_icd),
+                                   "field_index": segments[i].field_index,
+                                   "type": segments[i].type,
+                                   "type_name": segments[i].type_name,
+                                   "status_type": segments[i].status_type,
+                                   "desc": segments[i].desc,
+                                   "status_list": segments[i].status_list,
                                })
         }
     }
@@ -392,7 +417,7 @@ Item {
             break
         case __BIND_ICD_COLUMN:
             segment.bind_icd = value
-            // console.log("=============>", value)
+            console.log("bind_icd修改为", value)
             table.model.setProperty(index, "bind_icd", value)
             break
         case __FIELD_INDEX_COLUMN:

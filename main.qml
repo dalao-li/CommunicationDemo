@@ -17,7 +17,7 @@ ApplicationWindow {
     property var content: []
     property string path: ""
 
-    property var deviceIDComboxValue: []
+    property var gDeviceInfoAndICD: []
 
     property var gICDInfoList: []
 
