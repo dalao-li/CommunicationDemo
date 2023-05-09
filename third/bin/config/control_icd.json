@@ -1,0 +1,438 @@
+[
+    {
+        "bus": 0,
+        "bus_type": "udp",
+        "id": "16842753",
+        "name": "液压控制系统状态",
+        "values": [
+            {
+                "amp": 0,
+                "desc": "0/1切换",
+                "dim": 1,
+                "mask": "0xff",
+                "name": "心跳信号",
+                "offset": 0,
+                "order": 0,
+                "size": 1,
+                "type": 0
+            },
+            {
+                "amp": 0,
+                "desc": "0-disable,1-enable",
+                "dim": 1,
+                "mask": "0xff",
+                "name": "总控使能状态",
+                "offset": 1,
+                "order": 0,
+                "size": 1,
+                "type": 0
+            },
+            {
+                "amp": 0,
+                "desc": "0-停止,1-启动",
+                "dim": 1,
+                "mask": "0xff",
+                "name": "启动/停止状态",
+                "offset": 2,
+                "order": 0,
+                "size": 1,
+                "type": 0
+            },
+            {
+                "amp": 0,
+                "desc": "0-自动,1-手动",
+                "dim": 1,
+                "mask": "0xff",
+                "name": "设定转速模式",
+                "offset": 3,
+                "order": 0,
+                "size": 1,
+                "type": 0
+            },
+            {
+                "amp": 0,
+                "desc": "0-异常,1-正常",
+                "dim": 1,
+                "mask": "0xff",
+                "name": "1#电机风机状态",
+                "offset": 4,
+                "order": 0,
+                "size": 1,
+                "type": 0
+            },
+            {
+                "amp": 0,
+                "desc": "0-异常,1-正常",
+                "dim": 1,
+                "mask": "0xff",
+                "name": "1#电机电机状态",
+                "offset": 5,
+                "order": 0,
+                "size": 1,
+                "type": 0
+            },
+            {
+                "amp": 0,
+                "desc": "0-故障,1-正常",
+                "dim": 1,
+                "mask": "0xff",
+                "name": "1#电机变频故障",
+                "offset": 6,
+                "order": 0,
+                "size": 1,
+                "type": 0
+            },
+            {
+                "amp": 0,
+                "desc": "0-异常,1-正常",
+                "dim": 1,
+                "mask": "0xff",
+                "name": "1#电机超温状态",
+                "offset": 7,
+                "order": 0,
+                "size": 1,
+                "type": 0
+            },
+            {
+                "amp": 0,
+                "desc": "0-异常,1-正常",
+                "dim": 1,
+                "mask": "0xff",
+                "name": "2#电机风机状态",
+                "offset": 8,
+                "order": 0,
+                "size": 1,
+                "type": 0
+            },
+            {
+                "amp": 0,
+                "desc": "0-异常,1-正常",
+                "dim": 1,
+                "mask": "0xff",
+                "name": "2#电机电机状态",
+                "offset": 9,
+                "order": 0,
+                "size": 1,
+                "type": 0
+            },
+            {
+                "amp": 0,
+                "desc": "0-故障,1-正常",
+                "dim": 1,
+                "mask": "0xff",
+                "name": "2#电机变频故障",
+                "offset": 10,
+                "order": 0,
+                "size": 1,
+                "type": 0
+            },
+            {
+                "amp": 0,
+                "desc": "0-异常,1-正常",
+                "dim": 1,
+                "mask": "0xff",
+                "name": "2#电机超温状态",
+                "offset": 11,
+                "order": 0,
+                "size": 1,
+                "type": 0
+            },
+            {
+                "amp": 0,
+                "desc": "0-异常,1-正常",
+                "dim": 1,
+                "mask": "0xff",
+                "name": "3#电机风机状态",
+                "offset": 12,
+                "order": 0,
+                "size": 1,
+                "type": 0
+            },
+            {
+                "amp": 0,
+                "desc": "0-异常,1-正常",
+                "dim": 1,
+                "mask": "0xff",
+                "name": "3#电机电机状态",
+                "offset": 13,
+                "order": 0,
+                "size": 1,
+                "type": 0
+            },
+            {
+                "amp": 0,
+                "desc": "0-故障,1-正常",
+                "dim": 1,
+                "mask": "0xff",
+                "name": "3#电机变频故障",
+                "offset": 14,
+                "order": 0,
+                "size": 1,
+                "type": 0
+            },
+            {
+                "amp": 0,
+                "desc": "0-异常,1-正常",
+                "dim": 1,
+                "mask": "0xff",
+                "name": "3#电机超温状态",
+                "offset": 15,
+                "order": 0,
+                "size": 1,
+                "type": 0
+            },
+            {
+                "amp": 0,
+                "desc": "0-异常,1-正常",
+                "dim": 1,
+                "mask": "0xff",
+                "name": "4#电机风机状态",
+                "offset": 16,
+                "order": 0,
+                "size": 1,
+                "type": 0
+            },
+            {
+                "amp": 0,
+                "desc": "0-异常,1-正常",
+                "dim": 1,
+                "mask": "0xff",
+                "name": "4#电机电机状态",
+                "offset": 17,
+                "order": 0,
+                "size": 1,
+                "type": 0
+            },
+            {
+                "amp": 0,
+                "desc": "0-故障,1-正常",
+                "dim": 1,
+                "mask": "0xff",
+                "name": "4#电机变频故障",
+                "offset": 18,
+                "order": 0,
+                "size": 1,
+                "type": 0
+            },
+            {
+                "amp": 0,
+                "desc": "0-异常,1-正常",
+                "dim": 1,
+                "mask": "0xff",
+                "name": "4#电机超温状态",
+                "offset": 19,
+                "order": 0,
+                "size": 1,
+                "type": 0
+            }
+        ]
+    },
+    {
+        "bus": 0,
+        "bus_type": "udp",
+        "desc": "总控控制液压控制系统",
+        "id": "16842754",
+        "name": "总控使能指令",
+        "values": [
+            {
+                "amp": 0,
+                "desc": "0-disable,1-enable",
+                "dim": 1,
+                "mask": "0xFF",
+                "name": "总控使能位",
+                "offset": 0,
+                "order": 0,
+                "size": 1,
+                "type": 0
+            }
+        ]
+    },
+    {
+        "bus": 0,
+        "bus_type": "udp",
+        "desc": "总控设置液压控制系统的运行状态",
+        "id": "16842755",
+        "name": "启动/停止指令",
+        "values": [
+            {
+                "amp": 0,
+                "desc": "0-停止,1-启动",
+                "dim": 1,
+                "mask": "0xFF",
+                "name": "启动/停止位",
+                "offset": 0,
+                "order": 0,
+                "size": 1,
+                "type": 0
+            }
+        ]
+    },
+    {
+        "bus": 0,
+        "bus_type": "udp",
+        "desc": "总控设置液压控制系统的转速设定模式",
+        "id": "16842756",
+        "name": "设定转速模式指令",
+        "values": [
+            {
+                "amp": 0,
+                "desc": "0-自动,1-手动",
+                "dim": 1,
+                "mask": "0xFF",
+                "name": "转速模式位",
+                "offset": 0,
+                "order": 0,
+                "size": 1,
+                "type": 0
+            }
+        ]
+    },
+    {
+        "bus": 0,
+        "bus_type": "udp",
+        "desc": "手动设定转速数值",
+        "id": "16842757",
+        "name": "手动设定转速指令",
+        "values": [
+            {
+                "amp": 0,
+                "desc": "设置1#电机转速",
+                "dim": 1,
+                "mask": "0xffff",
+                "name": "1#电机转速",
+                "offset": 0,
+                "order": 0,
+                "size": 2,
+                "type": 0
+            },
+            {
+                "amp": 0,
+                "desc": "设置2#电机转速",
+                "dim": 1,
+                "mask": "0xffff",
+                "name": "2#电机转速",
+                "offset": 2,
+                "order": 0,
+                "size": 2,
+                "type": 0
+            },
+            {
+                "amp": 0,
+                "desc": "设置3#电机转速",
+                "dim": 1,
+                "mask": "0xffff",
+                "name": "3#电机转速",
+                "offset": 4,
+                "order": 0,
+                "size": 2,
+                "type": 0
+            },
+            {
+                "amp": 0,
+                "desc": "设置4#电机转速",
+                "dim": 1,
+                "mask": "0xffff",
+                "name": "4#电机转速",
+                "offset": 6,
+                "order": 0,
+                "size": 2,
+                "type": 0
+            }
+        ]
+    },
+    {
+        "bus": 0,
+        "bus_type": "udp",
+        "desc": "自动控制转速策略配置",
+        "id": "16842758",
+        "name": "自动控制转速指令",
+        "values": [
+            {
+                "amp": 0,
+                "desc": "配置段数量范围：0-20",
+                "dim": 1,
+                "mask": "0xffff",
+                "name": "配置段数量",
+                "offset": 0,
+                "order": 0,
+                "size": 2,
+                "type": 0
+            },
+            {
+                "amp": 0,
+                "desc": "默认值为6",
+                "dim": 1,
+                "mask": "0xffff",
+                "name": "单配置段字节数",
+                "offset": 2,
+                "order": 0,
+                "size": 2,
+                "type": 0
+            },
+            {
+                "amp": 0,
+                "desc": "配置数据",
+                "dim": 1,
+                "mask": "",
+                "name": "配置数据",
+                "offset": 4,
+                "order": 0,
+                "size": 120,
+                "type": 0
+            }
+        ]
+    },
+    {
+        "bus": 0,
+        "bus_type": "udp",
+        "desc": "电机实际转速数值",
+        "id": "16842759",
+        "name": "实际转速",
+        "values": [
+            {
+                "amp": 0,
+                "desc": "1#电机实际转速",
+                "dim": 1,
+                "mask": "0xffff",
+                "name": "1#电机转速",
+                "offset": 0,
+                "order": 0,
+                "size": 2,
+                "type": 0
+            },
+            {
+                "amp": 0,
+                "desc": "2#电机实际转速",
+                "dim": 1,
+                "mask": "0xffff",
+                "name": "2#电机转速",
+                "offset": 2,
+                "order": 0,
+                "size": 2,
+                "type": 0
+            },
+            {
+                "amp": 0,
+                "desc": "3#电机实际转速",
+                "dim": 1,
+                "mask": "0xffff",
+                "name": "3#电机转速",
+                "offset": 4,
+                "order": 0,
+                "size": 2,
+                "type": 0
+            },
+            {
+                "amp": 0,
+                "desc": "4#电机实际转速",
+                "dim": 1,
+                "mask": "0xffff",
+                "name": "4#电机转速",
+                "offset": 6,
+                "order": 0,
+                "size": 2,
+                "type": 0
+            }
+        ]
+    }   
+]

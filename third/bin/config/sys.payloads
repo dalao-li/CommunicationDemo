@@ -1,0 +1,199 @@
+{
+    "ROOT/FC_ROOT/FC_CARD_1/FC_PORT_1_2": {
+        "name": "FC Special数据",
+        "offset": 44,
+        "prefix": [
+            32
+        ],
+        "type": 0,
+        "values": [
+            {
+                "amp": 0,
+                "desc": "Message ID",
+                "dim": 1,
+                "mask": "0xffffffff",
+                "name": "Message ID",
+                "offset": 28,
+                "order": 1,
+                "size": 4,
+                "type": 0
+            }
+        ]
+    },
+    "ROOT/FC_ROOT/FC_CARD_0/FC_PORT_1_0": {
+        "name": "FC Normal数据",
+        "offset": 16,
+        "prefix": [
+            32
+        ],
+        "type": 1,
+        "values": ["message_id"]
+    },	
+    "ROOT/FTN_ROOT/FTN_CARD/FTN_PORT": {
+        "name": "Hwa429数据",
+        "offset": 1,
+        "prefix": [
+            112
+        ],
+        "type": 0,
+        "values": [
+            {
+                "amp": 0,
+                "desc": "Label",
+                "dim": 1,
+                "mask": "0xff",
+                "name": "Label",
+                "offset": 0,
+                "order": 0,
+                "size": 1,
+                "type": 0
+            }
+        ]
+    },
+    "ROOT/AFDX_ROOT/HWA_AFDX_CARD": {
+        "name": "HWA AFDX数据",
+        "prefix": [
+            0
+        ],
+        "type": 0,
+        "offset": 54,
+        "values": [
+	      {
+                "amp": 0,
+                "desc": "VL",
+                "dim": 1,
+                "mask": "0xffffffff",
+                "name": "VL",
+                "offset": 16,
+                "order": 1,
+                "size": 2,
+                "type": 0
+	      },
+	      {
+                "amp": 0,
+                "desc": "src_ip",
+                "dim": 1,
+                "mask": "0xffffffff",
+                "name": "src_ip",
+                "offset": 38,
+                "order": 1,
+                "size": 4,
+                "type": 0
+	      },
+	      {
+                "amp": 0,
+                "desc": "dest_ip",
+                "dim": 1,
+                "mask": "0xffffffff",
+                "name": "dest_ip",
+                "offset": 42,
+                "order": 1,
+                "size": 4,
+                "type": 0
+	      },
+	      {
+                "amp": 0,
+                "desc": "src_port",
+                "dim": 1,
+                "mask": "0xffffffff",
+                "name": "src_port",
+                "offset": 47,
+                "order": 1,
+                "size": 2,
+                "type": 0
+	      },
+	      {
+                "amp": 0,
+                "desc": "dest_port",
+                "dim": 1,
+                "mask": "0xffffffff",
+                "name": "dest_port",
+                "offset": 49,
+                "order": 1,
+                "size": 2,
+                "type": 0
+	      }
+	    ]
+    },
+    "ROOT/RS422_ROOT/RS422_CARD/RS422_PORT_1": {
+        "name": "RS422数据",
+        "type": 0
+    },
+    "ROOT/AVB_ROOT/AVB_CARD/AVB_PORT": {
+        "name": "AVB数据",
+        "type": 0,
+	"prefix": [
+            0
+        ]
+    },
+    "afdx": [
+        {
+            "amp": 0,
+            "desc": "VL",
+            "dim": 1,
+            "mask": "0xffffffff",
+            "name": "VL",
+            "offset": 12,
+            "order": 1,
+            "size": 2,
+            "type": 0
+        },
+        {
+            "amp": 0,
+            "desc": "src_ip",
+            "dim": 1,
+            "mask": "0xffffffff",
+            "name": "src_ip",
+            "offset": 34,
+            "order": 0,
+            "size": 4,
+            "type": 0
+        },
+        {
+            "amp": 0,
+            "desc": "dest_ip",
+            "dim": 1,
+            "mask": "0xffffffff",
+            "name": "dest_ip",
+            "offset": 38,
+            "order": 0,
+            "size": 4,
+            "type": 0
+        },
+        {
+            "amp": 0,
+            "desc": "src_port",
+            "dim": 1,
+            "mask": "0xffffffff",
+            "name": "src_port",
+            "offset": 43,
+            "order": 0,
+            "size": 2,
+            "type": 0
+        },
+        {
+            "amp": 0,
+            "desc": "dest_port",
+            "dim": 1,
+            "mask": "0xffffffff",
+            "name": "dest_port",
+            "offset": 45,
+            "order": 0,
+            "size": 2,
+            "type": 0
+        }
+    ],
+    "fc": [
+        {
+            "amp": 0,
+            "desc": "Message ID",
+            "dim": 1,
+            "mask": "0xffffffff",
+            "name": "Message ID",
+            "offset": 28,
+            "order": 1,
+            "size": 4,
+            "type": 0
+        }
+    ]
+}

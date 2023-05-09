@@ -1,0 +1,24 @@
+<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>Button/BatchAddButton.qml</file>
+        <file>Button/IconButton.qml</file>
+        <file>Device/Device.qml</file>
+        <file>Device/DeviceDetail.qml</file>
+        <file>Device/DeviceList.qml</file>
+        <file>DeviceStatus/DeviceStatusDetail.qml</file>
+        <file>DeviceStatus/DeviceStatusEditor.qml</file>
+        <file>DeviceStatus/DeviceStatusEnumData.qml</file>
+        <file>DeviceStatus/DeviceStatusList.qml</file>
+        <file>DeviceStatus/DeviceStatusSegmentList.qml</file>
+        <file>Payload/PayloadDetail.qml</file>
+        <file>Payload/PayloadEditor.qml</file>
+        <file>Payload/PayloadList.qml</file>
+        <file>Payload/SegmentList.qml</file>
+        <file>Payload/SetEnumData.qml</file>
+        <file>Receive/Receive.qml</file>
+        <file>Send/Send.qml</file>
+        <file>Payload/PayloadShowDetail.qml</file>
+        <file>Payload/PayloadBind.qml</file>
+    </qresource>
+</RCC>

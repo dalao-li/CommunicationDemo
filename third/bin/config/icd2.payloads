@@ -1,0 +1,94 @@
+[
+    {
+        "bus": 0,
+        "bus_type": "udp",
+        "id": "11",
+        "name": "test1",
+        "values": [
+            {
+                "amp": 0,
+                "desc": "整形测试",
+                "dim": 1,
+                "mask": "0xff",
+                "meaning": {
+                },
+                "name": "整形测试",
+                "offset": 0,
+                "order": 0,
+                "size": 1,
+                "type": 0
+            },
+            {
+                "amp": 0,
+                "desc": "枚举测试",
+                "dim": 1,
+                "mask": "0xff",
+                "meaning": {
+                    "0": "关",
+                    "1": "开",
+                    "2": "未知",
+                    "3": "故障"
+                },
+                "name": "枚举测试",
+                "offset": 1,
+                "order": 0,
+                "size": 1,
+                "type": 0
+            },
+            {
+                "amp": 0,
+                "desc": "布尔测试",
+                "dim": 1,
+                "mask": "0xff",
+                "meaning": {
+                },
+                "name": "布尔测试",
+                "offset": 2,
+                "order": 0,
+                "size": 1,
+                "type": 0
+            }
+        ]
+    },
+    {
+        "bus": 0,
+        "bus_type": "udp",
+        "desc": "Src: 多功能控制显示单元1,Dst: 无线电导航监视处理机",
+        "id": "15",
+        "name": "test2",
+        "values": [
+            {
+                "amp": 0,
+                "desc": "敌我识别应答机开关",
+                "dim": 1,
+                "mask": "0x1",
+                "max": 1,
+                "max_valve": 1,
+                "meaning": {
+                    "0": "关",
+                    "1": "开"
+                },
+                "min": 0,
+                "min_valve": 0,
+                "name": "敌我识别应答机开关",
+                "offset": 0,
+                "order": 0,
+                "size": 1,
+                "type": 0
+            },
+            {
+                "amp": 0,
+                "desc": "布尔测试",
+                "dim": 1,
+                "mask": "0xff",
+                "meaning": {
+                },
+                "name": "布尔测试",
+                "offset": 1,
+                "order": 0,
+                "size": 1,
+                "type": 0
+            }
+        ]
+    }
+]
