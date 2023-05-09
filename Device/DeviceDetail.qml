@@ -15,10 +15,10 @@ Item {
     signal itemChanged(string id, string value)
 
     property var _INPUT_ICD_COLUMN: 0
-    property var _INPUT_ICD_NAME_COLUMN: 1
-    property var _OUPUT_ICD_COLUMN: 2
-    property var _OUPUT_ICD_NAME_COLUMN: 3
-    property var _ICD_ID_COLUMN: 4
+    property var _OUPUT_ICD_COLUMN: 1
+    property var _ICD_NAME_COLUMN: 2
+    property var _ICD_ID_COLUMN: 3
+
 
     // 标题
     Rectangle {
@@ -103,7 +103,6 @@ Item {
             height: 25
             onTextChanged: {
                 if (root.device) {
-
                     // 修改gDeviceInfoAndICD中的值
                     for (var i in mainWindow.gDeviceInfoAndICD) {
                         if (mainWindow.gDeviceInfoAndICD[i].id === root.device.device_id) {
@@ -301,7 +300,7 @@ Item {
                     margins: 1
                 }
 
-                property var validColumn: [_INPUT_ICD_NAME_COLUMN, _OUPUT_ICD_NAME_COLUMN, _ICD_ID_COLUMN].includes(styleData.column)
+                property var validColumn: [_ICD_NAME_COLUMN, _ICD_ID_COLUMN].includes(styleData.column)
 
                 visible: validColumn
 
@@ -324,38 +323,40 @@ Item {
                 }
 
                 checked: {
-                    //console.log("输入选择," ,table.model.get(styleData.row).isOuputCheck)
-                    return table.model.get(styleData.row).isInputCheck
+                    return styleData.value
                 }
 
                 property var validColumn: [_INPUT_ICD_COLUMN].includes(styleData.column)
 
                 visible: validColumn
 
-                onCheckedChanged: {
+                onClicked: {
                     if (root.device) {
                         // 如果是勾选
-                        var icdID = table.model.get(styleData.row).icdValue
-                        if (checked) {
-                            root.device.input_icd.push(icdID)
-                            root.itemChanged("icd_info", JSON.stringify({"opeator": "add", "type": "input", "icd_id": icdID}))
+                        var line = table.model.get(styleData.row)
+                        if (checkedState === Qt.Checked) {
+                            root.device.input_icd.push(line.icdValue)
+                            // console.log("发送修改信号")
+                            root.itemChanged("icd_info", JSON.stringify({"opeator": "add", "type": "input", "icd_id": line.icdValue}))
+                            return
                         }
 
-                        if (!checked) {
+                        else {
                             var newList = []
                             for (var i = 0; i < root.device.input_icd.length; ++i) {
-                                if (root.device.input_icd[i] !== icdID) {
+                                if (root.device.input_icd[i] !== line.icdValue) {
                                     newList.push(root.device.input_icd[i])
                                 }
                             }
                             root.device.input_icd = newList
-                            root.itemChanged("icd_info", JSON.stringify({"opeator": "del", "type": "input", "icd_id": icdID}))
+                            root.itemChanged("icd_info", JSON.stringify({"opeator": "del", "type": "input", "icd_id": line.icdValue}))
                         }
 
                         // 修改gDeviceInfoAndICD中的值
-                        for (var i in mainWindow.gDeviceInfoAndICD) {
-                            if (mainWindow.gDeviceInfoAndICD[i].id === root.device.device_id) {
-                                mainWindow.gDeviceInfoAndICD[i].input_icd = root.device.input_icd
+                        for (var j in mainWindow.gDeviceInfoAndICD) {
+                            if (mainWindow.gDeviceInfoAndICD[j].id === root.device.device_id) {
+                                console.log("发出信号")
+                                mainWindow.gDeviceInfoAndICD[j].input_icd = root.device.input_icd
                                 break
                             }
                         }
@@ -375,30 +376,29 @@ Item {
                 visible: validColumn
 
                 checked: {
-                    //console.log("输出选择," ,table.model.get(styleData.row).isOuputCheck)
-                    return table.model.get(styleData.row).isOuputCheck
+                    return styleData.value
                 }
 
-                onCheckedChanged: {
+                onClicked: {
                     if (root.device) {
                         // 如果是勾选
-                        var icdID = table.model.get(styleData.row).icdValue
+                        var line = table.model.get(styleData.row)
                         if (checked) {
                             if (styleData.column === _OUPUT_ICD_COLUMN) {
-                                root.device.ouput_icd.push(icdID)
-                                root.itemChanged("icd_info", JSON.stringify({"opeator": "add", "type": "ouput", "icd_id": icdID}))
+                                root.device.ouput_icd.push(line.icdValue)
+                                root.itemChanged("icd_info", JSON.stringify({"opeator": "add", "type": "ouput", "icd_id": line.icdValue}))
                             }
                         }
 
                         if (!checked) {
                             var newList = []
                             for (var i = 0; i < root.device.ouput_icd.length; ++i) {
-                                if (root.device.ouput_icd[i] !== icdID) {
+                                if (root.device.ouput_icd[i] !== line.icdValue) {
                                     newList.push(root.device.ouput_icd[i])
                                 }
                             }
                             root.device.ouput_icd = newList
-                            root.itemChanged("icd_info", JSON.stringify({"opeator": "del", "type": "ouput", "icd_id": icdID}))
+                            root.itemChanged("icd_info", JSON.stringify({"opeator": "del", "type": "ouput", "icd_id": line.icdValue}))
                         }
                     }
                 }
@@ -414,32 +414,24 @@ Item {
         }
 
         TableViewColumn {
-            id: inputICD
-            visible: table.columsVisible[1]
-            role: "inputICDName"
-            title: "ICD名称"
-            width: 80
-        }
-
-        TableViewColumn {
             id: isOuput
-            visible: table.columsVisible[2]
+            visible: table.columsVisible[1]
             role: "isOuput"
             title: "输出选择"
             width: 80
         }
 
         TableViewColumn {
-            id: ouputICDName
-            visible: table.columsVisible[3]
-            role: "ouputICDName"
+            id: icdName
+            visible: table.columsVisible[2]
+            role: "icdName"
             title: "ICD名称"
             width: 100
         }
 
         TableViewColumn {
             id: icdValue
-            visible: table.columsVisible[4]
+            visible: table.columsVisible[3]
             role: "icdValue"
             title: "ICD id"
             width: 80
@@ -471,11 +463,9 @@ Item {
                 border.color: Desktop.Theme.current.section
             }
         } // end of rowDelegate
-        //        }
     } // end of TableView
 
     function load(value) {
-        // console.log("===>", JSON.stringify(value))
         device = value
 
         type.text = value.type
@@ -491,29 +481,42 @@ Item {
         addressInput.text = value.address
 
         table.model.clear()
-        for (var i in mainWindow.gICDInfoList) {
-            var nowLineICDId = mainWindow.gICDInfoList[i].icd_id
-            var nowLineICDName = mainWindow.gICDInfoList[i].name
+
+        // 查询当前所有icd
+        console.log("当前icd list, ", JSON.stringify(mainWindow.gICDInfoList))
+        var icdList = mainWindow.gICDInfoList
+
+        for (var i in icdList) {
+            // 如果当前行icd
+            var nowLineICDId = icdList[i].icd_id
+            var nowLineICDName = icdList[i].name
             var d = {
-                "isInputCheck": (()=> {
-                                   for (var j in value.input_icd) {
-                                       if (value.input_icd[j] === nowLineICDId) {
-                                           return true
-                                       }
-                                   }
-                                   return false
-                               })(),
-                "inputICDName": nowLineICDName,
-                "isOuputCheck": (()=> {
-                                   for (var j in value.ouput_icd) {
-                                       if (value.ouput_icd[j] === nowLineICDId) {
-                                           return true
-                                       }
-                                   }
-                                   return false
-                               })(),
-                "ouputICDName": nowLineICDName,
-                "icdValue": nowLineICDId,
+                "isInput": (()=> {
+                                     if (value.input_icd.length === 0) {
+                                         return false
+                                     }
+                                     var inputICDList = value.input_icd
+                                     for (var j in inputICDList) {
+                                         if (inputICDList[j] === nowLineICDId) {
+                                             return true
+                                         }
+                                     }
+                                     return false
+                                 })(),
+                "isOuput": (()=> {
+                                     if (value.ouput_icd.length === 0) {
+                                         return false
+                                     }
+                                     var ouputICDList = value.ouput_icd
+                                     for (var j in ouputICDList) {
+                                         if (ouputICDList[j] === nowLineICDId) {
+                                             return true
+                                         }
+                                     }
+                                     return false
+                                 })(),
+                "icdName": nowLineICDName,
+                "icdValue": String(nowLineICDId),
             }
             table.model.append(d)
         }

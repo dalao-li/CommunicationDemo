@@ -6,12 +6,10 @@ Item {
     id: root
 
     property int defaultHeight: 60
-
     property var payload
 
     height: defaultHeight
 
-    // 修改信号
     signal itemChanged(string id, string value)
 
     // 另存为文件
@@ -174,9 +172,6 @@ Item {
                     root.payload.id = String(value)
                     root.itemChanged("id", String(value))
                 }
-
-                // 当其他三项为空时拆分idInput值, 获取厂家号 设备号 数据号
-                //splitValue(idInput.value)
             }
         } 
     } // end flow
@@ -255,9 +250,6 @@ Item {
         }
 
         deviceICDList[deviceID].push(info)
-
-        //console.log("===========>", JSON.stringify(deviceICDList[deviceID]))
-
         devicesJSON["DeviceICDList"] = deviceICDList
 
         Excutor.query({"command": "write",

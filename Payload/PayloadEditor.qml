@@ -9,14 +9,8 @@ ColumnLayout {
 
     property var payloads: []
 
-    // 外部控件
     property alias payloadsList: payloadsList
     property alias payloadDetail: detail
-
-//    Component.onCompleted: {
-//        var payloads = Excutor.query({"payloads":""})
-//        load(payloads)
-//    }
 
     SplitView {
         Layout.fillHeight: true
@@ -42,8 +36,6 @@ ColumnLayout {
                     }
                     // 获取侧边栏对应索引的数据
                     var value = getPayload(payloadsList.currentIndex, payloadsList.busType)
-
-                    // console.log("->", JSON.stringify(value))
 
                     detail.load(value)
                     segmentList.load(value.values)

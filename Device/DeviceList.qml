@@ -8,15 +8,12 @@ ListView {
     id: root
 
     property var devices: []
-
     property var devicesJSON
 
     focus: true
-
     implicitWidth: 200
 
     model: ListModel {}
-
 
     // 导入文件
     FileDialog {
@@ -81,44 +78,28 @@ ListView {
             }
 
             onClicked: {
-                // 一次增加的数量
-                var max = 0
-                // console.log("==========>", index)
-                switch (index) {
-                case -1:
-                    max = 1
-                    break;
-                case 0: //5
-                    max = 5
-                    break;
-                case 1: //10
-                    max = 10
-                    break;
-                case 2: //20
-                    max = 20
-                    break;
+                var info = {
+                    "type": "设备_" + String(root.devices.length),
+                    "device_id": "device_" + String(createID()),
+                    "control_type": 0,
+                    "bus_type": 0,
+                    "ip": "",
+                    "send_port": "",
+                    "control_port": "",
+                    "rfm2g_id": "",
+                    "address": "",
+                    "input_icd": [],
+                    "ouput_icd": [],
                 }
-                for (var i=0; i<max; ++i) {
-                    var info = {
-                        "type": "设备_" + String(root.devices.length),
-                        "device_id": "device_" + String(generateId()),
-                        "control_type": 0,
-                        "bus_type": 0,
-                        "ip": "",
-                        "send_port": "",
-                        "control_port": "",
-                        "rfm2g_id": "",
-                        "address": "",
-                        "input_icd": [],
-                        "ouput_icd": [],
-                    }
-                    root.devices.push(info)
-                    // 将信息添加入model
-                    root.model.append(info)
+                root.devices.push(info)
 
-                    mainWindow.gDeviceInfoAndICD.push({"type": info.type, "id": info.device_id, "input_icd":[]})
-                }
+                root.model.append(info)
+
+                console.log("add DeviceList 数据", JSON.stringify(root.devices))
+                mainWindow.gDeviceInfoAndICD.push({"type": info.type, "id": info.device_id, "input_icd":[]})
             }
+
+
         } // BatchAddButton end
 
         // 导入按钮
@@ -183,20 +164,23 @@ ListView {
         onPressAndHold: mouse.accepted = false
     }
 
-    function contains(id) {
-        for (var i=0; i<root.devices.length; ++i) {
-            if (root.devices[i].device_id === id) {
-                return true
-            }
-            return false
-        }
-    }
+    function createID() {
+        const MAX = 65535
+        const MIN = 0
 
-    function generateId() {
-        var i = root.devices.length;
-        for (;;) {
-            if (!contains(String(i))) return i
-            ++i;
+        while(true) {
+            var num = Math.floor(Math.random() * (MIN - MAX)) + MAX
+            var flag = false
+            for (var i in root.devices) {
+                if (root.devices[i].device_id === num) {
+                    flag = true
+                    break
+                }
+            }
+
+            if (!flag) {
+                return num
+            }
         }
     }
 
@@ -213,7 +197,6 @@ ListView {
 
         var data = devicesJSON["monitor_device_type"]
 
-        // console.log(JSON.stringify(data))
         for (var i in data) {
             var info = {
                 "type": data[i].type,
@@ -243,7 +226,7 @@ ListView {
             mainWindow.gDeviceInfoAndICD.push({"type": data[i].type, "id": data[i].device_id, "input_icd": []})
 
             root.devices.push(info)
-            // 将信息添加入model
+
             root.model.append(info)
         }
     }
@@ -296,8 +279,6 @@ ListView {
             }
             res[device_id] = deviceICD
         }
-
-        //console.log("------------->", JSON.stringify(res))
 
         devicesJSON["DeviceICDList"] = res
 

@@ -1,8 +1,16 @@
+/*
+ * @Description:
+ * @Version: 1.0
+ * @Author: liyuanhao
+ * @Date: 2023-05-9 19:05:47
+ * @LastEditors: liyuanhao
+ * @LastEditTime: 2023-05-9 19:05:47
+ */
+
 import QtQuick 2.5
 import QtQuick.Layouts 1.1
 import QtQuick.Controls 1.4
 import DesktopControls 0.1
-
 
 ColumnLayout {
     id: root
@@ -12,7 +20,6 @@ ColumnLayout {
     property alias deviceDetail: deviceDetail
 
     SplitView {
-        // anchors.fill: parent
         Layout.fillHeight: true
         Layout.fillWidth: true
 
@@ -21,7 +28,6 @@ ColumnLayout {
             Layout.fillHeight: true
             color: "#f0f0f0"
 
-            // 侧边栏
             DeviceList {
                 id: deviceList
                 anchors.fill: parent
@@ -31,8 +37,8 @@ ColumnLayout {
 
                 onCurrentIndexChanged: {
                     // 获取侧边栏对应索引的数据
-                    var device = getDevice(deviceList.currentIndex)
-                    deviceDetail.load(device)
+                    console.log("DeviceDetail加载数据", JSON.stringify(root.devices[deviceList.currentIndex]))
+                    deviceDetail.load(root.devices[deviceList.currentIndex])
                 }
             }
         }
@@ -42,7 +48,7 @@ ColumnLayout {
             Layout.fillHeight: true
             color: "#f0f0f0"
 
-            // 编辑界面
+            // 左上编辑界面
             DeviceDetail {
                 id: deviceDetail
                 anchors {
@@ -62,30 +68,16 @@ ColumnLayout {
                     }
                     if (id === "icd_info") {
                         var v = JSON.parse(value)
-                        var addValue = []
-                        if (v["opeator"] === "add") {
-                            if (v["type"] === "input") {
-                                addValue = root.devices[deviceList.currentIndex].input_icd
-                                d["input_icd"] = addValue
-                            }
 
-                            if (v["type"] === "ouput") {
-                                addValue = root.devices[deviceList.currentIndex].ouput_icd
-                               // addValue.push(v["icd_id"])
-                                d["ouput_icd"] = addValue
-                            }
+                        if (v["type"] === "input") {
+                            console.log("....", root.devices[deviceList.currentIndex].input_icd)
+                            d["input_icd"] = root.devices[deviceList.currentIndex].input_icd
+                            // console.log("传递过来, ", JSON.stringify(d["input_icd"]))
+
                         }
 
-                        if (v["opeator"] === "del") {
-                            if (v["type"] === "input") {
-                                addValue = root.devices[deviceList.currentIndex].input_icd
-                                d["input_icd"] = addValue
-                            }
-
-                            if (v["type"] === "ouput") {
-                                addValue = root.devices[deviceList.currentIndex].ouput_icd
-                                d["ouput_icd"] = addValue
-                            }
+                        if (v["type"] === "ouput") {
+                            d["ouput_icd"] = root.devices[deviceList.currentIndex].ouput_icd
                         }
                     }
 
@@ -96,12 +88,5 @@ ColumnLayout {
                 }
             }
         }
-    }
-
-
-    // 获取产品
-    function getDevice(index) {
-        // console.log("----------->", JSON.stringify(root.devices[index]))
-        return root.devices[index]
     }
 }

@@ -72,14 +72,11 @@ ListView {
                     "bus_type": "udp",
                     "values": []
                 }
-                console.log("id =====", info.id)
                 root.payloads.push(info)
 
-                // 将信息添加入model
                 root.model.append({"name": info.name})
 
                 gICDInfoList.push({"name": info.name, "icd_id": info.id})
-                console.log("增加icd信息,", JSON.stringify(gICDInfoList))
             }
         } // BatchAddButton end
     } // header end
@@ -116,8 +113,6 @@ ListView {
                     root.model.remove(root.currentIndex, 1)
 
                     gICDInfoList.splice(root.currentIndex, 1)
-
-                    // sExcutor.query({"command":"remove_payload", "index":root.currentIndex })
                 }
             }
         }
@@ -130,7 +125,7 @@ ListView {
         onPressed: {
             mouse.accepted = false
             var index = root.indexAt(mouse.x, mouse.y - headerItem.height)
-            if( index > -1 ) {
+            if (index > -1) {
                 root.currentIndex = index
             }
         }
@@ -187,6 +182,5 @@ ListView {
                 return num
             }
         }
-
     }
 }
