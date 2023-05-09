@@ -292,12 +292,12 @@ ListView {
                 deviceICD.push({"icd_id": inputICDList[a], "type": "input"})
             }
             for (var b in ouputICDList) {
-                deviceICD.push({"icd_id": inputICDList[b], "type": "ouput"})
+                deviceICD.push({"icd_id": ouputICDList[b], "type": "ouput"})
             }
             res[device_id] = deviceICD
         }
 
-        console.log("------------->", JSON.stringify(res))
+        //console.log("------------->", JSON.stringify(res))
 
         devicesJSON["DeviceICDList"] = res
 

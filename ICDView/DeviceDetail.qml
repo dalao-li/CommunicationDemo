@@ -296,31 +296,78 @@ Item {
             } // TextField end
 
             CheckBox {
-                id: checkBox
+                id: inputCheck
                 anchors {
                     fill: parent
                     margins: 1
                 }
 
-                checked: false
+                checked: {
+                    var nowICDId = table.model.get(styleData.row).icdValue
 
-                property var validColumn: [_INPUT_ICD_COLUMN, _OUPUT_ICD_COLUMN].includes(styleData.column)
+                    for (var i in device) {
+                        if (device[i].input_icd === nowICDId) {
+                            return true
+                        }
+                        return false
+                    }
+                }
+
+                property var validColumn: [_INPUT_ICD_COLUMN].includes(styleData.column)
 
                 visible: validColumn
 
                 onCheckedChanged: {
+                    console.log("click, ", JSON.stringify(table.model.get(styleData.row)))
                     console.log("行:", styleData.row, "列:", styleData.column, "check", checked)
                     if (root.device) {
                         // 如果是勾选
-                        var icdID = mainWindow.gICDInfoList[styleData.row].icd_id
+                        var icdID = table.model.get(styleData.row).icdValue
                         if (checked) {
-                            // 判断是input 还是 ouput
+                            root.device.input_icd.push(icdID)
+                            root.itemChanged("icd_info", JSON.stringify({"opeator": "add", "type": "input", "icd_id": icdID}))
+                        }
 
-                            if (styleData.column === _INPUT_ICD_COLUMN) {
-                                root.device.input_icd.push(icdID)
-                                root.itemChanged("icd_info", JSON.stringify({"opeator": "add", "type": "input", "icd_id": icdID}))
+                        if (!checked) {
+                            var newList = []
+                            for (var i = 0; i < root.device.input_icd.length; ++i) {
+                                if (root.device.input_icd[i] !== icdID) {
+                                    newList.push(root.device.input_icd[i])
+                                }
                             }
+                            root.device.input_icd = newList
+                            root.itemChanged("icd_info", JSON.stringify({"opeator": "del", "type": "input", "icd_id": icdID}))
+                        }
+                    }
+                }
+            }
 
+            CheckBox {
+                id: ouputCheck
+                anchors {
+                    fill: parent
+                    margins: 1
+                }
+
+                property var validColumn: [_OUPUT_ICD_COLUMN].includes(styleData.column)
+
+                visible: validColumn
+
+                checked: {
+                    var nowICDId = table.model.get(styleData.row).icdValue
+                    for (var i in device) {
+                        if (device[i].ouput_icd === nowICDId) {
+                            return true
+                        }
+                        return false
+                    }
+                }
+
+                onCheckedChanged: {
+                    if (root.device) {
+                        // 如果是勾选
+                        var icdID = table.model.get(styleData.row).icdValue
+                        if (checked) {
                             if (styleData.column === _OUPUT_ICD_COLUMN) {
                                 root.device.ouput_icd.push(icdID)
                                 root.itemChanged("icd_info", JSON.stringify({"opeator": "add", "type": "ouput", "icd_id": icdID}))
@@ -329,25 +376,13 @@ Item {
 
                         if (!checked) {
                             var newList = []
-                            if (styleData.column === _INPUT_ICD_COLUMN) {
-                                for (var i = 0; i < root.device.input_icd.length; ++i) {
-                                    if (root.device.input_icd[i] !== icdID) {
-                                        newList.push(root.device.input_icd[i])
-                                    }
+                            for (var i = 0; i < root.device.ouput_icd.length; ++i) {
+                                if (root.device.ouput_icd[i] !== icdID) {
+                                    newList.push(root.device.ouput_icd[i])
                                 }
-                                root.device.input_icd = newList
-                                root.itemChanged("icd_info", JSON.stringify({"opeator": "del", "type": "input", "icd_id": icdID}))
                             }
-
-                            if (styleData.column === _OUPUT_ICD_COLUMN) {
-                                for (var i = 0; i < root.device.ouput_icd.length; ++i) {
-                                    if (root.device.input_icd[i] !== icdID) {
-                                        newList.push(root.device.ouput_icd[i])
-                                    }
-                                }
-                                root.device.ouput_icd = newList
-                                root.itemChanged("icd_info", JSON.stringify({"opeator": "del", "type": "ouput", "icd_id": icdID}))
-                            }
+                            root.device.ouput_icd = newList
+                            root.itemChanged("icd_info", JSON.stringify({"opeator": "del", "type": "ouput", "icd_id": icdID}))
                         }
                     }
                 }
@@ -422,13 +457,12 @@ Item {
         } // end of rowDelegate
 
 
-//        Binding {
-//            target: table
-//            property: "model"
-//            value: mainWindow.gICDInfoList
-//        }
+        //        Binding {
+        //            target: table
+        //            property: "model"
+        //            value: mainWindow.gICDInfoList
+        //        }
     } // end of TableView
-
 
     function load(value) {
         console.log("===>", JSON.stringify(value))
@@ -446,16 +480,31 @@ Item {
         rfm2gInput.text = value.rfm2g_id
         addressInput.text = value.address
 
+        table.model.clear()
         for (var i in mainWindow.gICDInfoList) {
-            // console.log("---------->", JSON.stringify(mainWindow.gICDInfoList[i]))
-            table.model.append({
-                                   "isInput": false,
-                                   "inputICDName": mainWindow.gICDInfoList[i].name,
-                                   "isOuput": false,
-                                   "ouputICDName": mainWindow.gICDInfoList[i].name,
 
-                                   "icdValue": mainWindow.gICDInfoList[i].icd_id,
-                               })
+            var d = {
+                "aaa": (()=> {
+                                   for (var j in value.input_icd) {
+                                       if (value.input_icd[j] === mainWindow.gICDInfoList[i].icd_id) {
+                                           return true
+                                       }
+                                   }
+                                   return false
+                               })(),
+                "inputICDName": mainWindow.gICDInfoList[i].name,
+                "bbb": (()=> {
+                                   for (var j in value.ouput_icd) {
+                                       if (value.ouput_icd[j] === mainWindow.gICDInfoList[i].icd_id) {
+                                           return true
+                                       }
+                                   }
+                                   return false
+                               })(),
+                "ouputICDName": mainWindow.gICDInfoList[i].name,
+                "icdValue": mainWindow.gICDInfoList[i].icd_id,
+            }
+            table.model.append(d)
         }
     }
 }
