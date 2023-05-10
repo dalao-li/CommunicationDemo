@@ -1,3 +1,12 @@
+/*
+ * @Description:
+ * @Version: 1.0
+ * @Author: liyuanhao
+ * @Date: 2023-05-09 19:05:47
+ * @LastEditors: liyuanhao
+ * @LastEditTime: 2023-05-09 19:05:47
+ */
+
 import QtQuick 2.5
 import QtQuick.Controls 1.4
 import QtQuick.Dialogs 1.2
@@ -11,14 +20,12 @@ Item {
     property int defaultHeight: 60
     property var device
 
-    // 修改信号
-    signal itemChanged(string id, string value)
-
     property var _INPUT_ICD_COLUMN: 0
     property var _OUPUT_ICD_COLUMN: 1
     property var _ICD_NAME_COLUMN: 2
     property var _ICD_ID_COLUMN: 3
 
+    signal itemChanged(string id, string value)
 
     // 标题
     Rectangle {
@@ -127,7 +134,9 @@ Item {
             id: isControl
             width: 300
             height: 25
+
             model: ["是", "否"]
+
             onCurrentIndexChanged: {
                 if (root.device) {
                     root.device.control_type = currentIndex
@@ -352,15 +361,12 @@ Item {
                         }
 
                         // 修改gDeviceInfoAndICD中的值
-                        // console.log("原始gDeviceInfoAndICD", JSON.stringify(gDeviceInfoAndICD))
                         for (var j in gDeviceInfoAndICD) {
                             if (gDeviceInfoAndICD[j].id === root.device.device_id) {
-                                console.log("发出信号")
                                 gDeviceInfoAndICD[j].input_icd = root.device.input_icd
                                 break
                             }
                         }
-                        // console.log("修改后gDeviceInfoAndICD", JSON.stringify(gDeviceInfoAndICD))
                     }
                 }
             }
@@ -382,7 +388,6 @@ Item {
 
                 onClicked: {
                     if (root.device) {
-                        // 如果是勾选
                         var line = table.model.get(styleData.row)
                         if (checked) {
                             if (styleData.column === _OUPUT_ICD_COLUMN) {
@@ -484,7 +489,7 @@ Item {
         table.model.clear()
 
         // 查询当前所有icd
-        console.log("当前icd list, ", JSON.stringify(mainWindow.gICDInfoList))
+        // console.log("当前icd list, ", JSON.stringify(mainWindow.gICDInfoList))
         var icdList = mainWindow.gICDInfoList
 
         for (var i in icdList) {

@@ -16,17 +16,13 @@ ApplicationWindow {
     height: 800
     title: qsTr("通信Demo")
 
-    //property var content: Excutor.query({"payloads": ""})
     property var content: []
     property string path: ""
 
     property var gDeviceInfoAndICD: []
-
     property var gICDInfoList: []
+    property var gDeviceMonitorSetting
 
-    property var deviceMonitorSettingJSON
-
-    // signal deviceIdChange()
 
     menuBar: MenuBar {
         Menu {

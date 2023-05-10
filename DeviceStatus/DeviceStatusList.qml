@@ -1,3 +1,5 @@
+
+
 import QtQuick 2.5
 import DesktopControls 0.1
 import QtQuick.Dialogs 1.2
@@ -60,16 +62,17 @@ ListView {
             anchors.rightMargin: 8
             anchors.verticalCenter: parent.verticalCenter
             onClicked: {
+                var _id = mainWindow.gDeviceInfoAndICD[0].id
                 var info = {
                     "type_name": "状态" + String(root.status.length),
                     "desc": "",
                     "monitor_status": [],
-                    "device_id": mainWindow.gDeviceInfoAndICD[0].id
+                    "device_id": _id
                 }
                 root.status.push(info)
 
                 // 将信息添加入model
-                root.model.append({"type_name": info.type_name})
+                root.model.append(info)
             }
         } // BatchAddButton end
     } // header end

@@ -239,7 +239,7 @@ Item {
         }
 
         // 读取JSON获取device_list信息
-        var devicesJSON = deviceMonitorSettingJSON
+        var devicesJSON = gDeviceMonitorSetting
         var deviceICDList = devicesJSON["DeviceICDList"]
 
         // 生成ICD JSON数据

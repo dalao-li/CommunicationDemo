@@ -37,7 +37,6 @@ ColumnLayout {
 
                 onCurrentIndexChanged: {
                     // 获取侧边栏对应索引的数据
-                    console.log("DeviceDetail加载数据", JSON.stringify(root.devices[deviceList.currentIndex]))
                     deviceDetail.load(root.devices[deviceList.currentIndex])
                 }
             }
@@ -66,14 +65,11 @@ ColumnLayout {
                     if (["control_type", "bus_type"].includes(id)) {
                         d[id] = Number(value)
                     }
-                    if (id === "icd_info") {
+
+                    else if (id === "icd_info") {
                         var v = JSON.parse(value)
-
                         if (v["type"] === "input") {
-                            // console.log("....", root.devices[deviceList.currentIndex].input_icd)
                             d["input_icd"] = root.devices[deviceList.currentIndex].input_icd
-                            // console.log("传递过来, ", JSON.stringify(d["input_icd"]))
-
                         }
 
                         if (v["type"] === "ouput") {

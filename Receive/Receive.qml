@@ -1,5 +1,14 @@
-import QtQuick 2.5
+/*
+ * @Description:
+ * @Version: 1.0
+ * @Author: liyuanhao
+ * @Date: 2023-05-09 19:05:47
+ * @LastEditors: liyuanhao
+ * @LastEditTime: 2023-05-09 19:05:47
+ */
 
+
+import QtQuick 2.5
 import QtQuick.Controls 1.4
 import QtQuick.Layouts 1.3
 

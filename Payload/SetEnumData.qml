@@ -5,6 +5,9 @@ import QtQuick.Layouts 1.1
 import QtQuick.Controls 1.4
 import DesktopControls 0.1 as Desktop
 
+import "../Button"
+
+
 Window {
     id: root
 
@@ -52,7 +55,7 @@ Window {
 
                 onClicked: {
                     if (table.rowCount > 0) {
-                        console.log("++++++++++enumInfos++++++++++++"+JSON.stringify(enumInfos))
+                        // console.log("++++++++++enumInfos++++++++++++"+JSON.stringify(enumInfos))
                         rootPage.getEnumdata(enumInfos)
                     }
                 }

@@ -6,7 +6,7 @@ Item {
     id: root
 
     property int defaultHeight: 60
-    property var statusDetailValue
+    property var deviceStatus
 
     height: defaultHeight
 
@@ -74,10 +74,10 @@ Item {
             textRole: "type"
 
             onCurrentIndexChanged: {
-                if (root.statusDetailValue) {
-                    var _id =  mainWindow.gDeviceInfoAndICD[currentIndex].id
-                    root.statusDetailValue.device_id = _id
-                    // console.log("修改信号发送", _id)
+                if (root.deviceStatus) {
+                    console.log("当前数据", JSON.stringify(root.deviceStatus))
+                    var _id =  mainWindow.gDeviceInfoAndICD[idList.currentIndex].id
+                    root.deviceStatus.device_id = _id
                     root.itemChanged("device_id", _id)
                 }
             }
@@ -101,8 +101,8 @@ Item {
             width: 100
             height: 25
             onTextChanged: {
-                if (root.statusDetailValue) {
-                    root.statusDetailValue.type_name = text
+                if (root.deviceStatus) {
+                    root.deviceStatus.type_name = text
                     root.itemChanged("type_name", text)
                 }
             }
@@ -119,31 +119,32 @@ Item {
             width: 300
             height: 25
             onTextChanged: {
-                if (root.statusDetailValue) {
-                    root.statusDetailValue.desc = text
+                if (root.deviceStatus) {
+                    root.deviceStatus.desc = text
                     root.itemChanged("desc", text)
                 }
             }
         }
     }
 
-
     function load(value) {
         var canUseICD = []
-        for (var i = 0; i < mainWindow.gDeviceInfoAndICD.length; ++i) {
-            if (value.device_id === mainWindow.gDeviceInfoAndICD[i].id) {
-                // console.log("切换选项卡", JSON.stringify(mainWindow.gDeviceInfoAndICD[i]))
-                canUseICD = mainWindow.gDeviceInfoAndICD[i].input_icd
-                idList.currentIndex = i
+        var deviceIDList = mainWindow.gDeviceInfoAndICD
+        var deviceCompoxIndex = 0
+        for (var i = 0; i < deviceIDList.length; ++i) {
+            if (value.device_id === deviceIDList[i].id) {
+                canUseICD = deviceIDList[i].input_icd
+                deviceCompoxIndex = i
+                console.log("======>", i)
                 break
             }
         }
 
-        console.log("DeviceStatusDetail 加载数据", JSON.stringify(value), " 可选ICD", canUseICD)
-        statusDetailValue = value
+        deviceStatus = value
 
         typeName.text = value.type_name
         descTextField.text = value.desc
+        idList.currentIndex = deviceCompoxIndex
 
     }
 }

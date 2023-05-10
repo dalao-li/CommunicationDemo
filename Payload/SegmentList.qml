@@ -210,9 +210,9 @@ Item {
 
                 visible: validColumn && styleData.selected && (segments[styleData.row].type === 4)
 
-                onClicked: {
-                    // console.log("click")
+                onClicked: { 
                     var component = Qt.createComponent("SetEnumData.qml")
+                    // console.debug("Error:"+ component.errorString() )
                     if (component.status === Component.Ready) {
                         var win = component.createObject()
                         win.show()
@@ -527,8 +527,6 @@ Item {
             segment.type = Number(value)
 
             table.model.setProperty(index, "type", Number(value))
-
-            // console.log("-->", JSON.stringify(segments[index]))
             // 修改mask
             if (segment.type === 0 || segment.type === 4 || segment.type === 5 || segment.type === 6) {
                 segment.mask = getMask(segment.size)

@@ -128,7 +128,7 @@ Window {
             TableViewColumn {
                 id: showInfoColumn
                 visible: true
-                role: "showInfo"
+                role: "showinfo"
                 title: "信息"
                 width: 200
             }
@@ -188,10 +188,7 @@ Window {
                         name: "minus"
                         color: "black"
                         onClicked: {
-                            //root.enumInfos.splice(table.currentRow, 1)
                             table.model.remove(table.currentRow, 1)
-
-                            //root.itemChanged()
                         }
                     }
                 }
@@ -245,7 +242,5 @@ Window {
             table.model.setProperty(index, "color", value)
             break
         }
-
-        //        root.itemChanged()
     }
 }

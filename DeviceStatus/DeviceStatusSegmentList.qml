@@ -12,8 +12,6 @@ Item {
     property var canUseICD : []
     property var _deviceID
 
-    signal itemChanged(string id, string value)
-
     property int __TYPE_ID_COLUMN: 0
     property var __BIND_ICD_COLUMN: 1
     property var __FIELD_INDEX_COLUMN: 2
@@ -22,6 +20,8 @@ Item {
     property var __STATUS_TYPE_COLUMN: 5
     property var __DESC_COLUMN: 6
     property var __STATUS_LIST_COLUMN: 7
+
+    signal itemChanged(string id, string value)
 
     // 表头
     Rectangle {
@@ -180,15 +180,18 @@ Item {
 
                 onClicked: {
                     var component = Qt.createComponent("DeviceStatusEnumData.qml")
-                    // console.debug("Error:"+ component.errorString() );
+                    if (component.status === Component.Error) {
+                        console.debug("Error:"+ component.errorString())
+                        return
+                    }
                     if (component.status === Component.Ready) {
                         var win = component.createObject()
                         win.show()
                         win.rootPage = root
 
+                        // 存在枚举值
                         if (segments[styleData.row].status_list) {
-                            //存在枚举值
-                            console.log("存在枚举", JSON.stringify(segments[styleData.row].status_list))
+                            // console.log("存在枚举", JSON.stringify(segments[styleData.row].status_list))
                             win.setEunmInfos(segments[styleData.row].status_list)
                         }
                     }
@@ -357,14 +360,6 @@ Item {
         table.model.insert(row + 1, info)
     }
 
-    function getMask(N) {
-        var ff = "0x"
-        for (var i = 0; i < N; i++) {
-            ff += "ff"
-        }
-        return ff
-    }
-
     function getEnumdata(meaning) {
         segments[table.currentRow].status_list = meaning
     }
@@ -375,13 +370,12 @@ Item {
         for (var i = 0; i < mainWindow.gDeviceInfoAndICD.length; ++i) {
             if (values.device_id === mainWindow.gDeviceInfoAndICD[i].id) {
                 canUseICD = mainWindow.gDeviceInfoAndICD[i].input_icd
-                //idList.currentIndex = i
+                // idList.currentIndex = i
                 break
             }
         }
 
-        console.log("加载DeviceStatusSegment数据,", JSON.stringify(values), "可选ICD", canUseICD)
-
+        // console.log("加载DeviceStatusSegment数据,", JSON.stringify(values), "可选ICD", canUseICD)
 
         batchAdd.enabled = true
 

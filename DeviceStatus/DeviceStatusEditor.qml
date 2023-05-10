@@ -1,3 +1,13 @@
+/*
+ * @Description:
+ * @Version: 1.0
+ * @Author: liyuanhao
+ * @Date: 2023-05-09 19:05:47
+ * @LastEditors: liyuanhao
+ * @LastEditTime: 2023-05-09 19:05:47
+ */
+
+
 import QtQuick 2.5
 import QtQuick.Layouts 1.1
 import QtQuick.Controls 1.4
@@ -5,6 +15,7 @@ import DesktopControls 0.1
 
 ColumnLayout {
     id: root
+
     property var status: []
     property alias deviceStatusList: deviceStatusList
     property alias deviceStatusDetail: deviceStatusDetail
@@ -19,26 +30,25 @@ ColumnLayout {
             Layout.fillHeight: true
             color: "#f0f0f0"
 
-            // al
             DeviceStatusList {
                 id: deviceStatusList
+
                 anchors.fill: parent
                 Layout.fillHeight: true
+
                 status: root.status
 
                 onCurrentIndexChanged: {
                     if (deviceStatusList.currentIndex < 0) {
                         return
                     }
-
-                    var s = root.status[deviceStatusList.currentIndex]
-                    deviceStatusDetail.load(s)
-                    deviceStatusSegment.load(s)
+                    var data = root.status[deviceStatusList.currentIndex]
+                    deviceStatusDetail.load(data)
+                    deviceStatusSegment.load(data)
                 }
             } // DeviceStatusList end
         }
 
-        // 右上方
         Rectangle {
             Layout.fillWidth: true
             Layout.fillHeight: true
