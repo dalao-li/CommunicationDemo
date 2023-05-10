@@ -1,3 +1,11 @@
+/*
+ * @Description:
+ * @Version: 1.0
+ * @Author: liyuanhao
+ * @Date: 2023-05-09 19:05:47
+ * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2023-05-10 14:52:15
+ */
 
 
 import QtQuick 2.5
@@ -7,7 +15,7 @@ import "../Button"
 
 
 ListView {
-    property var status : []
+    property var actions : []
 
     id: root
     focus: true
@@ -24,7 +32,7 @@ ListView {
         nameFilters: ["json files (*.json)", "All files (*)"]
         onAccepted: {
             var path = String(newfileDialog.fileUrls).substring(8)
-            saveDeviceInfo(path)
+            saveActionInfo(path)
         }
         onRejected: {
             console.log("Canceled")
@@ -58,20 +66,23 @@ ListView {
         // 增加按钮
         BatchAddButton {
             id: batchAdd
-            anchors.right: parent.right
-            anchors.rightMargin: 8
-            anchors.verticalCenter: parent.verticalCenter
-            onClicked: {
-                var _id = mainWindow.gDeviceBindList[0].id
-                var info = {
-                    "type_name": "状态" + String(root.status.length),
-                    "desc": "",
-                    "monitor_status": [],
-                    "device_id": _id
-                }
-                root.status.push(info)
 
-                // 将信息添加入model
+            anchors {
+                right: parent.right
+                rightMargin: 8
+                verticalCenter: parent.verticalCenter
+            }
+
+            onClicked: {
+                var defaultInfo = mainWindow.gDeviceBindList[0]
+                 var info = {
+                    "name": "动作" + String(root.actions.length),
+                    "id": String(createID()),
+                    "condition": [],
+                    "device_id": defaultInfo.id,
+                    "icd_id": defaultInfo.input_icd[0]
+                }
+                root.actions.push(info)
                 root.model.append(info)
             }
         } // BatchAddButton end
@@ -81,7 +92,7 @@ ListView {
         x: 3
         height: 27
         width: root.width
-        text: type_name
+        text: name
         color: "black"
     }
 
@@ -104,7 +115,7 @@ ListView {
                 name: "minus"
 
                 onClicked: {
-                    root.status.splice(root.currentIndex, 1)
+                    root.actions.splice(root.currentIndex, 1)
                     root.model.remove(root.currentIndex, 1)
                 }
             }
@@ -127,9 +138,29 @@ ListView {
         onPressAndHold: mouse.accepted = false
     }
 
+    // 生成随机ID
+    function createID() {
+        const MAX = 65535
+        const MIN = 0
+        while(true) {
+            var num = Math.floor(Math.random() * (MIN - MAX)) + MAX
+            var flag = false
+            for (var i in root.actions) {
+                if (root.actions[i].id === num) {
+                    flag = true
+                    break
+                }
+            }
+
+            if (!flag) {
+                return num
+            }
+        }
+    }
+
     // 导出
-    function saveDeviceInfo(path) {
-        var data = root.status
+    function saveActionInfo(path) {
+        var data = root.actions
         var dataList = []
         // 处理JSON
         for (var i in data) {

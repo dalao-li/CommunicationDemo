@@ -1,3 +1,13 @@
+/*
+ * @Description:
+ * @Version: 1.0
+ * @Author: liyuanhao
+ * @Date: 2023-05-09 19:05:47
+ * @LastEditors: liyuanhao
+ * @LastEditTime: 2023-05-09 19:05:47
+ */
+
+
 import QtQuick 2.5
 import QtQuick.Controls 1.4
 import QtQuick.Dialogs 1.2
@@ -8,19 +18,21 @@ import "Button"
 import "Device"
 import "DeviceStatus"
 import "Payload"
+import "DeviceAction"
 
 ApplicationWindow {
     id: mainWindow
     visible: true
     width: 1200
     height: 800
+
     title: qsTr("通信Demo")
 
     property var content: []
     property string path: ""
 
-    property var gDeviceInfoAndICD: []
-    property var gICDInfoList: []
+    property var gDeviceBindList: []
+    property var gICDList: []
     property var gDeviceMonitorSetting
 
 
@@ -109,7 +121,7 @@ ApplicationWindow {
         Tab {
             id: tab4
             title: "设备类型"
-            Device {
+            DeviceEditor {
                 id: device
             }
 
@@ -122,6 +134,14 @@ ApplicationWindow {
                 id: deviceStatus
             }
 
+        }
+
+        Tab {
+            id: tab6
+            title: "设备动作"
+            DeviceActionEditor {
+                id: deviceAction
+            }
         }
     } // TabView end
 

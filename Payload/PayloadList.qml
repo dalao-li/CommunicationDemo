@@ -76,7 +76,7 @@ ListView {
 
                 root.model.append({"name": info.name})
 
-                gICDInfoList.push({"name": info.name, "icd_id": info.id})
+                gICDList.push({"name": info.name, "icd_id": info.id})
             }
         } // BatchAddButton end
     } // header end
@@ -112,7 +112,7 @@ ListView {
                     root.payloads.splice(root.currentIndex, 1)
                     root.model.remove(root.currentIndex, 1)
 
-                    gICDInfoList.splice(root.currentIndex, 1)
+                    gICDList.splice(root.currentIndex, 1)
                 }
             }
         }

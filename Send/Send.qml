@@ -19,7 +19,6 @@ Item {
 
     property var curSegments:[]
 
-    //按照载荷规则更新列表数据
     function updateContent() {
         if (content.length < 1) return
 

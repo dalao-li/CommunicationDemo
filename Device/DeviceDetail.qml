@@ -88,13 +88,16 @@ Item {
                     root.device.type = text
                     root.itemChanged("type", text)
 
-                    // 修改gDeviceInfoAndICD中的值
-                    for (var i in mainWindow.gDeviceInfoAndICD) {
-                        if (mainWindow.gDeviceInfoAndICD[i].id === root.device.device_id) {
-                            mainWindow.gDeviceInfoAndICD[i].type = text
+                    // 修改gDeviceBindList中的值
+                    for (var i in mainWindow.gDeviceBindList) {
+                        if (gDeviceBindList[i].id === root.device.device_id) {
+                            gDeviceBindList[i].type = text
                             break
                         }
                     }
+
+                    root.device.type = text
+                    root.itemChanged("type", text)
                 }
             }
         }
@@ -110,10 +113,10 @@ Item {
             height: 25
             onTextChanged: {
                 if (root.device) {
-                    // 修改gDeviceInfoAndICD中的值
-                    for (var i in mainWindow.gDeviceInfoAndICD) {
-                        if (mainWindow.gDeviceInfoAndICD[i].id === root.device.device_id) {
-                            mainWindow.gDeviceInfoAndICD[i].id = text
+                    // 修改gDeviceBindList中的值
+                    for (var i in mainWindow.gDeviceBindList) {
+                        if (gDeviceBindList[i].id === root.device.device_id) {
+                            gDeviceBindList[i].id = text
                             break
                         }
                     }
@@ -360,10 +363,10 @@ Item {
                             root.itemChanged("icd_info", JSON.stringify({"opeator": "del", "type": "input", "icd_id": line.icdValue}))
                         }
 
-                        // 修改gDeviceInfoAndICD中的值
-                        for (var j in gDeviceInfoAndICD) {
-                            if (gDeviceInfoAndICD[j].id === root.device.device_id) {
-                                gDeviceInfoAndICD[j].input_icd = root.device.input_icd
+                        // 修改gDeviceBindList中的值
+                        for (var j in gDeviceBindList) {
+                            if (gDeviceBindList[j].id === root.device.device_id) {
+                                gDeviceBindList[j].input_icd = root.device.input_icd
                                 break
                             }
                         }
@@ -489,8 +492,7 @@ Item {
         table.model.clear()
 
         // 查询当前所有icd
-        // console.log("当前icd list, ", JSON.stringify(mainWindow.gICDInfoList))
-        var icdList = mainWindow.gICDInfoList
+        var icdList = mainWindow.gICDList
 
         for (var i in icdList) {
             // 如果当前行icd

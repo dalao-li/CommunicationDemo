@@ -8,18 +8,11 @@ import "../Button"
 Item {
     id: root
 
-    property var segments: []
+    property var actions: []
     property var canUseICD : []
-    property var _deviceID
 
-    property int __TYPE_ID_COLUMN: 0
-    property var __BIND_ICD_COLUMN: 1
-    property var __FIELD_INDEX_COLUMN: 2
-    property var __TYPE_COLUMN: 3
-    property var __TYPE_NAME_COLUMN: 4
-    property var __STATUS_TYPE_COLUMN: 5
-    property var __DESC_COLUMN: 6
-    property var __STATUS_LIST_COLUMN: 7
+    property int __CONDITION_BIND_ICD_ID_COLUMN: 0
+    property var __CONDTION_KEYS_COLUMN: 1
 
     signal itemChanged(string id, string value)
 
@@ -38,7 +31,7 @@ Item {
 
         Label {
             anchors.centerIn: parent
-            text: "状态信息"
+            text: "动作信息"
         }
 
         // 右上角增加按钮
@@ -81,7 +74,7 @@ Item {
                     margins: 1
                 }
 
-                property var validColumn: [__TYPE_ID_COLUMN, __TYPE_COLUMN, __TYPE_NAME_COLUMN, __DESC_COLUMN].includes(styleData.column)
+                property var validColumn: false
 
                 visible: validColumn && styleData.selected
 
@@ -103,7 +96,7 @@ Item {
                 }
             } // TextField end
 
-            // 绑定ICD
+            // conditon绑定ICD
             ComboBox {
                 id: typeBox
                 anchors {
@@ -111,7 +104,7 @@ Item {
                     margins: 1
                 }
 
-                property var validColumn: styleData.column === __BIND_ICD_COLUMN
+                property var validColumn: styleData.column === __CONDITION_BIND_ICD_ID_COLUMN
 
                 visible: validColumn && styleData.selected
 
@@ -123,7 +116,6 @@ Item {
                     if (!visible) {
                         return
                     }
-                    console.log("注意", styleData.value)
                     root.setValue(styleData.row, styleData.column, String(gICDList[currentIndex].icd_id))
                 }
 
@@ -132,44 +124,18 @@ Item {
                     for (var i in canUseICD) {
                         for (var j in gICDList) {
                             if (String(canUseICD[i]) === String(gICDList[j].icd_id)) {
-
                                 icdNameList.push(gICDList[j])
                                 break
                             }
                         }
                     }
-                    // console.log("当前可选ICD", JSON.stringify(icdNameList))
                     return icdNameList
-                }
-            }
-
-            // 大小
-            SpinBox {
-                anchors {
-                    fill: parent
-                    margins: 1
-                }
-
-                property var validColumn: styleData.column === __FIELD_INDEX_COLUMN || styleData.column === __STATUS_TYPE_COLUMN
-
-                visible: styleData.selected && validColumn
-
-                value: validColumn ? Number(styleData.value) : 0
-
-                maximumValue: 128
-                minimumValue: styleData.column === 1 ? 0 : 1
-
-                onValueChanged: {
-                    if (!visible) {
-                        return
-                    }
-                    root.setValue(styleData.row, styleData.column, value)
                 }
             }
 
             Button {
                 id: enumBtn
-                text: qsTr("添加状态")
+                text: qsTr("添加Condition")
                 anchors {
                     fill: parent
                     margins: 1
@@ -180,7 +146,7 @@ Item {
                 visible: validColumn && styleData.selected
 
                 onClicked: {
-                    var component = Qt.createComponent("DeviceStatusEnumData.qml")
+                    var component = Qt.createComponent("DeviceActionEnumData.qml")
                     if (component.status === Component.Error) {
                         console.debug("Error:"+ component.errorString())
                         return
@@ -191,9 +157,8 @@ Item {
                         win.rootPage = root
 
                         // 存在枚举值
-                        if (segments[styleData.row].status_list) {
-                            // console.log("存在枚举", JSON.stringify(segments[styleData.row].status_list))
-                            win.setEunmInfos(segments[styleData.row].status_list)
+                        if (segments[styleData.row].condition) {
+                            win.setEunmInfos(segments[styleData.row].condition)
                         }
                     }
                 }
@@ -202,7 +167,7 @@ Item {
             Label {
                 id: label
                 anchors.fill: parent
-                visible: !styleData.selected
+                visible: false
 
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
@@ -222,65 +187,17 @@ Item {
         } // itemDelegate end
 
         TableViewColumn {
-            id: typeID
-            visible: table.columsVisible[0]
-            role: "type_id"
-            title: "ID"
-            width: 160
-        }
-
-        TableViewColumn {
-            id: bindICD
-            visible: table.columsVisible[1]
-            role: "bind_icd"
-            title: "绑定ICD"
-            width: 80
-        }
-
-        TableViewColumn {
-            id: fieldIndex
-            visible: table.columsVisible[2]
-            role: "field_index"
-            title: "field_index"
-            width: 80
-        }
-
-        TableViewColumn {
             id: type
-            visible: table.columsVisible[3]
+            visible: table.columsVisible[__CONDITION_BIND_ICD_ID_COLUMN]
             role: "type"
             title: "类型"
             width: 100
         }
 
         TableViewColumn {
-            id: typeName
-            visible: table.columsVisible[4]
-            role: "type_name"
-            title: "类别名"
-            width: 100
-        }
-
-        TableViewColumn {
-            id: statusType
-            visible: table.columsVisible[5]
-            role: "status_type"
-            title: "status_type"
-            width: 80
-        }
-
-        TableViewColumn {
-            id: desc
-            visible: table.columsVisible[6]
-            role: "desc"
-            title: "描述"
-            width: 80
-        }
-
-        TableViewColumn {
-            id: statusList
-            visible: table.columsVisible[7]
-            role: "statusList"
+            id: condition
+            visible: table.columsVisible[__CONDTION_KEYS_COLUMN]
+            role: "condition"
             title: "状态列表"
             width: 80
         }
@@ -346,14 +263,8 @@ Item {
     // 增加新行
     function addSegment(row) {
         var info = {
-            "type_id": row + 1,
-            "bind_icd": "",
-            "field_index": 0,
-            "type": row + 1,
-            "type_name": "状态" + String(row + 1),
-            "status_type": 0,
-            "desc": "",
-            "status_list": []
+            "bind_icd": gICDList[0].icd_id,
+            "condition": []
         }
 
         root.segments.splice(row + 1, 0, info)
@@ -362,21 +273,17 @@ Item {
     }
 
     function getEnumdata(meaning) {
-        segments[table.currentRow].status_list = meaning
+        segments[table.currentRow].condition = meaning
     }
 
     // 加载列表数据
     function load(values) {
-        _deviceID = values.device_id
         for (var i = 0; i < mainWindow.gDeviceBindList.length; ++i) {
             if (values.device_id === mainWindow.gDeviceBindList[i].id) {
                 canUseICD = mainWindow.gDeviceBindList[i].input_icd
-                // idList.currentIndex = i
                 break
             }
         }
-
-        // console.log("加载DeviceStatusSegment数据,", JSON.stringify(values), "可选ICD", canUseICD)
 
         batchAdd.enabled = true
 
@@ -386,14 +293,8 @@ Item {
 
         for (var i in segments) {
             table.model.append({
-                                   "type_id": segments[i].type_id,
-                                   "bind_icd": segments[i].bind_icd,
-                                   "field_index": segments[i].field_index,
-                                   "type": segments[i].type,
-                                   "type_name": segments[i].type_name,
-                                   "status_type": segments[i].status_type,
-                                   "desc": segments[i].desc,
-                                   "status_list": segments[i].status_list,
+                                   "bind_icd": segments[i].type_id,
+                                   "status_list": segments[i].condition,
                                })
         }
     }
@@ -406,55 +307,16 @@ Item {
 
         var segment = root.segments[index]
         switch (column) {
-        case __TYPE_ID_COLUMN:
-            segment.type_id = value
-            table.model.setProperty(index, "type_id", value)
-            break
-        case __BIND_ICD_COLUMN:
+        case __CONDITION_BIND_ICD_ID_COLUMN:
             segment.bind_icd = value
-            console.log("bind_icd修改为", value)
-            table.model.setProperty(index, "bind_icd", String(value))
+            table.model.setProperty(index, "bind_icd", value)
             break
-        case __FIELD_INDEX_COLUMN:
-            segment.field_index = value
-            table.model.setProperty(index, "field_index", value)
-            break
-        case __TYPE_COLUMN:
-            segment.type = value
-            table.model.setProperty(index, "type", value)
-            break
-        case __TYPE_NAME_COLUMN:
-            segment.type_name = value
-            table.model.setProperty(index, "type_name", value)
-            break
-        case __STATUS_TYPE_COLUMN:
-            segment.status_type = value
-            table.model.setProperty(index, "status_type", value)
-            break
-        case __DESC_COLUMN:
-            segment.desc = value
-            table.model.setProperty(index, "desc", value)
-            break
-        case __STATUS_LIST_COLUMN:
-            segment.status_list = value
-            table.model.setProperty(index, "status_list", value)
+
+        case __CONDTION_KEYS_COLUMN:
+            segment.condition = value
+            table.model.setProperty(index, "condition", value)
             break
         }
         root.segments[index] = segment
-    }
-
-    function persist(index, state) {
-        var apppath = Excutor.query({ "apppath": "" })
-
-        var file = apppath + "/config/persistence.soft"
-
-        var config = Excutor.query({"read": file })
-        config.payload_editor.segments[index] = state
-
-        Excutor.query({
-                          "command": "write",
-                          "path": file,
-                          "content": Framework.formatJSON(JSON.stringify(config))
-                      })
     }
 }

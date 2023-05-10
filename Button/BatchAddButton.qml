@@ -42,7 +42,6 @@ Item {
                 id: item
 
                 onTriggered: {
-                    console.log("-------index22--------")
                     root.clicked(index)
                     console.log(index)
                 }

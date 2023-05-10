@@ -104,7 +104,7 @@ ListView {
                 root.devices.push(info)
                 root.model.append(info)
 
-                mainWindow.gDeviceInfoAndICD.push({"type": info.type, "id": info.device_id, "input_icd":[]})
+                gDeviceBindList.push({"type": info.type, "id": info.device_id, "input_icd":[]})
             }
         } // BatchAddButton end
 
@@ -148,7 +148,7 @@ ListView {
                     root.devices.splice(root.currentIndex, 1)
                     root.model.remove(root.currentIndex, 1)
 
-                    mainWindow.gDeviceInfoAndICD.splice(root.currentIndex, 1)
+                    mainWindow.gDeviceBindList.splice(root.currentIndex, 1)
                 }
             }
         }
@@ -229,7 +229,7 @@ ListView {
             }
 
             // 将设备名与id写入全局device列表
-            gDeviceInfoAndICD.push({"type": data[i].type, "id": data[i].device_id, "input_icd": []})
+            gDeviceBindList.push({"type": data[i].type, "id": data[i].device_id, "input_icd": []})
 
             root.devices.push(info)
             root.model.append(info)

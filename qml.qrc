@@ -3,7 +3,7 @@
         <file>main.qml</file>
         <file>Button/BatchAddButton.qml</file>
         <file>Button/IconButton.qml</file>
-        <file>Device/Device.qml</file>
+        <file>Device/DeviceEditor.qml</file>
         <file>Device/DeviceDetail.qml</file>
         <file>Device/DeviceList.qml</file>
         <file>DeviceStatus/DeviceStatusDetail.qml</file>
@@ -20,5 +20,10 @@
         <file>Send/Send.qml</file>
         <file>Payload/PayloadShowDetail.qml</file>
         <file>Payload/PayloadBind.qml</file>
+        <file>DeviceAction/DeviceActionEditor.qml</file>
+        <file>DeviceAction/DeviceActionList.qml</file>
+        <file>DeviceAction/DeviceActionDetail.qml</file>
+        <file>DeviceAction/DeviceActionSegmentList.qml</file>
+        <file>DeviceAction/DeviceActionEnumData.qml</file>
     </qresource>
 </RCC>

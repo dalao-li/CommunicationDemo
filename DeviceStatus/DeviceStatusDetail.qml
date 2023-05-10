@@ -75,8 +75,7 @@ Item {
 
             onCurrentIndexChanged: {
                 if (root.deviceStatus) {
-                    console.log("当前数据", JSON.stringify(root.deviceStatus))
-                    var _id =  mainWindow.gDeviceInfoAndICD[idList.currentIndex].id
+                    var _id =  mainWindow.gDeviceBindList[idList.currentIndex].id
                     root.deviceStatus.device_id = _id
                     root.itemChanged("device_id", _id)
                 }
@@ -86,7 +85,7 @@ Item {
         Binding {
             target: idList
             property: "model"
-            value: mainWindow.gDeviceInfoAndICD
+            value: mainWindow.gDeviceBindList
         }
 
         Label {
@@ -129,13 +128,13 @@ Item {
 
     function load(value) {
         var canUseICD = []
-        var deviceIDList = mainWindow.gDeviceInfoAndICD
+        var deviceIDList = mainWindow.gDeviceBindList
         var deviceCompoxIndex = 0
         for (var i = 0; i < deviceIDList.length; ++i) {
             if (value.device_id === deviceIDList[i].id) {
                 canUseICD = deviceIDList[i].input_icd
                 deviceCompoxIndex = i
-                console.log("======>", i)
+                // console.log("======>", i)
                 break
             }
         }
