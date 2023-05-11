@@ -1,3 +1,12 @@
+/*
+ * @Description:
+ * @Version: 1.0
+ * @Author: liyuanhao
+ * @Date: 2023-05-09 19:05:47
+ * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2023-05-10 14:52:15
+ */
+
 import QtQuick 2.5
 import Qt.labs.settings 1.0
 import QtQuick.Controls 1.4
@@ -9,17 +18,17 @@ Item {
     id: root
 
     property var segments: []
-    property var canUseICD : []
+    property var _canUseICD : []
     property var _deviceID
 
-    property int __TYPE_ID_COLUMN: 0
-    property var __BIND_ICD_COLUMN: 1
-    property var __FIELD_INDEX_COLUMN: 2
-    property var __TYPE_COLUMN: 3
-    property var __TYPE_NAME_COLUMN: 4
-    property var __STATUS_TYPE_COLUMN: 5
-    property var __DESC_COLUMN: 6
-    property var __STATUS_LIST_COLUMN: 7
+    property int _TYPE_ID_COLUMN: 0
+    property var _BIND_ICD_COLUMN: 1
+    property var _FIELD_INDEX_COLUMN: 2
+    property var _TYPE_COLUMN: 3
+    property var _TYPE_NAME_COLUMN: 4
+    property var _STATUS_TYPE_COLUMN: 5
+    property var _DESC_COLUMN: 6
+    property var _STATUS_LIST_COLUMN: 7
 
     signal itemChanged(string id, string value)
 
@@ -81,7 +90,7 @@ Item {
                     margins: 1
                 }
 
-                property var validColumn: [__TYPE_ID_COLUMN, __TYPE_COLUMN, __TYPE_NAME_COLUMN, __DESC_COLUMN].includes(styleData.column)
+                property var validColumn: [_TYPE_ID_COLUMN, _TYPE_COLUMN, _TYPE_NAME_COLUMN, _DESC_COLUMN].includes(styleData.column)
 
                 visible: validColumn && styleData.selected
 
@@ -111,7 +120,7 @@ Item {
                     margins: 1
                 }
 
-                property var validColumn: styleData.column === __BIND_ICD_COLUMN
+                property var validColumn: styleData.column === _BIND_ICD_COLUMN
 
                 visible: validColumn && styleData.selected
 
@@ -123,22 +132,19 @@ Item {
                     if (!visible) {
                         return
                     }
-                    console.log("注意", styleData.value)
-                    root.setValue(styleData.row, styleData.column, String(gICDList[currentIndex].icd_id))
+                    root.setValue(styleData.row, styleData.column, String(gICDInfo[currentIndex].icd_id))
                 }
 
                 model: {
                     var icdNameList = []
-                    for (var i in canUseICD) {
-                        for (var j in gICDList) {
-                            if (String(canUseICD[i]) === String(gICDList[j].icd_id)) {
-
-                                icdNameList.push(gICDList[j])
+                    for (var i in _canUseICD) {
+                        for (var j in gICDInfo) {
+                            if (String(_canUseICD[i]) === String(gICDInfo[j].icd_id)) {
+                                icdNameList.push(gICDInfo[j])
                                 break
                             }
                         }
                     }
-                    // console.log("当前可选ICD", JSON.stringify(icdNameList))
                     return icdNameList
                 }
             }
@@ -150,7 +156,7 @@ Item {
                     margins: 1
                 }
 
-                property var validColumn: styleData.column === __FIELD_INDEX_COLUMN || styleData.column === __STATUS_TYPE_COLUMN
+                property var validColumn: styleData.column === _FIELD_INDEX_COLUMN || styleData.column === _STATUS_TYPE_COLUMN
 
                 visible: styleData.selected && validColumn
 
@@ -175,9 +181,7 @@ Item {
                     margins: 1
                 }
 
-                property var validColumn: styleData.column === __STATUS_LIST_COLUMN
-
-                visible: validColumn && styleData.selected
+                visible: (styleData.column === _STATUS_LIST_COLUMN) && styleData.selected
 
                 onClicked: {
                     var component = Qt.createComponent("DeviceStatusEnumData.qml")
@@ -190,9 +194,7 @@ Item {
                         win.show()
                         win.rootPage = root
 
-                        // 存在枚举值
                         if (segments[styleData.row].status_list) {
-                            // console.log("存在枚举", JSON.stringify(segments[styleData.row].status_list))
                             win.setEunmInfos(segments[styleData.row].status_list)
                         }
                     }
@@ -211,8 +213,7 @@ Item {
                     if (!visible) {
                         return ""
                     }
-
-                    if (styleData.column === __TYPE_NAME_COLUMN || styleData.column === __DESC_COLUMN) {
+                    if (styleData.column === _TYPE_NAME_COLUMN || styleData.column === _DESC_COLUMN) {
                         return String(styleData.value)
 
                     }
@@ -335,7 +336,6 @@ Item {
                     onClicked: {
                         root.segments.splice(table.currentRow, 1)
                         table.model.remove(table.currentRow, 1)
-                        //root.itemChanged()
                     }
                 }
             }
@@ -357,7 +357,6 @@ Item {
         }
 
         root.segments.splice(row + 1, 0, info)
-
         table.model.insert(row + 1, info)
     }
 
@@ -368,22 +367,18 @@ Item {
     // 加载列表数据
     function load(values) {
         _deviceID = values.device_id
-        for (var i = 0; i < mainWindow.gDeviceBindList.length; ++i) {
-            if (values.device_id === mainWindow.gDeviceBindList[i].id) {
-                canUseICD = mainWindow.gDeviceBindList[i].input_icd
-                // idList.currentIndex = i
+        for (var i in gDeviceBindInfo) {
+            if (values.device_id === gDeviceBindInfo[i].id) {
+                _canUseICD = gDeviceBindInfo[i].input_icd
                 break
             }
         }
 
-        // console.log("加载DeviceStatusSegment数据,", JSON.stringify(values), "可选ICD", canUseICD)
-
         batchAdd.enabled = true
-
-        table.model.clear()
 
         segments = values.monitor_status
 
+        table.model.clear()
         for (var i in segments) {
             table.model.append({
                                    "type_id": segments[i].type_id,
@@ -406,55 +401,39 @@ Item {
 
         var segment = root.segments[index]
         switch (column) {
-        case __TYPE_ID_COLUMN:
+        case _TYPE_ID_COLUMN:
             segment.type_id = value
             table.model.setProperty(index, "type_id", value)
             break
-        case __BIND_ICD_COLUMN:
+        case _BIND_ICD_COLUMN:
             segment.bind_icd = value
-            console.log("bind_icd修改为", value)
             table.model.setProperty(index, "bind_icd", String(value))
             break
-        case __FIELD_INDEX_COLUMN:
+        case _FIELD_INDEX_COLUMN:
             segment.field_index = value
             table.model.setProperty(index, "field_index", value)
             break
-        case __TYPE_COLUMN:
+        case _TYPE_COLUMN:
             segment.type = value
             table.model.setProperty(index, "type", value)
             break
-        case __TYPE_NAME_COLUMN:
+        case _TYPE_NAME_COLUMN:
             segment.type_name = value
             table.model.setProperty(index, "type_name", value)
             break
-        case __STATUS_TYPE_COLUMN:
+        case _STATUS_TYPE_COLUMN:
             segment.status_type = value
             table.model.setProperty(index, "status_type", value)
             break
-        case __DESC_COLUMN:
+        case _DESC_COLUMN:
             segment.desc = value
             table.model.setProperty(index, "desc", value)
             break
-        case __STATUS_LIST_COLUMN:
+        case _STATUS_LIST_COLUMN:
             segment.status_list = value
             table.model.setProperty(index, "status_list", value)
             break
         }
         root.segments[index] = segment
-    }
-
-    function persist(index, state) {
-        var apppath = Excutor.query({ "apppath": "" })
-
-        var file = apppath + "/config/persistence.soft"
-
-        var config = Excutor.query({"read": file })
-        config.payload_editor.segments[index] = state
-
-        Excutor.query({
-                          "command": "write",
-                          "path": file,
-                          "content": Framework.formatJSON(JSON.stringify(config))
-                      })
     }
 }

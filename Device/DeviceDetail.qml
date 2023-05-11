@@ -3,9 +3,10 @@
  * @Version: 1.0
  * @Author: liyuanhao
  * @Date: 2023-05-09 19:05:47
- * @LastEditors: liyuanhao
- * @LastEditTime: 2023-05-09 19:05:47
+ * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2023-05-11 17:33:00
  */
+
 
 import QtQuick 2.5
 import QtQuick.Controls 1.4
@@ -18,8 +19,9 @@ Item {
     id: root
 
     property int defaultHeight: 60
-    property var device
+    property var _device
 
+    // 列名枚举
     property var _INPUT_ICD_COLUMN: 0
     property var _OUPUT_ICD_COLUMN: 1
     property var _ICD_NAME_COLUMN: 2
@@ -51,8 +53,7 @@ Item {
                 } else {
                     root.height = defaultHeight
                 }
-
-                !flow.visible
+                flow.visible = !flow.visible
             }
         }
     } // title end
@@ -66,13 +67,11 @@ Item {
             topMargin: 10
         }
 
-        // 每行两列
         columns: 2
-        // 15行
         rowSpacing: 15
         columnSpacing: 20
 
-        // 外部输入设备名称
+        // devicd type
         Label {
             text: "设备名称"
             horizontalAlignment: Text.AlignLeft
@@ -84,25 +83,25 @@ Item {
             width: 300
             height: 25
             onTextChanged: {
-                if (root.device) {
-                    root.device.type = text
+                if (root._device) {
+                    root._device.type = text
                     root.itemChanged("type", text)
 
-                    // 修改gDeviceBindList中的值
-                    for (var i in mainWindow.gDeviceBindList) {
-                        if (gDeviceBindList[i].id === root.device.device_id) {
-                            gDeviceBindList[i].type = text
+                    // 修改gDeviceBindInfo中的值
+                    for (var i in gDeviceBindInfo) {
+                        if (gDeviceBindInfo[i].id === root._device.device_id) {
+                            gDeviceBindInfo[i].type = text
                             break
                         }
                     }
 
-                    root.device.type = text
+                    root._device.type = text
                     root.itemChanged("type", text)
                 }
             }
         }
 
-        // 根据设备名称生成ID
+        // device_id
         Label {
             text: "设备ID"
         }
@@ -112,49 +111,49 @@ Item {
             width: 300
             height: 25
             onTextChanged: {
-                if (root.device) {
-                    // 修改gDeviceBindList中的值
-                    for (var i in mainWindow.gDeviceBindList) {
-                        if (gDeviceBindList[i].id === root.device.device_id) {
-                            gDeviceBindList[i].id = text
+                if (root._device) {
+                    // 修改gDeviceBindInfo中的值
+                    for (var i in gDeviceBindInfo) {
+                        if (gDeviceBindInfo[i].id === root._device.device_id) {
+                            gDeviceBindInfo[i].id = text
                             break
                         }
                     }
 
-                    root.device.device_id = text
+                    root._device.device_id = text
                     root.itemChanged("device_id", text)
                 }
             }
 
         }
 
-        // 选择是否被控
+        // control type
         Label {
             text: "是否被控"
         }
 
         ComboBox {
-            id: isControl
+            id: controlCombox
             width: 300
             height: 25
 
             model: ["是", "否"]
 
             onCurrentIndexChanged: {
-                if (root.device) {
-                    root.device.control_type = currentIndex
+                if (root._device) {
+                    root._device.control_type = currentIndex
                     root.itemChanged("control_type", currentIndex)
                 }
             }
         }
 
-        //
+        // bus type
         Label {
             text: "bus_type"
         }
 
         ComboBox {
-            id: busType
+            id: busTypeCombox
             width: 300
             height: 25
             model: ["UDP", "反射内存卡"]
@@ -164,30 +163,30 @@ Item {
                 if (currentIndex === 0) {
                     ipLabel.visible = true
                     sendPortLabel.visible = true
-                    ipInput.visible = true
-                    sendPortInput.visible = true
+                    ipField.visible = true
+                    sendPortField.visible = true
 
                     rfm2gLabel.visible = false
                     addressLabel.visible = false
-                    rfm2gInput.visible = false
-                    addressInput.visible = false
+                    rfm2gField.visible = false
+                    addressField.visible = false
                 }
 
                 // rfm2g address
                 if (currentIndex === 1) {
                     ipLabel.visible = false
                     sendPortLabel.visible = false
-                    ipInput.visible = false
-                    sendPortInput.visible = false
+                    ipField.visible = false
+                    sendPortField.visible = false
 
                     rfm2gLabel.visible = true
                     addressLabel.visible = true
-                    rfm2gInput.visible = true
-                    addressInput.visible = true
+                    rfm2gField.visible = true
+                    addressField.visible = true
                 }
 
-                if (root.device) {
-                    root.device.bus_type = currentIndex
+                if (root._device) {
+                    root._device.bus_type = currentIndex
                     root.itemChanged("bus_type", currentIndex)
                 }
             }
@@ -200,12 +199,12 @@ Item {
         }
 
         TextField {
-            id: ipInput
+            id: ipField
             width: 300
             height: 25
             onTextChanged: {
-                if (root.device) {
-                    root.device.ip = text
+                if (root._device) {
+                    root._device.ip = text
                     root.itemChanged("ip", text)
                 }
             }
@@ -218,12 +217,12 @@ Item {
         }
 
         TextField {
-            id: sendPortInput
+            id: sendPortField
             width: 300
             height: 25
             onTextChanged: {
-                if (root.device) {
-                    root.device.send_port = text
+                if (root._device) {
+                    root._device.send_port = text
                     root.itemChanged("send_port", text)
                 }
             }
@@ -237,13 +236,13 @@ Item {
         }
 
         TextField {
-            id: rfm2gInput
+            id: rfm2gField
             visible: false
             width: 300
             height: 25
             onTextChanged: {
-                if (root.device) {
-                    root.device.rfm2g_id = text
+                if (root._device) {
+                    root._device.rfm2g_id = text
                     root.itemChanged("rfm2g_id", text)
                 }
             }
@@ -257,23 +256,21 @@ Item {
         }
 
         TextField {
-            id: addressInput
+            id: addressField
             visible: false
             width: 300
             height: 25
             onTextChanged: {
-                if (root.device) {
-                    root.device.address = text
+                if (root._device) {
+                    root._device.address = text
                     root.itemChanged("address", text)
                 }
             }
         }
     } // Grid end
 
-
-    // 表头
     Rectangle {
-        id: icdTitle
+        id: icdLabel
         anchors {
             left: parent.left
             right: parent.right
@@ -291,11 +288,10 @@ Item {
         }
     } // Rectangle end
 
-    // 除表头之外的表格内容
     TableView {
         id: table
         anchors {
-            top: icdTitle.bottom
+            top: icdLabel.bottom
             // bottom: parent.bottom
             left: parent.left
             right: parent.right
@@ -327,6 +323,7 @@ Item {
                 verticalAlignment: Text.AlignVCenter
             } // TextField end
 
+            // input icd 选择
             CheckBox {
                 id: inputCheck
                 anchors {
@@ -334,46 +331,47 @@ Item {
                     margins: 1
                 }
 
-                checked: {
-                    return styleData.value
-                }
+                checked: styleData.value
 
-                property var validColumn: [_INPUT_ICD_COLUMN].includes(styleData.column)
-
-                visible: validColumn
+                visible: styleData.column === _INPUT_ICD_COLUMN
 
                 onClicked: {
-                    if (root.device) {
-                        // 如果是勾选
-                        var line = table.model.get(styleData.row)
+                    if (root._device) {
+                        // 勾选
+                        var updateValue = {}
+                        var nowICD = table.model.get(styleData.row).icdValue
                         if (checkedState === Qt.Checked) {
-                            root.device.input_icd.push(line.icdValue)
-                            // console.log("发送修改信号")
-                            root.itemChanged("icd_info", JSON.stringify({"opeator": "add", "type": "input", "icd_id": line.icdValue}))
+                            root._device.input_icd.push(nowICD)
+                            updateValue = {"opeator": "add", "type": "input", "icd_id":nowICD}
+
                         }
 
+                        // 取消
                         else {
                             var newList = []
-                            for (var i = 0; i < root.device.input_icd.length; ++i) {
-                                if (root.device.input_icd[i] !== line.icdValue) {
-                                    newList.push(root.device.input_icd[i])
+                            for (var i = 0; i < root._device.input_icd.length; ++i) {
+                                if (root._device.input_icd[i] !== nowICD) {
+                                    newList.push(root._device.input_icd[i])
                                 }
                             }
-                            root.device.input_icd = newList
-                            root.itemChanged("icd_info", JSON.stringify({"opeator": "del", "type": "input", "icd_id": line.icdValue}))
+                            root._device.input_icd = newList
+                            updateValue = {"opeator": "del", "type": "input", "icd_id": nowICD}
                         }
 
-                        // 修改gDeviceBindList中的值
-                        for (var j in gDeviceBindList) {
-                            if (gDeviceBindList[j].id === root.device.device_id) {
-                                gDeviceBindList[j].input_icd = root.device.input_icd
-                                break
+                        root.itemChanged("icd_info", JSON.stringify(updateValue))
+
+                        // 修改gDeviceBindInfo
+                        for (var j in gDeviceBindInfo) {
+                            if (gDeviceBindInfo[j].id === root._device.device_id) {
+                                gDeviceBindInfo[j].input_icd = root._device.input_icd
+                                return
                             }
                         }
                     }
                 }
-            }
+            } // CheckBox end
 
+            // ouput icd选择
             CheckBox {
                 id: ouputCheck
                 anchors {
@@ -381,33 +379,40 @@ Item {
                     margins: 1
                 }
 
-                property var validColumn: [_OUPUT_ICD_COLUMN].includes(styleData.column)
+                visible: styleData.column === _OUPUT_ICD_COLUMN
 
-                visible: validColumn
-
-                checked: {
-                    return styleData.value
-                }
+                checked: styleData.value
 
                 onClicked: {
-                    if (root.device) {
-                        var line = table.model.get(styleData.row)
-                        if (checked) {
+                    if (root._device) {
+                        var nowICD = table.model.get(styleData.row).icdValue
+                        var updateValue = {}
+                        // 勾选
+                        if (checkedState === Qt.Checked) {
                             if (styleData.column === _OUPUT_ICD_COLUMN) {
-                                root.device.ouput_icd.push(line.icdValue)
-                                root.itemChanged("icd_info", JSON.stringify({"opeator": "add", "type": "ouput", "icd_id": line.icdValue}))
+                                root._device.ouput_icd.push(nowICD)
+                                updateValue = {"opeator": "add", "type": "ouput", "icd_id": nowICD}
                             }
                         }
-
-                        if (!checked) {
+                        // 取消
+                        else {
                             var newList = []
-                            for (var i = 0; i < root.device.ouput_icd.length; ++i) {
-                                if (root.device.ouput_icd[i] !== line.icdValue) {
-                                    newList.push(root.device.ouput_icd[i])
+                            for (var i = 0; i < root._device.ouput_icd.length; ++i) {
+                                if (root._device.ouput_icd[i] !== nowICD) {
+                                    newList.push(root._device.ouput_icd[i])
                                 }
                             }
-                            root.device.ouput_icd = newList
-                            root.itemChanged("icd_info", JSON.stringify({"opeator": "del", "type": "ouput", "icd_id": line.icdValue}))
+                            root._device.ouput_icd = newList
+                            updateValue = {"opeator": "del", "type": "ouput", "icd_id": nowICD}
+                        }
+                        root.itemChanged("icd_info", JSON.stringify(updateValue))
+
+                        // 修改gDeviceBindInfo
+                        for (var j in gDeviceBindInfo) {
+                            if (gDeviceBindInfo[j].id === root._device.device_id) {
+                                gDeviceBindInfo[j].ouput_icd = root._device.ouput_icd
+                                return
+                            }
                         }
                     }
                 }
@@ -475,56 +480,46 @@ Item {
     } // end of TableView
 
     function load(value) {
-        device = value
+        _device = value
 
         type.text = value.type
         deviceID.text = value.device_id
 
-        isControl.currentIndex = value.control_type
-        busType.currentIndex = value.bus_type
+        controlCombox.currentIndex = value.control_type
+        busTypeCombox.currentIndex = value.bus_type
 
-        ipInput.text = value.ip
-        sendPortInput.text = value.send_port
+        ipField.text = value.ip
+        sendPortField.text = value.send_port
 
-        rfm2gInput.text = value.rfm2g_id
-        addressInput.text = value.address
+        rfm2gField.text = value.rfm2g_id
+        addressField.text = value.address
 
         table.model.clear()
-
         // 查询当前所有icd
-        var icdList = mainWindow.gICDList
-
-        for (var i in icdList) {
-            // 如果当前行icd
-            var nowLineICDId = icdList[i].icd_id
-            var nowLineICDName = icdList[i].name
+        for (var i in gICDInfo) {
+            var icdID = gICDInfo[i].icd_id
+            var icdName = gICDInfo[i].name
             var d = {
+                // 判断该行input icd 是否已经被选择
                 "isInput": (()=> {
-                                     if (value.input_icd.length === 0) {
-                                         return false
-                                     }
-                                     var inputICDList = value.input_icd
-                                     for (var j in inputICDList) {
-                                         if (inputICDList[j] === nowLineICDId) {
-                                             return true
-                                         }
-                                     }
-                                     return false
-                                 })(),
+                                for (var j in value.input_icd) {
+                                    if (value.input_icd[j] === icdID) {
+                                        return true
+                                    }
+                                }
+                                return false
+                            })(),
+                // 判断该行ouput icd 是否已经被选择
                 "isOuput": (()=> {
-                                     if (value.ouput_icd.length === 0) {
-                                         return false
-                                     }
-                                     var ouputICDList = value.ouput_icd
-                                     for (var j in ouputICDList) {
-                                         if (ouputICDList[j] === nowLineICDId) {
-                                             return true
-                                         }
-                                     }
-                                     return false
-                                 })(),
-                "icdName": nowLineICDName,
-                "icdValue": String(nowLineICDId),
+                                for (var j in value.ouput_icd) {
+                                    if (value.ouput_icd[j] === icdID) {
+                                        return true
+                                    }
+                                }
+                                return false
+                            })(),
+                "icdName": icdName,
+                "icdValue": String(icdID),
             }
             table.model.append(d)
         }

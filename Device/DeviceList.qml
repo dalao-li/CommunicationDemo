@@ -18,7 +18,7 @@ ListView {
     id: root
 
     property var devices: []
-    property var _devicesJSON
+    property var _deviceFile
 
     focus: true
     implicitWidth: 200
@@ -48,7 +48,7 @@ ListView {
         nameFilters: ["json files (*.json)", "All files (*)"]
         onAccepted: {
             var path = String(newfileDialog.fileUrls).substring(8)
-            saveDeviceInfo(path)
+            saveJSONFile(path)
         }
         onRejected: {
             console.log("Canceled")
@@ -104,11 +104,10 @@ ListView {
                 root.devices.push(info)
                 root.model.append(info)
 
-                gDeviceBindList.push({"type": info.type, "id": info.device_id, "input_icd":[]})
+                gDeviceBindInfo.push({"type": info.type, "id": info.device_id, "input_icd":[], "ouput_icd": []})
             }
         } // BatchAddButton end
 
-        // 导入
         Button {
             width: 80
             height: 32
@@ -148,7 +147,7 @@ ListView {
                     root.devices.splice(root.currentIndex, 1)
                     root.model.remove(root.currentIndex, 1)
 
-                    mainWindow.gDeviceBindList.splice(root.currentIndex, 1)
+                    gDeviceBindInfo.splice(root.currentIndex, 1)
                 }
             }
         }
@@ -197,12 +196,11 @@ ListView {
         }
 
         // 读取JSON
-        _devicesJSON = Excutor.query({"read": path})
+        _deviceFile = Excutor.query({"read": path})
 
-        gDeviceMonitorSetting = _devicesJSON
+        gDeviceMonitorSetting = _deviceFile
 
-        var data = _devicesJSON["monitor_device_type"]
-
+        var data = _deviceFile["monitor_device_type"]
         for (var i in data) {
             var info = {
                 "type": data[i].type,
@@ -229,14 +227,15 @@ ListView {
             }
 
             // 将设备名与id写入全局device列表
-            gDeviceBindList.push({"type": data[i].type, "id": data[i].device_id, "input_icd": []})
+            gDeviceBindInfo.push({"type": data[i].type, "id": data[i].device_id, "input_icd": [], "ouput_icd": []})
 
             root.devices.push(info)
             root.model.append(info)
         }
     }
 
-    function saveDeviceInfo(path) {
+    // 存储文件
+    function saveJSONFile(path) {
         var data = root.devices
         var dataList = []
 
@@ -266,12 +265,12 @@ ListView {
         }
 
         // 如果前期未导入JSON
-        if (_devicesJSON === undefined) {
-            _devicesJSON = {}
+        if (_deviceFile === undefined) {
+            _deviceFile = {}
         }
 
-        console.log("当前deviceInfo JSON", JSON.stringify(_devicesJSON))
-        _devicesJSON["monitor_device_type"] = dataList
+        // console.log("当前deviceInfo JSON", JSON.stringify(_deviceFile))
+        _deviceFile["monitor_device_type"] = dataList
 
         var icdResultList = {}
         // 增加设置ICD信息
@@ -291,10 +290,10 @@ ListView {
             icdResultList[device_id] = deviceICD
         }
 
-        _devicesJSON["DeviceICDList"] = icdResultList
+        _deviceFile["DeviceICDList"] = icdResultList
 
         Excutor.query({"command": "write",
-                          content: Excutor.formatJSON(JSON.stringify(_devicesJSON)),
+                          content: Excutor.formatJSON(JSON.stringify(_deviceFile)),
                           path: path})
     }
 }

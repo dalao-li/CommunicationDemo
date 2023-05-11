@@ -17,9 +17,6 @@ ColumnLayout {
     id: root
 
     property var actions: []
-    property alias deviceActionList: deviceActionList
-    property alias deviceActionDetail: deviceActionDetail
-    property alias deviceActionSegmentList: deviceActionSegmentList
 
     SplitView {
         Layout.fillHeight: true
@@ -32,7 +29,7 @@ ColumnLayout {
             color: "#f0f0f0"
 
             DeviceActionList {
-                id: deviceActionList
+                id: listComponent
 
                 anchors.fill: parent
                 Layout.fillHeight: true
@@ -40,14 +37,14 @@ ColumnLayout {
                 actions: root.actions
 
                 onCurrentIndexChanged: {
-                    if (deviceActionList.currentIndex < 0) {
+                    if (listComponent.currentIndex < 0) {
                         return
                     }
-                    var data = root.actions[deviceActionList.currentIndex]
-                    deviceActionDetail.load(data)
-                    // deviceActionSegmentList.load(data)
+                    var data = root.actions[listComponent.currentIndex]
+                    detailComponent.load(data)
+                    segmentComponent.load(data)
                 }
-            } // deviceActionList end
+            } // listComponent end
         }
 
         Rectangle {
@@ -56,7 +53,7 @@ ColumnLayout {
             color: "#f0f0f0"
 
             DeviceActionDetail {
-                id: deviceActionDetail
+                id: detailComponent
                 anchors {
                     top: parent.top
                     left: parent.left
@@ -64,7 +61,7 @@ ColumnLayout {
                 }
 
                 onItemChanged: {
-                    if (deviceActionList.currentIndex < 0) {
+                    if (listComponent.currentIndex < 0) {
                         return
                     }
 
@@ -77,19 +74,26 @@ ColumnLayout {
                         d["icd_id"] = value
                     }
 
+                    // 修改device_id
                     if (id === "device_id") {
                         d["device_id"] = value
                     }
-                    deviceActionList.model.set(deviceActionList.currentIndex, d)
+
+                    // 修改bind_icd
+                    if (id === "bind_icd") {
+                        d["bind_icd"] = value
+                    }
+
+                    listComponent.model.set(listComponent.currentIndex, d)
                 }
             }
 
             DeviceActionSegmentList {
-                id: deviceActionSegmentList
+                id: segmentComponent
                 anchors {
                     left: parent.left
                     right: parent.right
-                    top: deviceActionDetail.bottom
+                    top: detailComponent.bottom
                     topMargin: 5
                     bottom: parent.bottom
                 }

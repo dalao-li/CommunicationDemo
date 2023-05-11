@@ -6,14 +6,12 @@ Item {
     id: root
 
     property int defaultHeight: 60
-    property var deviceStatus
+    property var _status
 
     height: defaultHeight
 
-    // 修改信号
     signal itemChanged(string id, string value)
 
-    // 标题
     Rectangle {
         id: title
         anchors {
@@ -28,17 +26,16 @@ Item {
             text: "设备状态录入"
         }
 
-        // 点击折叠
         MouseArea {
             anchors.fill: parent
             onClicked: {
+                // 折叠
                 if (root.height === defaultHeight) {
                     root.height = title.height
                 } else {
                     root.height = defaultHeight
                 }
-
-                !flow.visible
+                flow.visible = !flow.visible
             }
         }
     } // title end
@@ -64,7 +61,7 @@ Item {
         }
 
         ComboBox {
-            id: idList
+            id: idCompox
             width: 130
             height: 25
             enabled: {
@@ -73,19 +70,15 @@ Item {
 
             textRole: "type"
 
+            model: gDeviceBindInfo
+
             onCurrentIndexChanged: {
-                if (root.deviceStatus) {
-                    var _id =  mainWindow.gDeviceBindList[idList.currentIndex].id
-                    root.deviceStatus.device_id = _id
-                    root.itemChanged("device_id", _id)
+                if (root._status) {
+                    var id = gDeviceBindInfo[idCompox.currentIndex].id
+                    root._status.device_id = id
+                    root.itemChanged("device_id", id)
                 }
             }
-        }
-
-        Binding {
-            target: idList
-            property: "model"
-            value: mainWindow.gDeviceBindList
         }
 
         Label {
@@ -96,12 +89,12 @@ Item {
         }
 
         TextField {
-            id: typeName
+            id: typeNameField
             width: 100
             height: 25
             onTextChanged: {
-                if (root.deviceStatus) {
-                    root.deviceStatus.type_name = text
+                if (root._status) {
+                    root._status.type_name = text
                     root.itemChanged("type_name", text)
                 }
             }
@@ -114,12 +107,12 @@ Item {
         }
 
         TextField {
-            id: descTextField
+            id: descField
             width: 300
             height: 25
             onTextChanged: {
-                if (root.deviceStatus) {
-                    root.deviceStatus.desc = text
+                if (root._status) {
+                    root._status.desc = text
                     root.itemChanged("desc", text)
                 }
             }
@@ -128,22 +121,20 @@ Item {
 
     function load(value) {
         var canUseICD = []
-        var deviceIDList = mainWindow.gDeviceBindList
-        var deviceCompoxIndex = 0
-        for (var i = 0; i < deviceIDList.length; ++i) {
-            if (value.device_id === deviceIDList[i].id) {
-                canUseICD = deviceIDList[i].input_icd
-                deviceCompoxIndex = i
-                // console.log("======>", i)
+        var compoxIndex = 0
+        for (var i = 0; i < gDeviceBindInfo.length; ++i) {
+            if (value.device_id === gDeviceBindInfo[i].id) {
+                canUseICD = gDeviceBindInfo[i].input_icd
+                compoxIndex = i
                 break
             }
         }
 
-        deviceStatus = value
+        _status = value
 
-        typeName.text = value.type_name
-        descTextField.text = value.desc
-        idList.currentIndex = deviceCompoxIndex
+        typeNameField.text = value.type_name
+        descField.text = value.desc
+        idCompox.currentIndex = compoxIndex
 
     }
 }

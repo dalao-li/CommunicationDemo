@@ -67,16 +67,15 @@ ListView {
             onClicked: {
                 var info = {
                     "name": "载荷" + String(root.payloads.length),
-                    "id": createID(),
+                    "id": String(createID()),
                     "bus": 0,
                     "bus_type": "udp",
                     "values": []
                 }
                 root.payloads.push(info)
-
                 root.model.append({"name": info.name})
 
-                gICDList.push({"name": info.name, "icd_id": info.id})
+                gICDInfo.push({"name": info.name, "icd_id": info.id})
             }
         } // BatchAddButton end
     } // header end
@@ -112,7 +111,7 @@ ListView {
                     root.payloads.splice(root.currentIndex, 1)
                     root.model.remove(root.currentIndex, 1)
 
-                    gICDList.splice(root.currentIndex, 1)
+                    gICDInfo.splice(root.currentIndex, 1)
                 }
             }
         }
@@ -139,12 +138,8 @@ ListView {
         // 处理meaning
         for (var i in payloads) {
             var values = payloads[i].values
-            console.log("处理前, ", JSON.stringify(values))
-
-
             for (var j in values) {
                 var resMean = {}
-                console.log("处理枚举, ", JSON.stringify(values[j].meaning))
                 var meanList = values[j].meaning
                 for (var k in meanList) {
                     var name = meanList[k].enumname
@@ -152,13 +147,11 @@ ListView {
                     resMean[name] = data
                 }
 
-                console.log("处理后, ", JSON.stringify(resMean))
                 payloads[i].values[j].meaning = resMean
             }
 
         }
 
-        console.log("保存ICD", JSON.stringify(payloads))
         Excutor.query({"command": "write",
                           content: Excutor.formatJSON(JSON.stringify(payloads)),
                           path: path})

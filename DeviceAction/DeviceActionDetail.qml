@@ -16,12 +16,12 @@ Item {
     id: root
 
     property int defaultHeight: 60
-    property var deviceAction
-    property var canUseICD : []
 
-    height: defaultHeight
+    property var _action : []
 
     signal itemChanged(string id, string value)
+
+    height: defaultHeight
 
     Rectangle {
         id: title
@@ -40,13 +40,13 @@ Item {
         MouseArea {
             anchors.fill: parent
             onClicked: {
+                // 折叠
                 if (root.height === defaultHeight) {
                     root.height = title.height
                 } else {
                     root.height = defaultHeight
                 }
-
-                !flow.visible
+                flow.visible = !flow.visible
             }
         }
     } // title end
@@ -72,25 +72,25 @@ Item {
         }
 
         ComboBox {
-            id: idList
+            id: deviceIDCombox
             width: 130
             height: 25
 
             textRole: "type"
 
+            model: gDeviceBindInfo
+
             onCurrentIndexChanged: {
-                if (root.deviceAction) {
-                    var _id =  mainWindow.gDeviceBindList[idList.currentIndex].id
-                    root.deviceAction.device_id = _id
-                    root.itemChanged("device_id", _id)
+                if (root._action) {
+                    var nowDevice = gDeviceBindInfo[deviceIDCombox.currentIndex]
+                    // 修改device_id 同时修改 device_bind_id
+                    root._action.device_id = nowDevice.id
+                    root._action.device_bind_icd = nowDevice.input_icd
+                    root.itemChanged("device_id", nowDevice.id)
+                    root.itemChanged("device_bind_icd", nowDevice.input_icd)
+                    // console.log("修改后", JSON.stringify(root._action))
                 }
             }
-        }
-
-        Binding {
-            target: idList
-            property: "model"
-            value: mainWindow.gDeviceBindList
         }
 
         Label {
@@ -101,7 +101,7 @@ Item {
         }
 
         ComboBox {
-            id: icdList
+            id: icdCombox
             width: 130
             height: 25
             enabled: {
@@ -111,25 +111,25 @@ Item {
             textRole: "name"
 
             model: {
-                var icdNameList = []
-                for (var i in canUseICD) {
-                    for (var j in gICDList) {
-                        if (String(canUseICD[i]) === String(gICDList[j].icd_id)) {
-                            icdNameList.push(gICDList[j])
+                var icdInfo = []
+                for (var i in _action.device_bind_icd) {
+                    for (var j in gICDInfo) {
+                        if (String(_action.device_bind_icd[i]) === String(gICDInfo[j].icd_id)) {
+                            icdInfo.push(gICDInfo[j])
                             break
                         }
                     }
                 }
-                return icdNameList
+                return icdInfo
             }
 
             // textRole: "input_icd"
             onCurrentIndexChanged: {
-                if (root.deviceAction) {
-                    var deviceInfo = gDeviceBindList[idList.currentIndex]
-                    var nowICDId = deviceInfo.input_icd[currentIndex]
-                    root.deviceAction.icd_id = nowICDId
+                if (root._action) {
+                    var nowICDId = _action.device_bind_icd[currentIndex]
+                    root._action.icd_id = nowICDId
                     root.itemChanged("icd_id", nowICDId)
+                    // console.log("发送修改icd信号", nowICDId)
                 }
             }
         }
@@ -146,8 +146,8 @@ Item {
             width: 100
             height: 25
             onTextChanged: {
-                if (root.deviceAction) {
-                    root.deviceAction.name = text
+                if (root._action) {
+                    root._action.name = text
                     root.itemChanged("name", text)
                 }
             }
@@ -155,32 +155,31 @@ Item {
     }
 
     function load(value) {
-        var deviceInfo = mainWindow.gDeviceBindList
+        _action = value
 
         var nowDeviceIDIndex = 0
         var nowICDIDIndex = 0
-        // 修改device_id
-        for (var i = 0; i < deviceInfo.length; ++i) {
-            if (value.device_id === deviceInfo[i].id) {
+        // 获取device_id 下标
+        for (var i in gDeviceBindInfo) {
+            if (value.device_id === gDeviceBindInfo[i].id) {
                 nowDeviceIDIndex = i
-
-                canUseICD = deviceInfo[i].input_icd
-                // 修改icd_id
-                for (var j = 0; j < deviceInfo[i].input_icd.length; ++j) {
-                    if (value.icd_icd === deviceInfo[i].input_icd[j]) {
-                        nowICDIDIndex = j
-                        break
-                    }
-                }
+                break
             }
         }
 
-
-        deviceAction = value
+        // 获取icd_id 下标
+        for (var j in value.device_bind_icd) {
+            if (value.icd_icd === value.device_bind_icd[j]) {
+                nowICDIDIndex = j
+                break
+            }
+        }
 
         name.text = value.name
-        idList.currentIndex = nowDeviceIDIndex
-        icdList.currentIndex = nowICDIDIndex
+        deviceIDCombox.currentIndex = nowDeviceIDIndex
+        icdCombox.currentIndex = nowICDIDIndex
+
+        console.log("DeviceActionDetail加载", JSON.stringify(value), "\n")
 
     }
 }

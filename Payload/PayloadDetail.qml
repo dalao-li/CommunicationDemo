@@ -107,9 +107,8 @@ Item {
 
             onTextChanged: {
                 // 清除上次输入的值
-                idInput.value &= 0xFFFFFF
-                // console.log("factory: ", text, "sum value:", idInput.value)
-                idInput.value |= (parseInt(text, 16) << 24)
+                icdIDField.value &= 0xFFFFFF
+                icdIDField.value |= (parseInt(text, 16) << 24)
             }
         }
 
@@ -127,9 +126,8 @@ Item {
             inputMask: ">HH"
             text: ""
             onTextChanged: {
-                // console.log("deviceID: ", text, "sum value:", idInput.value)
-                idInput.value &= 0xFF00FFFF
-                idInput.value |= (parseInt(text, 16) << 16)
+                icdIDField.value &= 0xFF00FFFF
+                icdIDField.value |= (parseInt(text, 16) << 16)
             }
         }
 
@@ -148,12 +146,12 @@ Item {
             inputMask: ">HHHH"
 
             onTextChanged: {
-                // console.log("dataID: ", text, "sum value:", idInput.value)
-                idInput.value &= (0xFFFF0000)
-                idInput.value |= (parseInt(text, 16))
+                icdIDField.value &= (0xFFFF0000)
+                icdIDField.value |= (parseInt(text, 16))
             }
         }
 
+        // icd id
         Label {
             text: "ID"
             height: 25
@@ -162,7 +160,7 @@ Item {
         }
 
         SpinBox {
-            id: idInput
+            id: icdIDField
             width: 80
             height: 25
             //value:
@@ -180,7 +178,7 @@ Item {
     function load(value) {
         payload = value
         name.text = value.name
-        idInput.value = Number(value.id)
+        icdIDField.value = Number(value.id)
     }
 
     function analyzePays(value) {
@@ -225,35 +223,5 @@ Item {
         factoryID.text = factoryValue.toString(16)
         deviceID.text = deviceValue.toString(16)
         dataID.text = dataValue.toString(16)
-    }
-
-    function getIdList() {
-        idList.model =  deviceIdList
-        console.log("当前读取", deviceIdList)
-    }
-
-    // 保存deviceICD数据
-    function saveDeviceICDInfo(path) {
-        if (path === "") {
-            return
-        }
-
-        // 读取JSON获取device_list信息
-        var devicesJSON = gDeviceMonitorSetting
-        var deviceICDList = devicesJSON["DeviceICDList"]
-
-        // 生成ICD JSON数据
-        var deviceID = idList.model[idList.currentIndex].device_id
-        var info = {
-            "icd_id": String(idInput.value),
-            "type": iotype.currentText
-        }
-
-        deviceICDList[deviceID].push(info)
-        devicesJSON["DeviceICDList"] = deviceICDList
-
-        Excutor.query({"command": "write",
-                          content: Excutor.formatJSON(JSON.stringify(devicesJSON)),
-                          path: path})
     }
 }

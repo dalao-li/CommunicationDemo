@@ -7,10 +7,12 @@
  * @LastEditTime: 2023-05-9 19:05:47
  */
 
+
 import QtQuick 2.5
 import QtQuick.Layouts 1.1
 import QtQuick.Controls 1.4
 import DesktopControls 0.1
+
 
 ColumnLayout {
     id: root
@@ -36,7 +38,6 @@ ColumnLayout {
                 devices: root.devices
 
                 onCurrentIndexChanged: {
-                    // 获取侧边栏对应索引的数据
                     deviceDetail.load(root.devices[deviceList.currentIndex])
                 }
             }
@@ -47,7 +48,6 @@ ColumnLayout {
             Layout.fillHeight: true
             color: "#f0f0f0"
 
-            // 左上编辑界面
             DeviceDetail {
                 id: deviceDetail
                 anchors {

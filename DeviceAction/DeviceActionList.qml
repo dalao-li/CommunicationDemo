@@ -74,13 +74,15 @@ ListView {
             }
 
             onClicked: {
-                var defaultInfo = mainWindow.gDeviceBindList[0]
-                 var info = {
+                // 默认是选第一个设备, 选择第一个icd
+                var defaultInfo = gDeviceBindInfo[0]
+                var info = {
                     "name": "动作" + String(root.actions.length),
                     "id": String(createID()),
                     "condition": [],
                     "device_id": defaultInfo.id,
-                    "icd_id": defaultInfo.input_icd[0]
+                    "icd_id": defaultInfo.input_icd[0],
+                    "device_bind_icd": defaultInfo.input_icd
                 }
                 root.actions.push(info)
                 root.model.append(info)
@@ -158,19 +160,13 @@ ListView {
         }
     }
 
+    // TODO
     // 导出
     function saveActionInfo(path) {
         var data = root.actions
         var dataList = []
         // 处理JSON
-        for (var i in data) {
-            var res = {}
-            res["id"] = data[i].device_id
-            res["type_name"] = data[i].type_name
-            res["desc"] = data[i].desc
-            res["monitor_status"] = data[i].monitor_status
-            dataList.push(res)
-        }
+
 
         Excutor.query({"command": "write",
                           content: Excutor.formatJSON(JSON.stringify(dataList)),

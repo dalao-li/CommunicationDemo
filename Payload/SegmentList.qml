@@ -84,11 +84,7 @@ Item {
                     margins: 1
                 }
 
-                // property var validColumn: styleData.column === __NAME_COLUMN || styleData.column === __MASK_COLUMN || styleData.column === DESC_COLUMN
-
-                property var validColumn: [__NAME_COLUMN, __MASK_COLUMN, __DESC_COLUMN].includes(styleData.column)
-
-                visible: validColumn && styleData.selected
+                visible: [__NAME_COLUMN, __MASK_COLUMN, __DESC_COLUMN].includes(styleData.column) && styleData.selected
 
                 text: {
                     if (validColumn) {
@@ -470,8 +466,7 @@ Item {
     }
 
     function getEnumdata(meaning) {
-        // 修改枚举JSON值为 {枚举值:枚举名}
-        console.log("保存枚举", JSON.stringify(meaning))
+        // console.log("保存枚举", JSON.stringify(meaning))
         segments[table.currentRow].meaning = meaning
     }
 
@@ -507,22 +502,22 @@ Item {
         var segment = root.segments[index]
         switch (column) {
         // name
-        case 0:
+        case __NAME_COLUMN:
             segment.name = value
             table.model.setProperty(index, "name", value)
             break
         // offset
-        case 1:
+        case __OFFSET_COLUMN:
             segment.offset = Number(value)
             table.model.setProperty(index, "offset", Number(value))
             break
         // size
-        case 2:
+        case __SIZE_COLUMN:
             segment.size = Number(value)
             table.model.setProperty(index, "size", Number(value))
             break
         // int型、enum型、uint型、char型需要设置掩码
-        case 3:
+        case __TYPE_COLUMN:
             //type
             segment.type = Number(value)
 
@@ -552,41 +547,41 @@ Item {
             table.model.setProperty(index, "size", segment.size)
             break
         // mask
-        case 4:
+        case __MASK_COLUMN:
             if (segment.type === 0 || segment.type === 4 || segment.type === 5 || segment.type === 6) {
                 segment.mask = value
                 table.model.setProperty(index, "mask", value)
             }
             break
-        case 5:
+        case __ORDER_COLUMN:
             //order
             segment.order = Number(value)
             table.model.setProperty(index, "order", Number(value))
             break
-        case 6:
+        case __DIM_COLUMN:
             //dim
             segment.dim = Number(value)
             table.model.setProperty(index, "dim", Number(value))
             break
-        case 7:
+        case __AMP_COLUMN:
             //amp
             segment.amp = Number(value)
             table.model.setProperty(index, "amp", Number(value))
             break
-        case 8:
+        case __BITSTART_COLUMN:
             //bit_start
             table.model.setProperty(index, "bit_start", Number(value))
             break
-        case 9:
+        case __BIT_LENGTH_COLUMN:
             //bit_length
             table.model.setProperty(index, "bit_length", Number(value))
             break
-        case 10:
+        case __DESC_COLUMN:
             //desc
             segment.desc = value
             table.model.setProperty(index, "desc", value)
             break
-        case 11:
+        case __MEANING_COLUMN:
             // meaning
             if (segment.type === 4) {
                 segment.meaning = value

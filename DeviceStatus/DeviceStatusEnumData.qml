@@ -18,6 +18,11 @@ Window {
 
     property var rootPage
 
+    property var __VALUE_COLUMN: 0
+    property var __SHOWINFO_COLUMN: 1
+    property var __ICON_COLUMN: 2
+    property var __COLOR_COLUMN: 3
+
     signal itemChanged
     signal enumSave
 
@@ -52,7 +57,6 @@ Window {
 
                 onClicked: {
                     if (table.rowCount > 0) {
-                        console.log("++++++++++enumInfos++++++++++++"+JSON.stringify(enumInfos))
                         rootPage.getEnumdata(enumInfos)
                     }
                 }
@@ -99,7 +103,7 @@ Window {
                         margins: 1
                     }
 
-                    property var validColumn: styleData.column === 0 || styleData.column === 1 || styleData.column === 2 || styleData.column === 3
+                    property var validColumn: [__VALUE_COLUMN, __SHOWINFO_COLUMN, __COLOR_COLUMN, __ICON_COLUMN].includes(styleData.column)
 
                     visible: validColumn
 
@@ -112,7 +116,7 @@ Window {
                         if (!visible) {
                             return
                         }
-                        setValue(styleData.row, styleData.column, field.text)
+                        updateValue(styleData.row, styleData.column, field.text)
                     }
                 }
             }
@@ -197,8 +201,8 @@ Window {
         //setEunmInfos
     }
 
-    function addEnum(row) //添加枚举值
-    {
+    // 添加枚举值
+    function addEnum(row) {
         var info = {
             "value": "",
             "showinfo": "",
@@ -209,35 +213,34 @@ Window {
         table.model.insert(row + 1, info)
     }
 
+    // 将已经保存的枚举值重新输入子界面
     function setEunmInfos(enumInfos) {
-        //将已经保存的枚举值重新输入子界面
         for (var i = 0; i < enumInfos.length; i++) {
             table.model.insert(i, enumInfos[i])
         }
     }
 
-    function setValue(index, column, value) {
-        if (index < 0 || column < 0)
+    function updateValue(index, column, value) {
+        if (index < 0 || column < 0) {
             return
+        }
 
         var enuminfo = root.enumInfos[index]
+
         switch (column) {
-        case 0:
-            // value
+        case __VALUE_COLUMN:
             enuminfo.value = value
             table.model.setProperty(index, "value", value)
             break
-        case 1:
-            // showinfo
+        case __SHOWINFO_COLUMN:
             enuminfo.showinfo = value
             table.model.setProperty(index, "showinfo", value)
             break
-
-        case 2:
-            enuminfo.icon = value
+        case __ICON_COLUMN:
             table.model.setProperty(index, "icon", value)
+            enuminfo.icon = value
             break
-        case 3:
+        case __COLOR_COLUMN:
             enuminfo.color = value
             table.model.setProperty(index, "color", value)
             break

@@ -11,8 +11,8 @@ Item {
     property var actions: []
     property var canUseICD : []
 
-    property int __CONDITION_BIND_ICD_ID_COLUMN: 0
-    property var __CONDTION_KEYS_COLUMN: 1
+    property int _CONDITION_BIND_ICDICOLUMN: 0
+    property var _CONDTION_KEYS_COLUMN: 1
 
     signal itemChanged(string id, string value)
 
@@ -104,7 +104,7 @@ Item {
                     margins: 1
                 }
 
-                property var validColumn: styleData.column === __CONDITION_BIND_ICD_ID_COLUMN
+                property var validColumn: styleData.column === _CONDITION_BIND_ICDICOLUMN
 
                 visible: validColumn && styleData.selected
 
@@ -116,15 +116,15 @@ Item {
                     if (!visible) {
                         return
                     }
-                    root.setValue(styleData.row, styleData.column, String(gICDList[currentIndex].icd_id))
+                    root.setValue(styleData.row, styleData.column, String(gICDInfo[currentIndex].icd_id))
                 }
 
                 model: {
                     var icdNameList = []
                     for (var i in canUseICD) {
-                        for (var j in gICDList) {
-                            if (String(canUseICD[i]) === String(gICDList[j].icd_id)) {
-                                icdNameList.push(gICDList[j])
+                        for (var j in gICDInfo) {
+                            if (String(canUseICD[i]) === String(gICDInfo[j].icd_id)) {
+                                icdNameList.push(gICDInfo[j])
                                 break
                             }
                         }
@@ -133,6 +133,7 @@ Item {
                 }
             }
 
+            // 添加condition
             Button {
                 id: enumBtn
                 text: qsTr("添加Condition")
@@ -141,9 +142,7 @@ Item {
                     margins: 1
                 }
 
-                property var validColumn: styleData.column === __STATUS_LIST_COLUMN
-
-                visible: validColumn && styleData.selected
+                visible: styleData.column === __STATUS_LIST_COLUMN && styleData.selected
 
                 onClicked: {
                     var component = Qt.createComponent("DeviceActionEnumData.qml")
@@ -157,8 +156,8 @@ Item {
                         win.rootPage = root
 
                         // 存在枚举值
-                        if (segments[styleData.row].condition) {
-                            win.setEunmInfos(segments[styleData.row].condition)
+                        if (actions[styleData.row].condition) {
+                            win.setEunmInfos(actions[styleData.row].condition)
                         }
                     }
                 }
@@ -188,7 +187,7 @@ Item {
 
         TableViewColumn {
             id: type
-            visible: table.columsVisible[__CONDITION_BIND_ICD_ID_COLUMN]
+            visible: table.columsVisible[_CONDITION_BIND_ICDICOLUMN]
             role: "type"
             title: "类型"
             width: 100
@@ -196,7 +195,7 @@ Item {
 
         TableViewColumn {
             id: condition
-            visible: table.columsVisible[__CONDTION_KEYS_COLUMN]
+            visible: table.columsVisible[_CONDTION_KEYS_COLUMN]
             role: "condition"
             title: "状态列表"
             width: 80
@@ -250,9 +249,8 @@ Item {
                     name: "minus"
                     color: "black"
                     onClicked: {
-                        root.segments.splice(table.currentRow, 1)
+                        root.actions.splice(table.currentRow, 1)
                         table.model.remove(table.currentRow, 1)
-                        //root.itemChanged()
                     }
                 }
             }
@@ -263,24 +261,24 @@ Item {
     // 增加新行
     function addSegment(row) {
         var info = {
-            "bind_icd": gICDList[0].icd_id,
+            "bind_icd": gICDInfo[0].icd_id,
             "condition": []
         }
 
-        root.segments.splice(row + 1, 0, info)
-
+        root.actions.splice(row + 1, 0, info)
         table.model.insert(row + 1, info)
     }
 
+    // 获取枚举
     function getEnumdata(meaning) {
-        segments[table.currentRow].condition = meaning
+        actions[table.currentRow].condition = meaning
     }
 
     // 加载列表数据
     function load(values) {
-        for (var i = 0; i < mainWindow.gDeviceBindList.length; ++i) {
-            if (values.device_id === mainWindow.gDeviceBindList[i].id) {
-                canUseICD = mainWindow.gDeviceBindList[i].input_icd
+        for (var i in gDeviceBindInfo) {
+            if (values.device_id === gDeviceBindInfo[i].id) {
+                canUseICD = gDeviceBindInfo[i].input_icd
                 break
             }
         }
@@ -289,12 +287,11 @@ Item {
 
         table.model.clear()
 
-        segments = values.monitor_status
-
-        for (var i in segments) {
+        actions = values.monitor_status
+        for (var i in actions) {
             table.model.append({
-                                   "bind_icd": segments[i].type_id,
-                                   "status_list": segments[i].condition,
+                                   "bind_icd": actions[i].type_id,
+                                   "status_list": actions[i].condition,
                                })
         }
     }
@@ -305,18 +302,18 @@ Item {
             return
         }
 
-        var segment = root.segments[index]
+        var segment = root.actions[index]
         switch (column) {
-        case __CONDITION_BIND_ICD_ID_COLUMN:
+        case _CONDITION_BIND_ICDICOLUMN:
             segment.bind_icd = value
             table.model.setProperty(index, "bind_icd", value)
             break
 
-        case __CONDTION_KEYS_COLUMN:
+        case _CONDTION_KEYS_COLUMN:
             segment.condition = value
             table.model.setProperty(index, "condition", value)
             break
         }
-        root.segments[index] = segment
+        root.actions[index] = segment
     }
 }

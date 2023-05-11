@@ -1,4 +1,14 @@
-﻿import QtQuick 2.5
+﻿/*
+ * @Description:
+ * @Version: 1.0
+ * @Author: liyuanhao
+ * @Date: 2023-05-09 19:05:47
+ * @LastEditors: liyuanhao
+ * @LastEditTime: 2023-05-09 19:05:47
+ */
+
+
+import QtQuick 2.5
 import Qt.labs.settings 1.0
 import QtQuick.Window 2.0
 import QtQuick.Layouts 1.1
@@ -9,19 +19,23 @@ import "../Button"
 
 
 Window {
+    property var enumInfos: []
+
+    property var rootPage
+
+    property var __ENUM_NAME_COLUMN: 0
+    property var __ENUM_DATA_COLUMN: 1
+
+    signal itemChanged
+    signal enumSave
+
+
     id: root
 
     width: 800
     height: 500
 
     title: qsTr("枚举值设置")
-
-    property var enumInfos: []
-
-    property var rootPage
-
-    signal itemChanged
-    signal enumSave
 
     Item {
         //        id:root
@@ -55,7 +69,6 @@ Window {
 
                 onClicked: {
                     if (table.rowCount > 0) {
-                        // console.log("++++++++++enumInfos++++++++++++"+JSON.stringify(enumInfos))
                         rootPage.getEnumdata(enumInfos)
                     }
                 }
@@ -102,10 +115,7 @@ Window {
                         margins: 1
                     }
 
-                    property var validColumn: styleData.column === 0 || styleData.column === 1
-
-                    visible: validColumn
-                    // text: styleData.column === 0  ? "名称" : "数值"
+                    visible: styleData.column === __ENUM_NAME_COLUMN || styleData.column === __ENUM_DATA_COLUMN
 
                     text: styleData.value
 
@@ -116,7 +126,7 @@ Window {
                         if (!visible) {
                             return
                         }
-                        setValue(styleData.row, styleData.column, field.text)
+                        updateValue(styleData.row, styleData.column, field.text)
                     }
                 }
             }
@@ -151,6 +161,7 @@ Window {
                     anchors.bottom: parent.bottom
 
                     color: Qt.darker(Desktop.Theme.current.accent, 1.5)
+
                     visible: styleData.selected
                 }
 
@@ -176,10 +187,8 @@ Window {
                         name: "minus"
                         color: "black"
                         onClicked: {
-                            //root.enumInfos.splice(table.currentRow, 1)
+                            root.enumInfos.splice(table.currentRow, 1)
                             table.model.remove(table.currentRow, 1)
-
-                            //root.itemChanged()
                         }
                     }
                 }
@@ -188,42 +197,41 @@ Window {
         //setEunmInfos
     }
 
-    function addEnum(row) //添加枚举值
-    {
+    // 添加枚举值
+    function addEnum(row) {
         var info = {
             "enumname": "",
             "enumdata": ""
         }
         root.enumInfos.push(info)
         table.model.insert(row + 1, info)
-        //root.itemChanged()
     }
 
+    // 将已经保存的枚举值重新输入子界面
     function setEunmInfos(enumInfos) {
-        //将已经保存的枚举值重新输入子界面
         for (var i = 0; i < enumInfos.length; i++) {
-            console.log("将已经保存的枚举值重新输入子界面", enumInfos[i])
+            // console.log("将已经保存的枚举值重新输入子界面", enumInfos[i])
             table.model.insert(i, enumInfos[i])
         }
     }
 
-    function setValue(index, column, value) {
-        if (index < 0 || column < 0)
+    function updateValue(index, column, value) {
+        if (index < 0 || column < 0) {
             return
+        }
 
         var enuminfo = root.enumInfos[index]
         switch (column) {
-        case 0:
-            //enumname
+        case __ENUM_NAME_COLUMN:
+            // enumname
             enuminfo.enumname = value
             table.model.setProperty(index, "enumname", value)
             break
-        case 1:
-            //enumdata
+        case __ENUM_DATA_COLUMN:
+            // enumdata
             enuminfo.enumdata = value
             table.model.setProperty(index, "enumdata", value)
             break
         }
-        //        root.itemChanged()
     }
 }

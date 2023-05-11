@@ -31,8 +31,8 @@ ApplicationWindow {
     property var content: []
     property string path: ""
 
-    property var gDeviceBindList: []
-    property var gICDList: []
+    property var gDeviceBindInfo: []
+    property var gICDInfo: []
     property var gDeviceMonitorSetting
 
 

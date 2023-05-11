@@ -17,8 +17,6 @@ ColumnLayout {
     id: root
 
     property var status: []
-    property alias deviceStatusList: deviceStatusList
-    property alias deviceStatusDetail: deviceStatusDetail
 
     SplitView {
         Layout.fillHeight: true
@@ -31,7 +29,7 @@ ColumnLayout {
             color: "#f0f0f0"
 
             DeviceStatusList {
-                id: deviceStatusList
+                id: listComponent
 
                 anchors.fill: parent
                 Layout.fillHeight: true
@@ -39,12 +37,12 @@ ColumnLayout {
                 status: root.status
 
                 onCurrentIndexChanged: {
-                    if (deviceStatusList.currentIndex < 0) {
+                    if (listComponent.currentIndex < 0) {
                         return
                     }
-                    var data = root.status[deviceStatusList.currentIndex]
-                    deviceStatusDetail.load(data)
-                    deviceStatusSegment.load(data)
+                    var data = root.status[listComponent.currentIndex]
+                    detailComponent.load(data)
+                    segmentComponent.load(data)
                 }
             } // DeviceStatusList end
         }
@@ -55,7 +53,8 @@ ColumnLayout {
             color: "#f0f0f0"
 
             DeviceStatusDetail {
-                id: deviceStatusDetail
+                id: detailComponent
+
                 anchors {
                     top: parent.top
                     left: parent.left
@@ -63,7 +62,7 @@ ColumnLayout {
                 }
 
                 onItemChanged: {
-                    if (deviceStatusList.currentIndex < 0) {
+                    if (listComponent.currentIndex < 0) {
                         return
                     }
 
@@ -79,16 +78,16 @@ ColumnLayout {
                     if (id === "device_id") {
                         d["device_id"] = value
                     }
-                    deviceStatusList.model.set(deviceStatusList.currentIndex, d)
+                    listComponent.model.set(listComponent.currentIndex, d)
                 }
             }
 
             DeviceStatusSegmentList {
-                id: deviceStatusSegment
+                id: segmentComponent
                 anchors {
                     left: parent.left
                     right: parent.right
-                    top: deviceStatusDetail.bottom
+                    top: detailComponent.bottom
                     topMargin: 5
                     bottom: parent.bottom
                 }

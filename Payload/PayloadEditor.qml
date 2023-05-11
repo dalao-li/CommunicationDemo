@@ -1,3 +1,13 @@
+/*
+ * @Description:
+ * @Version: 1.0
+ * @Author: liyuanhao
+ * @Date: 2023-05-09 19:05:47
+ * @LastEditors: liyuanhao
+ * @LastEditTime: 2023-05-09 19:05:47
+ */
+
+
 import QtQuick 2.5
 import QtQuick.Layouts 1.1
 import QtQuick.Controls 1.4
@@ -34,7 +44,6 @@ ColumnLayout {
                     if (payloadsList.currentIndex < 0) {
                         return
                     }
-                    // 获取侧边栏对应索引的数据
                     var value = getPayload(payloadsList.currentIndex, payloadsList.busType)
 
                     detail.load(value)

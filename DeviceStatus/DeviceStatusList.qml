@@ -1,4 +1,11 @@
-
+/*
+ * @Description:
+ * @Version: 1.0
+ * @Author: liyuanhao
+ * @Date: 2023-05-09 19:05:47
+ * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2023-05-11 17:15:25
+ */
 
 import QtQuick 2.5
 import DesktopControls 0.1
@@ -7,15 +14,14 @@ import "../Button"
 
 
 ListView {
-    property var status : []
-
     id: root
     focus: true
     implicitWidth: 200
 
+    property var status : []
+
     model: ListModel {}
 
-    // 另存为文件
     FileDialog {
         id: newfileDialog
         title: "Please choose a file"
@@ -31,7 +37,6 @@ ListView {
         }
     }
 
-    // 表头部分
     header: Rectangle {
         height: 32
         width: root.width
@@ -44,8 +49,6 @@ ListView {
             size: 20
             name: "save"
             color: "black"
-            anchors.right: batchAdd.left
-            anchors.rightMargin: 5
 
             MouseArea {
                 anchors.fill: parent
@@ -58,20 +61,21 @@ ListView {
         // 增加按钮
         BatchAddButton {
             id: batchAdd
-            anchors.right: parent.right
-            anchors.rightMargin: 8
-            anchors.verticalCenter: parent.verticalCenter
+            anchors {
+                right: parent.right
+                rightMargin: 8
+                verticalCenter: parent.verticalCenter
+            }
+
             onClicked: {
-                var _id = mainWindow.gDeviceBindList[0].id
                 var info = {
                     "type_name": "状态" + String(root.status.length),
                     "desc": "",
                     "monitor_status": [],
-                    "device_id": _id
+                    // 默认是第一个设备
+                    "device_id": gDeviceBindInfo[0].id
                 }
                 root.status.push(info)
-
-                // 将信息添加入model
                 root.model.append(info)
             }
         } // BatchAddButton end
