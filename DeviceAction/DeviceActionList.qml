@@ -75,12 +75,12 @@ ListView {
 
             onClicked: {
                 // 默认是选第一个设备, 选择第一个icd
-                var defaultInfo = gDeviceBindInfo[0]
+                var defaultInfo = gDevices[0]
                 var info = {
                     "name": "动作" + String(root.actions.length),
                     "id": String(createID()),
                     "condition": [],
-                    "device_id": defaultInfo.id,
+                    "device_id": defaultInfo.device_id,
                     "icd_id": defaultInfo.input_icd[0],
                     "device_bind_icd": defaultInfo.input_icd
                 }

@@ -1,4 +1,14 @@
-﻿import QtQuick 2.5
+﻿/*
+ * @Description:
+ * @Version: 1.0
+ * @Author: liyuanhao
+ * @Date: 2023-05-09 19:05:47
+ * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2023-05-11 17:33:00
+ */
+
+
+import QtQuick 2.5
 import Qt.labs.settings 1.0
 import QtQuick.Controls 1.4
 import DesktopControls 0.1 as Desktop
@@ -8,22 +18,37 @@ import "../Button"
 Item {
     id: root
 
+    property var segments: []
+
+    // 列名枚举
+    property var _NAME_COLUMN: 0
+    property var _OFFSET_COLUMN: 1
+    property var _SIZE_COLUMN: 2
+    property var _TYPE_COLUMN: 3
+    property var _MASK_COLUMN: 4
+    property var _ORDER_COLUMN: 5
+    property var _DIM_COLUMN: 6
+    property var _AMP_COLUMN: 7
+    property var _BITSTART_COLUMN: 8
+    property var _BIT_LENGTH_COLUMN: 9
+    property var _DESC_COLUMN: 10
+    property var _MEANING_COLUMN: 11
+
+    // 数据类型枚举
+    // "无符号整数", "单精度浮点", "双精度浮点", "字符串", "枚举", "有符号整数", "字符", "ASCII", "UNICODE"
+    property var _UINT_TYPE: 0
+    property var _FLOAT_TYPE: 1
+    property var _DOUBLE_TYPE: 2
+    property var _STR_TYPE: 3
+    property var _ENUM_TYPE: 4
+    property var _INT_TYPE: 5
+    property var _CHAR_TYPE: 6
+    property var _ASCII_TYPE: 7
+    property var _UNICODE: 8
+
+
+
     signal itemChanged(string id, string value)
-
-    property var segments
-
-    property var __NAME_COLUMN: 0
-    property var __OFFSET_COLUMN: 1
-    property var __SIZE_COLUMN: 2
-    property var __TYPE_COLUMN: 3
-    property var __MASK_COLUMN: 4
-    property var __ORDER_COLUMN: 5
-    property var __DIM_COLUMN: 6
-    property var __AMP_COLUMN: 7
-    property var __BITSTART_COLUMN: 8
-    property var __BIT_LENGTH_COLUMN: 9
-    property var __DESC_COLUMN: 10
-    property var __MEANING_COLUMN: 11
 
     // 表头
     Rectangle {
@@ -56,6 +81,7 @@ Item {
                 id: batchAdd
                 enabled: false
                 anchors.verticalCenter: parent.verticalCenter
+
                 onClicked: {
                     addSegment(table.rowCount - 1)
                 }
@@ -84,7 +110,9 @@ Item {
                     margins: 1
                 }
 
-                visible: [__NAME_COLUMN, __MASK_COLUMN, __DESC_COLUMN].includes(styleData.column) && styleData.selected
+                property var validColumn: [_NAME_COLUMN, _MASK_COLUMN, _DESC_COLUMN].includes(styleData.column)
+
+                visible: validColumn && styleData.selected
 
                 text: {
                     if (validColumn) {
@@ -100,7 +128,7 @@ Item {
                     if (!visible) {
                         return
                     }
-                    root.setValue(styleData.row, styleData.column, field.text)
+                    root.updateValue(styleData.row, styleData.column, field.text)
                 }
             } // TextField end
 
@@ -111,16 +139,16 @@ Item {
                     margins: 1
                 }
 
-                property var validColumn: styleData.column === __TYPE_COLUMN || styleData.column === __ORDER_COLUMN
+                property var validColumn: styleData.column === _TYPE_COLUMN || styleData.column === _ORDER_COLUMN
 
                 visible: validColumn && styleData.selected
 
                 model: {
-                    if (styleData.column === __TYPE_COLUMN) {
+                    if (styleData.column === _TYPE_COLUMN) {
                         return ["无符号整数", "单精度浮点", "双精度浮点", "字符串", "枚举", "有符号整数", "字符", "ASCII", "UNICODE"]
                     }
 
-                    if (styleData.column === __ORDER_COLUMN) {
+                    if (styleData.column === _ORDER_COLUMN) {
                         return ["小端", "大端"]
                     }
                     return []
@@ -132,7 +160,7 @@ Item {
                     if (!visible) {
                         return
                     }
-                    root.setValue(styleData.row, styleData.column, typeBox.currentIndex)
+                    root.updateValue(styleData.row, styleData.column, typeBox.currentIndex)
                 }
             }
 
@@ -143,13 +171,12 @@ Item {
                     margins: 1
                 }
 
-                property var validColumn: styleData.column === __OFFSET_COLUMN || styleData.column === __SIZE_COLUMN
+                property var validColumn: styleData.column === _OFFSET_COLUMN || styleData.column === _SIZE_COLUMN
 
                 visible: styleData.selected && validColumn
 
-                enabled: {
-                    return styleData.selected && !(segments[styleData.row].type === 1 || segments[styleData.row].type === 2 || segments[styleData.row].type === 6)
-                }
+                enabled: styleData.selected && ![_UINT_TYPE, _DOUBLE_TYPE, _CHAR_TYPE].includes(segments[styleData.row].type)
+
 
                 value: validColumn ? Number(styleData.value) : 0
 
@@ -161,11 +188,11 @@ Item {
                         return
                     }
 
-                    root.setValue(styleData.row, styleData.column, value)
+                    root.updateValue(styleData.row, styleData.column, value)
 
-                    if (styleData.column === 2) {
-                        root.setValue(styleData.row, 4, getMask(value))
-                        root.setValue(styleData.row, 9, value * 8)
+                    if (styleData.column === _SIZE_COLUMN) {
+                        root.updateValue(styleData.row, 4, getMask(value))
+                        root.updateValue(styleData.row, 9, value * 8)
                     }
                     root.updateOffset(styleData.row)
                 }
@@ -177,7 +204,7 @@ Item {
                     margins: 1
                 }
 
-                property var validColumn: styleData.column === 6 || styleData.column === 7
+                property var validColumn: styleData.column === _DIM_COLUMN || styleData.column === _AMP_COLUMN
 
                 visible: styleData.selected && validColumn
 
@@ -190,7 +217,7 @@ Item {
                     if (!visible) {
                         return
                     }
-                    root.setValue(styleData.row, styleData.column, value)
+                    root.updateValue(styleData.row, styleData.column, value)
                 }
             }
 
@@ -202,22 +229,19 @@ Item {
                     margins: 1
                 }
 
-                property var validColumn: styleData.column === 11
+                visible: styleData.selected && styleData.column === _MEANING_COLUMN && (segments[styleData.row].type === _ENUM_TYPE)
 
-                visible: validColumn && styleData.selected && (segments[styleData.row].type === 4)
-
-                onClicked: { 
+                onClicked: {
                     var component = Qt.createComponent("SetEnumData.qml")
                     // console.debug("Error:"+ component.errorString() )
                     if (component.status === Component.Ready) {
-                        var win = component.createObject()
-                        win.show()
-                        win.rootPage = root
+                        var windows = component.createObject()
+                        windows.show()
+                        windows.rootPage = root
 
                         if (segments[styleData.row].meaning) {
-                            //存在枚举值
-                            console.log("存在枚举", JSON.stringify(segments[styleData.row].meaning))
-                            win.setEunmInfos(segments[styleData.row].meaning)
+                            // console.log("存在枚举", JSON.stringify(segments[styleData.row].meaning))
+                            windows.setEunmInfos(segments[styleData.row].meaning)
                         }
                     }
                 }
@@ -226,7 +250,7 @@ Item {
             Label {
                 id: label
                 anchors.fill: parent
-                visible: !styleData.selected || styleData.column === __BITSTART_COLUMN || styleData.column === __BIT_LENGTH_COLUMN
+                visible: !styleData.selected || [_BITSTART_COLUMN, _BIT_LENGTH_COLUMN].includes(styleData.column)
 
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
@@ -236,17 +260,16 @@ Item {
                         return ""
                     }
 
-                    if (styleData.column === __NAME_COLUMN || styleData.column === __DESC_COLUMN) {
+                    if (styleData.column === _NAME_COLUMN || styleData.column === _DESC_COLUMN) {
                         return String(styleData.value)
-
                     }
 
-                    if (styleData.column === __TYPE_COLUMN) {
+                    if (styleData.column === _TYPE_COLUMN) {
                         var dts = ["无符号整数", "单精度浮点", "双精度浮点", "字符串", "枚举", "有符号整数", "字符", "ASCII", "UNICODE"]
                         return dts[Number(styleData.value)]
                     }
 
-                    if (styleData.column === __ORDER_COLUMN) {
+                    if (styleData.column === _ORDER_COLUMN) {
                         return Number(styleData.value) === 0 ? "小端" : "大端"
                     }
 
@@ -366,6 +389,7 @@ Item {
             Rectangle {
                 height: styleData.selected ? 25 : 1
                 width: parent.width
+
                 anchors.bottom: parent.bottom
 
                 color: Qt.darker(Desktop.Theme.current.accent, 1.5)
@@ -376,6 +400,7 @@ Item {
             Rectangle {
                 height: 1
                 width: parent.width
+
                 anchors.bottom: parent.bottom
 
                 color: Qt.darker(Desktop.Theme.current.accent, 1.5)
@@ -388,6 +413,7 @@ Item {
                 visible: styleData.selected
 
                 anchors.verticalCenter: parent.verticalCenter
+
                 x: table.width - 55
 
                 // 每一行最后的两个加减按钮
@@ -407,13 +433,36 @@ Item {
                     onClicked: {
                         root.segments.splice(table.currentRow, 1)
                         table.model.remove(table.currentRow, 1)
-                        //root.itemChanged()
                     }
                 }
             }
         } // end of rowDelegate
     } // end of TableView
 
+
+    // 加载列表数据
+    function load(values) {
+        batchAdd.enabled = true
+
+        table.model.clear()
+        // 按共享传递
+        segments = values
+        for (var i in values) {
+            table.model.append({
+                                   "name": values[i].name,
+                                   "offset": values[i].offset,
+                                   "size": values[i].size,
+                                   "mask": values[i].mask,
+                                   "order": values[i].order,
+                                   "type": values[i].type,
+                                   "desc": values[i].desc,
+                                   "dim": values[i].dim,
+                                   "amp": values[i].amp,
+                                   "meaning": values[i].meaning
+                               })
+        }
+        // console.log("加载全部", JSON.stringify(payloads))
+    }
 
     // 增加新行
     function addSegment(row) {
@@ -436,10 +485,9 @@ Item {
             "dim": 1,
             "amp": 0,
             "meaning": {},
-            "btnvisible": false
+            // "btnvisible": false
         }
         root.segments.splice(row + 1, 0, info)
-
         table.model.insert(row + 1, info)
 
         root.updateOffset(row + 1)
@@ -447,22 +495,19 @@ Item {
 
     // 修改偏移量值
     function updateOffset(startRow) {
-        var count = table.model.count
-        var row = startRow + 1
-
-        for (; row < count; row++) {
+        for (var row = startRow + 1; row < table.model.count; row++) {
             var preInfo = table.model.get(row - 1)
             var offset = Number(preInfo.offset) + Number(preInfo.size)
-            root.setValue(row, 1, offset)
+            root.updateValue(row, 1, offset)
         }
     }
 
-    function getMask(N) {
-        var ff = "0x"
-        for (var i = 0; i < N; i++) {
-            ff += "ff"
+    function getMask(num) {
+        var res = "0x"
+        for (var i = 0; i < num; i++) {
+            res += "ff"
         }
-        return ff
+        return res
     }
 
     function getEnumdata(meaning) {
@@ -470,60 +515,37 @@ Item {
         segments[table.currentRow].meaning = meaning
     }
 
-    // 加载列表数据
-    function load(values) {
-        batchAdd.enabled = true
-
-        table.model.clear()
-
-        segments = values
-        for (var i in values) {
-            table.model.append({
-                                   "name": values[i].name,
-                                   "offset": values[i].offset,
-                                   "size": values[i].size,
-                                   "mask": values[i].mask,
-                                   "order": values[i].order,
-                                   "type": values[i].type,
-                                   "desc": values[i].desc,
-                                   "dim": values[i].dim,
-                                   "amp": values[i].amp,
-                                   "meaning": values[i].meaning
-                               })
-        }
-    }
-
     // 修改某行某列的值
-    function setValue(index, column, value) {
+    function updateValue(index, column, value) {
         if (index < 0 || column < 0) {
             return
         }
 
         var segment = root.segments[index]
         switch (column) {
-        // name
-        case __NAME_COLUMN:
+            // name
+        case _NAME_COLUMN:
             segment.name = value
             table.model.setProperty(index, "name", value)
             break
-        // offset
-        case __OFFSET_COLUMN:
+            // offset
+        case _OFFSET_COLUMN:
             segment.offset = Number(value)
             table.model.setProperty(index, "offset", Number(value))
             break
-        // size
-        case __SIZE_COLUMN:
+            // size
+        case _SIZE_COLUMN:
             segment.size = Number(value)
             table.model.setProperty(index, "size", Number(value))
             break
-        // int型、enum型、uint型、char型需要设置掩码
-        case __TYPE_COLUMN:
+            // int型、enum型、uint型、char型需要设置掩码
+        case _TYPE_COLUMN:
             //type
             segment.type = Number(value)
 
             table.model.setProperty(index, "type", Number(value))
             // 修改mask
-            if (segment.type === 0 || segment.type === 4 || segment.type === 5 || segment.type === 6) {
+            if ([_UINT_TYPE, _ENUM_TYPE, _INT_TYPE, _CHAR_TYPE].includes(segment.type)) {
                 segment.mask = getMask(segment.size)
             } else {
                 segment.mask = ""
@@ -532,64 +554,62 @@ Item {
             table.model.setProperty(index, "mask", segment.mask)
 
             // 修改size
-            if (segment.type === 1) {
+            if (segment.type === _FLOAT_TYPE) {
                 segment.size = 4
                 //SpinBox.enabled = true
             }
-            if (segment.type === 2) {
+            if (segment.type === _DOUBLE_TYPE) {
                 segment.size = 8
                 //SpinBox.enabled = false
             }
-            if (segment.type === 6) {
+            if (segment.type === _CHAR_TYPE) {
                 segment.size = 1
                 //SpinBox.enabled = false
             }
             table.model.setProperty(index, "size", segment.size)
             break
-        // mask
-        case __MASK_COLUMN:
-            if (segment.type === 0 || segment.type === 4 || segment.type === 5 || segment.type === 6) {
+        case _MASK_COLUMN:
+            if ([_UINT_TYPE, _ENUM_TYPE, _INT_TYPE, _CHAR_TYPE].includes(segment.type)) {
                 segment.mask = value
                 table.model.setProperty(index, "mask", value)
             }
             break
-        case __ORDER_COLUMN:
+        case _ORDER_COLUMN:
             //order
             segment.order = Number(value)
             table.model.setProperty(index, "order", Number(value))
             break
-        case __DIM_COLUMN:
+        case _DIM_COLUMN:
             //dim
             segment.dim = Number(value)
             table.model.setProperty(index, "dim", Number(value))
             break
-        case __AMP_COLUMN:
+        case _AMP_COLUMN:
             //amp
             segment.amp = Number(value)
             table.model.setProperty(index, "amp", Number(value))
             break
-        case __BITSTART_COLUMN:
+        case _BITSTART_COLUMN:
             //bit_start
             table.model.setProperty(index, "bit_start", Number(value))
             break
-        case __BIT_LENGTH_COLUMN:
+        case _BIT_LENGTH_COLUMN:
             //bit_length
             table.model.setProperty(index, "bit_length", Number(value))
             break
-        case __DESC_COLUMN:
+        case _DESC_COLUMN:
             //desc
             segment.desc = value
             table.model.setProperty(index, "desc", value)
             break
-        case __MEANING_COLUMN:
+        case _MEANING_COLUMN:
             // meaning
-            if (segment.type === 4) {
+            if (segment.type === _ENUM_TYPE) {
                 segment.meaning = value
                 table.model.setProperty(index, "meaning", value)
                 break
             }
         }
-        // console.log('-->', JSON.stringify(segment))
         root.segments[index] = segment
     }
 

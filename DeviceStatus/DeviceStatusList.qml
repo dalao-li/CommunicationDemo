@@ -30,7 +30,7 @@ ListView {
         nameFilters: ["json files (*.json)", "All files (*)"]
         onAccepted: {
             var path = String(newfileDialog.fileUrls).substring(8)
-            saveDeviceInfo(path)
+            saveJSONFile(path)
         }
         onRejected: {
             console.log("Canceled")
@@ -73,7 +73,9 @@ ListView {
                     "desc": "",
                     "monitor_status": [],
                     // 默认是第一个设备
-                    "device_id": gDeviceBindInfo[0].id
+                    "device_id": gDevices[0].device_id,
+                    // 默认绑定其第一个icd
+                    "bind_icd": gDevices[0].input_icd
                 }
                 root.status.push(info)
                 root.model.append(info)
@@ -122,7 +124,7 @@ ListView {
             // 实现高亮效果
             mouse.accepted = false
             var index = root.indexAt(mouse.x, mouse.y - headerItem.height)
-            if(index > -1) {
+            if (index > -1) {
                 root.currentIndex = index
             }
         }
@@ -132,21 +134,20 @@ ListView {
     }
 
     // 导出
-    function saveDeviceInfo(path) {
-        var data = root.status
-        var dataList = []
+    function saveJSONFile(path) {
+        var jsonData = []
         // 处理JSON
-        for (var i in data) {
+        for (var i in root.status) {
             var res = {}
-            res["id"] = data[i].device_id
-            res["type_name"] = data[i].type_name
-            res["desc"] = data[i].desc
-            res["monitor_status"] = data[i].monitor_status
-            dataList.push(res)
+            res["id"] = root.status[i].device_id
+            res["type_name"] = root.status[i].type_name
+            res["desc"] = root.status[i].desc
+            res["monitor_status"] = root.status[i].monitor_status
+            jsonData.push(res)
         }
 
         Excutor.query({"command": "write",
-                          content: Excutor.formatJSON(JSON.stringify(dataList)),
+                          content: Excutor.formatJSON(JSON.stringify(jsonData)),
                           path: path})
     }
 }

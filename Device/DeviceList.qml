@@ -3,8 +3,8 @@
  * @Version: 1.0
  * @Author: liyuanhao
  * @Date: 2023-05-09 19:05:47
- * @LastEditors: liyuanhao
- * @LastEditTime: 2023-05-09 19:05:47
+ * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2023-05-12 14:26:31
  */
 
 import QtQuick 2.5
@@ -18,7 +18,7 @@ ListView {
     id: root
 
     property var devices: []
-    property var _deviceFile
+    property var deviceJSONFile
 
     focus: true
     implicitWidth: 200
@@ -32,7 +32,7 @@ ListView {
         nameFilters: ["json files (*.json)", "All files (*)"]
         onAccepted: {
             var path = String(deviceDialog.fileUrls).substring(8)
-            importDevice(path)
+            readJSONFile(path)
         }
         onRejected: {
             console.log("Canceled")
@@ -103,8 +103,7 @@ ListView {
                 }
                 root.devices.push(info)
                 root.model.append(info)
-
-                gDeviceBindInfo.push({"type": info.type, "id": info.device_id, "input_icd":[], "ouput_icd": []})
+                gDevices.push(info)
             }
         } // BatchAddButton end
 
@@ -190,17 +189,15 @@ ListView {
     }
 
     // 导入设备信息
-    function importDevice(path) {
+    function readJSONFile(path) {
         if (path === "") {
             return
         }
 
         // 读取JSON
-        _deviceFile = Excutor.query({"read": path})
+        deviceJSONFile = Excutor.query({"read": path})
 
-        gDeviceMonitorSetting = _deviceFile
-
-        var data = _deviceFile["monitor_device_type"]
+        var data = deviceJSONFile["monitor_device_type"]
         for (var i in data) {
             var info = {
                 "type": data[i].type,
@@ -222,78 +219,74 @@ ListView {
                 "control_port": data[i].control_port,
                 "rfm2g_id": data[i].rfm2g_id,
                 "address": data[i].address,
+                // 附加信息
                 "input_icd": [],
                 "ouput_icd": [],
             }
 
-            // 将设备名与id写入全局device列表
-            gDeviceBindInfo.push({"type": data[i].type, "id": data[i].device_id, "input_icd": [], "ouput_icd": []})
-
             root.devices.push(info)
             root.model.append(info)
+            gDevices.push(info)
         }
     }
 
     // 存储文件
     function saveJSONFile(path) {
-        var data = root.devices
-        var dataList = []
-
-        for (var i in data) {
+        var monitorDeviceType = []
+        for (var i in root.devices) {
             var info = {
-                "type": data[i].type,
-                "device_id": data[i].device_id,
+                "type": root.devices[i].type,
+                "device_id": root.devices[i].device_id,
                 "control_type": (()=> {
-                                     if (data[i].control_type === 0) {
+                                     if (root.devices[i].control_type === 0) {
                                          return "controlled"
                                      }
                                      return "uncontrolled"
                                  })(),
                 "bus_type": (()=> {
-                                 if (data[i].bus_type === 0) {
+                                 if (root.devices[i].bus_type === 0) {
                                      return "udp"
                                  }
                                  return "反射内存"
                              })(),
-                "ip": data[i].ip,
-                "send_port": data[i].send_port,
-                "control_port": data[i].control_port,
-                "rfm2g_id": data[i].rfm2g_id,
-                "address": data[i].address
+                "ip": root.devices[i].ip,
+                "send_port": root.devices[i].send_port,
+                "control_port": root.devices[i].control_port,
+                "rfm2g_id": root.devices[i].rfm2g_id,
+                "address": root.devices[i].address
             }
-            dataList.push(info)
+            monitorDeviceType.push(info)
         }
 
         // 如果前期未导入JSON
-        if (_deviceFile === undefined) {
-            _deviceFile = {}
+        if (deviceJSONFile === undefined) {
+            deviceJSONFile = {}
         }
 
-        // console.log("当前deviceInfo JSON", JSON.stringify(_deviceFile))
-        _deviceFile["monitor_device_type"] = dataList
+        deviceJSONFile["monitor_device_type"] = monitorDeviceType
 
-        var icdResultList = {}
+        var deviceICDList = {}
         // 增加设置ICD信息
-        for (var j in data) {
-            var device_id = data[j].device_id
-            var inputICDList = data[j].input_icd
-            var ouputICDList = data[j].ouput_icd
+        for (var j in root.devices) {
+            var device_id = root.devices[j].device_id
+            var inputICD = root.devices[j].input_icd
+            var ouputICD = root.devices[j].ouput_icd
 
-            var deviceICD = []
+            var bindICD = []
             // 处理input icd
-            for (var a in inputICDList) {
-                deviceICD.push({"icd_id": inputICDList[a], "type": "input"})
+            for (var x in inputICD) {
+                bindICD.push({"icd_id": inputICD[x], "type": "input"})
             }
-            for (var b in ouputICDList) {
-                deviceICD.push({"icd_id": ouputICDList[b], "type": "ouput"})
+            for (var y in ouputICD) {
+                bindICD.push({"icd_id": ouputICD[y], "type": "ouput"})
             }
-            icdResultList[device_id] = deviceICD
+            deviceICDList[device_id] = bindICD
         }
 
-        _deviceFile["DeviceICDList"] = icdResultList
+        deviceJSONFile["DeviceICDList"] = deviceICDList
 
         Excutor.query({"command": "write",
-                          content: Excutor.formatJSON(JSON.stringify(_deviceFile)),
+                          content: Excutor.formatJSON(JSON.stringify(deviceJSONFile)),
                           path: path})
     }
 }

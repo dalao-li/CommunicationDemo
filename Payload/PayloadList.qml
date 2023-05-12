@@ -1,3 +1,13 @@
+/*
+ * @Description:
+ * @Version: 1.0
+ * @Author: liyuanhao
+ * @Date: 2023-05-09 19:05:47
+ * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2023-05-10 14:52:15
+ */
+
+
 import QtQuick 2.5
 import DesktopControls 0.1
 import QtQuick.Dialogs 1.2
@@ -24,7 +34,7 @@ ListView {
         nameFilters: ["json files (*.json)", "All files (*)"]
         onAccepted: {
             var path = String(newfileDialog.fileUrls).substring(8)
-            savePayloadsInfo(path)
+            saveJSONFile(path)
         }
         onRejected: {
             console.log("Canceled")
@@ -40,12 +50,14 @@ ListView {
         // 保存按钮
         AwesomeIcon {
             id: save
-            anchors.verticalCenter: parent.verticalCenter
+
             size: 20
             name: "save"
             color: "black"
+
             anchors.right: batchAdd.left
             anchors.rightMargin: 5
+            anchors.verticalCenter: parent.verticalCenter
 
             MouseArea {
                 anchors.fill: parent
@@ -75,7 +87,9 @@ ListView {
                 root.payloads.push(info)
                 root.model.append({"name": info.name})
 
-                gICDInfo.push({"name": info.name, "icd_id": info.id})
+                gPayloads.push(info)
+
+                // console.log("增加, 当前gICDInfo", JSON.stringify(gICDInfo), "\n")
             }
         } // BatchAddButton end
     } // header end
@@ -110,8 +124,8 @@ ListView {
                 onClicked: {
                     root.payloads.splice(root.currentIndex, 1)
                     root.model.remove(root.currentIndex, 1)
-
-                    gICDInfo.splice(root.currentIndex, 1)
+                    gPayloads.splice(root.currentIndex, 1)
+                    // console.log("删除, 当前gICDInfo", JSON.stringify(gICDInfo), "\n")
                 }
             }
         }
@@ -134,19 +148,17 @@ ListView {
         onPressAndHold: mouse.accepted = false
     }
 
-    function savePayloadsInfo(path) {
+    function saveJSONFile(path) {
         // 处理meaning
         for (var i in payloads) {
-            var values = payloads[i].values
-            for (var j in values) {
+            for (var j in  payloads[i].values) {
                 var resMean = {}
-                var meanList = values[j].meaning
+                var meanList =  payloads[i].values[j].meaning
                 for (var k in meanList) {
                     var name = meanList[k].enumname
                     var data = meanList[k].enumdata
                     resMean[name] = data
                 }
-
                 payloads[i].values[j].meaning = resMean
             }
 

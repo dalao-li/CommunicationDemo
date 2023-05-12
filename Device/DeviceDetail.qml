@@ -87,10 +87,10 @@ Item {
                     root._device.type = text
                     root.itemChanged("type", text)
 
-                    // 修改gDeviceBindInfo中的值
-                    for (var i in gDeviceBindInfo) {
-                        if (gDeviceBindInfo[i].id === root._device.device_id) {
-                            gDeviceBindInfo[i].type = text
+                    // 修改gDevices中的值
+                    for (var i in gDevices) {
+                        if (gDevices[i].device_id === root._device.device_id) {
+                            gDevices[i].type = text
                             break
                         }
                     }
@@ -112,10 +112,10 @@ Item {
             height: 25
             onTextChanged: {
                 if (root._device) {
-                    // 修改gDeviceBindInfo中的值
-                    for (var i in gDeviceBindInfo) {
-                        if (gDeviceBindInfo[i].id === root._device.device_id) {
-                            gDeviceBindInfo[i].id = text
+                    // 修改gDevices中的值
+                    for (var i in gDevices) {
+                        if (gDevices[i].device_id === root._device.device_id) {
+                            gDevices[i].device_id = text
                             break
                         }
                     }
@@ -360,10 +360,10 @@ Item {
 
                         root.itemChanged("icd_info", JSON.stringify(updateValue))
 
-                        // 修改gDeviceBindInfo
-                        for (var j in gDeviceBindInfo) {
-                            if (gDeviceBindInfo[j].id === root._device.device_id) {
-                                gDeviceBindInfo[j].input_icd = root._device.input_icd
+                        // 修改gDevices
+                        for (var j in gDevices) {
+                            if (gDevices[j].device_id === root._device.device_id) {
+                                gDevices[j].input_icd = root._device.input_icd
                                 return
                             }
                         }
@@ -407,10 +407,10 @@ Item {
                         }
                         root.itemChanged("icd_info", JSON.stringify(updateValue))
 
-                        // 修改gDeviceBindInfo
-                        for (var j in gDeviceBindInfo) {
-                            if (gDeviceBindInfo[j].id === root._device.device_id) {
-                                gDeviceBindInfo[j].ouput_icd = root._device.ouput_icd
+                        // 修改gDevices
+                        for (var j in gDevices) {
+                            if (gDevices[j].device_id === root._device.device_id) {
+                                gDevices[j].ouput_icd = root._device.ouput_icd
                                 return
                             }
                         }
@@ -496,14 +496,12 @@ Item {
 
         table.model.clear()
         // 查询当前所有icd
-        for (var i in gICDInfo) {
-            var icdID = gICDInfo[i].icd_id
-            var icdName = gICDInfo[i].name
+        for (var i in gPayloads) {
             var d = {
                 // 判断该行input icd 是否已经被选择
                 "isInput": (()=> {
                                 for (var j in value.input_icd) {
-                                    if (value.input_icd[j] === icdID) {
+                                    if (value.input_icd[j] === gPayloads[i].id) {
                                         return true
                                     }
                                 }
@@ -512,14 +510,14 @@ Item {
                 // 判断该行ouput icd 是否已经被选择
                 "isOuput": (()=> {
                                 for (var j in value.ouput_icd) {
-                                    if (value.ouput_icd[j] === icdID) {
+                                    if (value.ouput_icd[j] === gPayloads[i].id) {
                                         return true
                                     }
                                 }
                                 return false
                             })(),
-                "icdName": icdName,
-                "icdValue": String(icdID),
+                "icdName": gPayloads[i].name,
+                "icdValue": String(gPayloads[i].id),
             }
             table.model.append(d)
         }

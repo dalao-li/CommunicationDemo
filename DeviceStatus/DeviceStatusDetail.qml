@@ -29,7 +29,6 @@ Item {
         MouseArea {
             anchors.fill: parent
             onClicked: {
-                // 折叠
                 if (root.height === defaultHeight) {
                     root.height = title.height
                 } else {
@@ -70,11 +69,11 @@ Item {
 
             textRole: "type"
 
-            model: gDeviceBindInfo
+            model: gDevices
 
             onCurrentIndexChanged: {
                 if (root._status) {
-                    var id = gDeviceBindInfo[idCompox.currentIndex].id
+                    var id = gDevices[idCompox.currentIndex].device_id
                     root._status.device_id = id
                     root.itemChanged("device_id", id)
                 }
@@ -120,21 +119,16 @@ Item {
     }
 
     function load(value) {
-        var canUseICD = []
-        var compoxIndex = 0
-        for (var i = 0; i < gDeviceBindInfo.length; ++i) {
-            if (value.device_id === gDeviceBindInfo[i].id) {
-                canUseICD = gDeviceBindInfo[i].input_icd
-                compoxIndex = i
+        _status = value
+
+        for (var i in gDevices) {
+            if (value.device_id === gDevices[i].device_id) {
+                idCompox.currentIndex = i
                 break
             }
         }
 
-        _status = value
-
         typeNameField.text = value.type_name
         descField.text = value.desc
-        idCompox.currentIndex = compoxIndex
-
     }
 }

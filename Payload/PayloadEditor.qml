@@ -19,9 +19,6 @@ ColumnLayout {
 
     property var payloads: []
 
-    property alias payloadsList: payloadsList
-    property alias payloadDetail: detail
-
     SplitView {
         Layout.fillHeight: true
         Layout.fillWidth: true
@@ -34,20 +31,20 @@ ColumnLayout {
 
             // 侧边栏
             PayloadList {
-                id: payloadsList
+                id: listComponent
                 anchors.fill: parent
                 Layout.fillHeight: true
 
                 payloads: root.payloads
 
                 onCurrentIndexChanged: {
-                    if (payloadsList.currentIndex < 0) {
+                    if (listComponent.currentIndex < 0) {
                         return
                     }
-                    var value = getPayload(payloadsList.currentIndex, payloadsList.busType)
 
-                    detail.load(value)
-                    segmentList.load(value.values)
+                    var data = root.payloads[listComponent.currentIndex]
+                    detailComponent.load(data)
+                    segmentComponent.load(data.values)
                 }
             } // PayloadList end
         }
@@ -59,30 +56,30 @@ ColumnLayout {
             color: "#f0f0f0"
 
             PayloadDetail {
-                id: detail
+                id: detailComponent
                 anchors {
                     top: parent.top
                     left: parent.left
                     right: parent.right
                 }
                 onItemChanged: {
-                    if (payloadsList.currentIndex < 0) {
+                    if (listComponent.currentIndex < 0) {
                         return
                     }
 
                     if (id === "name") {
-                        payloadsList.model.set(payloadsList.currentIndex, {"name": value})
+                        listComponent.model.set(listComponent.currentIndex, {"name": value})
                     }
                 }
             }
 
             SegmentList {
-                id: segmentList
+                id: segmentComponent
 
                 anchors {
                     left: parent.left
                     right: parent.right
-                    top: detail.bottom
+                    top: detailComponent.bottom
                     topMargin: 5
                     bottom: parent.bottom
                 }
@@ -91,20 +88,17 @@ ColumnLayout {
     }
 
     function load(config) {
-        payloadsList.model.clear()
+        listComponent.model.clear()
         payloads = config
         for (var i = 0; i < config.length; ++i) {
             var payload = config[i]
-            payloadsList.model.append({name: payload.name})
+            listComponent.model.append({name: payload.name})
         }
-        payloadsList.currentIndex = 0
-        var payloadValue = getPayload(payloadsList.currentIndex, payloadsList.busType)
-        detail.load(payloadValue)
-        segmentList.load(payloadValue.values)
-    }
+        listComponent.currentIndex = 0
 
-    function save() {
-        payloadsList.savePayload(path)
+        var payloadValue = getPayload(listComponent.currentIndex, listComponent.busType)
+        detailComponent.load(payloadValue)
+        segmentComponent.load(payloadValue.values)
     }
 
 
@@ -114,24 +108,26 @@ ColumnLayout {
     }
 
     function cleanPayload() {
-        payloadsList.model.clear()
-        segmentList.load([])
+        listComponent.model.clear()
+        segmentComponent.load([])
     }
 
     //按照总线类型bus获取index的载荷数据
     function getPayload(index, busType) {
-        // console.log("----->", root.payloads)
-        if (!busType)
+        if (!busType) {
             return root.payloads[index]
+        }
 
         var counter = -1
-        for (var i=0; i<root.payloads.length; ++i) {
+        for (var i= 0; i<root.payloads.length; ++i) {
             var payload = root.payloads[i]
-            if (payload.bus_type === busType)
+            if (payload.bus_type === busType) {
                 ++counter
+            }
 
-            if (index === counter)
+            if (index === counter) {
                 return payload
+            }
         }
     }
 

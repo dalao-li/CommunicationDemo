@@ -22,7 +22,6 @@ ColumnLayout {
         Layout.fillHeight: true
         Layout.fillWidth: true
 
-        // 侧边栏
         Rectangle {
             implicitWidth: 200
             Layout.fillHeight: true

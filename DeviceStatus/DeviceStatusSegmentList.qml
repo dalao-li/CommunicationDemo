@@ -18,8 +18,7 @@ Item {
     id: root
 
     property var segments: []
-    property var _canUseICD : []
-    property var _deviceID
+    property var input_icd : []
 
     property int _TYPE_ID_COLUMN: 0
     property var _BIND_ICD_COLUMN: 1
@@ -132,15 +131,15 @@ Item {
                     if (!visible) {
                         return
                     }
-                    root.setValue(styleData.row, styleData.column, String(gICDInfo[currentIndex].icd_id))
+                    root.setValue(styleData.row, styleData.column, String(gPayloads[currentIndex].id))
                 }
 
                 model: {
                     var icdNameList = []
-                    for (var i in _canUseICD) {
-                        for (var j in gICDInfo) {
-                            if (String(_canUseICD[i]) === String(gICDInfo[j].icd_id)) {
-                                icdNameList.push(gICDInfo[j])
+                    for (var i in input_icd) {
+                        for (var j in gPayloads) {
+                            if (String(input_icd[i]) === String(gPayloads[j].id)) {
+                                icdNameList.push(gPayloads[j])
                                 break
                             }
                         }
@@ -149,27 +148,40 @@ Item {
                 }
             }
 
-            // 大小
-            SpinBox {
+            // ICD下的工程index
+            ComboBox {
+                id: icdIndex
                 anchors {
                     fill: parent
                     margins: 1
                 }
 
-                property var validColumn: styleData.column === _FIELD_INDEX_COLUMN || styleData.column === _STATUS_TYPE_COLUMN
+                property var validColumn: styleData.column === _FIELD_INDEX_COLUMN
 
-                visible: styleData.selected && validColumn
+                visible: validColumn && styleData.selected
 
-                value: validColumn ? Number(styleData.value) : 0
+                textRole: "name"
 
-                maximumValue: 128
-                minimumValue: styleData.column === 1 ? 0 : 1
+                currentIndex: validColumn ? Number(styleData.value) : 0
 
-                onValueChanged: {
+                onCurrentIndexChanged: {
                     if (!visible) {
                         return
                     }
-                    root.setValue(styleData.row, styleData.column, value)
+                    root.setValue(styleData.row, styleData.column, styleData.value)
+                }
+
+                model: {
+                    // 获取当前选择的icd
+                    var nowICD = table.model.get(styleData.row).bind_icd
+                    for (var i in gPayloads) {
+                        if (String(nowICD) === String(gPayloads[j].id)) {
+                            var icdInfo = gPayloads[j].id
+                            break
+                        }
+                    }
+                    var indexNameList = []
+                    return indexNameList
                 }
             }
 
@@ -242,7 +254,7 @@ Item {
             id: fieldIndex
             visible: table.columsVisible[2]
             role: "field_index"
-            title: "field_index"
+            title: "域索引"
             width: 80
         }
 
@@ -366,17 +378,17 @@ Item {
 
     // 加载列表数据
     function load(values) {
-        _deviceID = values.device_id
-        for (var i in gDeviceBindInfo) {
-            if (values.device_id === gDeviceBindInfo[i].id) {
-                _canUseICD = gDeviceBindInfo[i].input_icd
+        segments = values.monitor_status
+
+        // 设置input_icd
+        for (var i in gDevices) {
+            if (values.device_id === gDevices[i].device_id) {
+                input_icd = gDevices[i].input_icd
                 break
             }
         }
 
         batchAdd.enabled = true
-
-        segments = values.monitor_status
 
         table.model.clear()
         for (var i in segments) {

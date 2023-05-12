@@ -1,3 +1,12 @@
+/*
+ * @Description:
+ * @Version: 1.0
+ * @Author: liyuanhao
+ * @Date: 2023-05-09 19:05:47
+ * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2023-05-10 14:52:15
+ */
+
 import QtQuick 2.5
 import QtQuick.Controls 1.4
 import QtQuick.Dialogs 1.2
@@ -6,27 +15,11 @@ Item {
     id: root
 
     property int defaultHeight: 60
-    property var payload
-
-    height: defaultHeight
+    property var _payload
 
     signal itemChanged(string id, string value)
 
-    // 另存为文件
-    FileDialog {
-        id: newfileDialog
-        title: "Please choose a file"
-
-        selectExisting: false
-        nameFilters: ["json files (*.json)", "All files (*)"]
-        onAccepted: {
-            var path = String(newfileDialog.fileUrls).substring(8)
-            saveDeviceICDInfo(path)
-        }
-        onRejected: {
-            console.log("Canceled")
-        }
-    }
+    height: defaultHeight
 
     Rectangle {
         id: title
@@ -79,13 +72,22 @@ Item {
         }
 
         TextField {
-            id: name
+            id: nameField
             width: 100
             height: 25
             onTextChanged: {
-                if (root.payload) {
-                    root.payload.name = text
+                if (root._payload) {
+                    root._payload.name = text
                     root.itemChanged("name", text)
+
+                    // 同步修改gICDInfo
+                    for (var i in gPayloads) {
+                        if (gPayloads[i].icd_id === root._payload.id) {
+                            gPayloads[i].name = text
+                            return
+                        }
+                    }
+                    // console.log("修改, 当前gICDInfo", JSON.stringify(gICDInfo))
                 }
             }
         }
@@ -166,18 +168,19 @@ Item {
             //value:
             maximumValue: 99999999999
             onValueChanged: {
-                if (root.payload) {
-                    root.payload.id = String(value)
+                if (root._payload) {
+                    root._payload.id = String(value)
                     root.itemChanged("id", String(value))
                 }
             }
         } 
     } // end flow
 
+
     // 加载函数
     function load(value) {
-        payload = value
-        name.text = value.name
+        _payload = value
+        nameField.text = value.name
         icdIDField.value = Number(value.id)
     }
 

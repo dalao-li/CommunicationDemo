@@ -31,9 +31,13 @@ ApplicationWindow {
     property var content: []
     property string path: ""
 
-    property var gDeviceBindInfo: []
-    property var gICDInfo: []
-    property var gDeviceMonitorSetting
+    property var gPayloads: []
+
+    property var gDevices: []
+
+    property var gStatus: []
+
+    property var gActions: []
 
 
     menuBar: MenuBar {
@@ -114,7 +118,6 @@ ApplicationWindow {
             title: "ICD编辑"
             PayloadEditor {
                 id: payloadEditor
-                //payloads: content
             }
         }
 
@@ -124,7 +127,6 @@ ApplicationWindow {
             DeviceEditor {
                 id: device
             }
-
         }
 
         Tab {
@@ -144,8 +146,6 @@ ApplicationWindow {
             }
         }
     } // TabView end
-
-
 
     Component.onCompleted: {
         tabView.currentIndex = 1

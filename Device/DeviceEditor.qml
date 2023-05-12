@@ -13,13 +13,10 @@ import QtQuick.Layouts 1.1
 import QtQuick.Controls 1.4
 import DesktopControls 0.1
 
-
 ColumnLayout {
     id: root
 
     property var devices: []
-    property alias deviceList: deviceList
-    property alias deviceDetail: deviceDetail
 
     SplitView {
         Layout.fillHeight: true
