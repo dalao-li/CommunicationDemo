@@ -18,7 +18,7 @@ ListView {
     id: root
 
     property var busType
-    property var payloads
+    property var payloads: []
 
     focus: true
     implicitWidth: 200
@@ -86,10 +86,6 @@ ListView {
                 }
                 root.payloads.push(info)
                 root.model.append({"name": info.name})
-
-                gPayloads.push(info)
-
-                // console.log("增加, 当前gICDInfo", JSON.stringify(gICDInfo), "\n")
             }
         } // BatchAddButton end
     } // header end
@@ -124,8 +120,6 @@ ListView {
                 onClicked: {
                     root.payloads.splice(root.currentIndex, 1)
                     root.model.remove(root.currentIndex, 1)
-                    gPayloads.splice(root.currentIndex, 1)
-                    // console.log("删除, 当前gICDInfo", JSON.stringify(gICDInfo), "\n")
                 }
             }
         }

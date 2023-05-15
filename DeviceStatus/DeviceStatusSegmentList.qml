@@ -131,15 +131,15 @@ Item {
                     if (!visible) {
                         return
                     }
-                    root.setValue(styleData.row, styleData.column, String(gPayloads[currentIndex].id))
+                    root.setValue(styleData.row, styleData.column, String(payloads[currentIndex].id))
                 }
 
                 model: {
                     var icdNameList = []
                     for (var i in input_icd) {
-                        for (var j in gPayloads) {
-                            if (String(input_icd[i]) === String(gPayloads[j].id)) {
-                                icdNameList.push(gPayloads[j])
+                        for (var j in payloads) {
+                            if (String(input_icd[i]) === String(payloads[j].id)) {
+                                icdNameList.push(payloads[j])
                                 break
                             }
                         }
@@ -174,14 +174,14 @@ Item {
                 model: {
                     // 获取当前选择的icd
                     var nowICD = table.model.get(styleData.row).bind_icd
-                    for (var i in gPayloads) {
-                        if (String(nowICD) === String(gPayloads[j].id)) {
-                            var icdInfo = gPayloads[j].id
-                            break
+
+                    // 获取其values
+                    var values = []
+                    for (var i in payloads) {
+                        if (String(nowICD) === String(payloads[i].id)) {
+                            return  payloads[i].values
                         }
                     }
-                    var indexNameList = []
-                    return indexNameList
                 }
             }
 
@@ -354,6 +354,34 @@ Item {
         } // end of rowDelegate
     } // end of TableView
 
+    // 加载列表数据
+    function load(values) {
+        segments = values.monitor_status
+
+        // 设置input_icd
+        for (var i in devices) {
+            if (values.device_id === devices[i].device_id) {
+                input_icd = devices[i].input_icd
+                break
+            }
+        }
+
+        batchAdd.enabled = true
+
+        table.model.clear()
+        for (var i in segments) {
+            table.model.append({
+                                   "type_id": segments[i].type_id,
+                                   "bind_icd": segments[i].bind_icd,
+                                   "field_index": segments[i].field_index,
+                                   "type": segments[i].type,
+                                   "type_name": segments[i].type_name,
+                                   "status_type": segments[i].status_type,
+                                   "desc": segments[i].desc,
+                                   "status_list": segments[i].status_list,
+                               })
+        }
+    }
 
     // 增加新行
     function addSegment(row) {
@@ -374,35 +402,6 @@ Item {
 
     function getEnumdata(meaning) {
         segments[table.currentRow].status_list = meaning
-    }
-
-    // 加载列表数据
-    function load(values) {
-        segments = values.monitor_status
-
-        // 设置input_icd
-        for (var i in gDevices) {
-            if (values.device_id === gDevices[i].device_id) {
-                input_icd = gDevices[i].input_icd
-                break
-            }
-        }
-
-        batchAdd.enabled = true
-
-        table.model.clear()
-        for (var i in segments) {
-            table.model.append({
-                                   "type_id": segments[i].type_id,
-                                   "bind_icd": segments[i].bind_icd,
-                                   "field_index": segments[i].field_index,
-                                   "type": segments[i].type,
-                                   "type_name": segments[i].type_name,
-                                   "status_type": segments[i].status_type,
-                                   "desc": segments[i].desc,
-                                   "status_list": segments[i].status_list,
-                               })
-        }
     }
 
     // 修改某行某列的值

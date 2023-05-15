@@ -69,13 +69,11 @@ ListView {
 
             onClicked: {
                 var info = {
-                    "type_name": "状态" + String(root.status.length),
+                    "type_name": "状态_" + String(root.status.length),
                     "desc": "",
                     "monitor_status": [],
                     // 默认是第一个设备
-                    "device_id": gDevices[0].device_id,
-                    // 默认绑定其第一个icd
-                    "bind_icd": gDevices[0].input_icd
+                    "device_id": devices[0].device_id,
                 }
                 root.status.push(info)
                 root.model.append(info)

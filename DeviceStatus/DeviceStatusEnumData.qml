@@ -18,10 +18,10 @@ Window {
 
     property var rootPage
 
-    property var __VALUE_COLUMN: 0
-    property var __SHOWINFO_COLUMN: 1
-    property var __ICON_COLUMN: 2
-    property var __COLOR_COLUMN: 3
+    property var _VALUE_COLUMN: 0
+    property var _SHOWINFO_COLUMN: 1
+    property var _ICON_COLUMN: 2
+    property var _COLOR_COLUMN: 3
 
     signal itemChanged
     signal enumSave
@@ -103,9 +103,7 @@ Window {
                         margins: 1
                     }
 
-                    property var validColumn: [__VALUE_COLUMN, __SHOWINFO_COLUMN, __COLOR_COLUMN, __ICON_COLUMN].includes(styleData.column)
-
-                    visible: validColumn
+                    visible: [_VALUE_COLUMN, _SHOWINFO_COLUMN, _COLOR_COLUMN, _ICON_COLUMN].includes(styleData.column)
 
                     text: styleData.value
 
@@ -228,19 +226,19 @@ Window {
         var enuminfo = root.enumInfos[index]
 
         switch (column) {
-        case __VALUE_COLUMN:
+        case _VALUE_COLUMN:
             enuminfo.value = value
             table.model.setProperty(index, "value", value)
             break
-        case __SHOWINFO_COLUMN:
+        case _SHOWINFO_COLUMN:
             enuminfo.showinfo = value
             table.model.setProperty(index, "showinfo", value)
             break
-        case __ICON_COLUMN:
+        case _ICON_COLUMN:
             table.model.setProperty(index, "icon", value)
             enuminfo.icon = value
             break
-        case __COLOR_COLUMN:
+        case _COLOR_COLUMN:
             enuminfo.color = value
             table.model.setProperty(index, "color", value)
             break

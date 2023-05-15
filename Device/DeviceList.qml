@@ -103,7 +103,6 @@ ListView {
                 }
                 root.devices.push(info)
                 root.model.append(info)
-                gDevices.push(info)
             }
         } // BatchAddButton end
 
@@ -145,8 +144,6 @@ ListView {
                 onClicked: {
                     root.devices.splice(root.currentIndex, 1)
                     root.model.remove(root.currentIndex, 1)
-
-                    gDeviceBindInfo.splice(root.currentIndex, 1)
                 }
             }
         }
@@ -226,7 +223,6 @@ ListView {
 
             root.devices.push(info)
             root.model.append(info)
-            gDevices.push(info)
         }
     }
 
@@ -268,19 +264,15 @@ ListView {
         var deviceICDList = {}
         // 增加设置ICD信息
         for (var j in root.devices) {
-            var device_id = root.devices[j].device_id
-            var inputICD = root.devices[j].input_icd
-            var ouputICD = root.devices[j].ouput_icd
-
             var bindICD = []
             // 处理input icd
-            for (var x in inputICD) {
-                bindICD.push({"icd_id": inputICD[x], "type": "input"})
+            for (var x in root.devices[j].input_icd) {
+                bindICD.push({"icd_id": root.devices[j].input_icd[x], "type": "input"})
             }
-            for (var y in ouputICD) {
-                bindICD.push({"icd_id": ouputICD[y], "type": "ouput"})
+            for (var y in root.devices[j].ouput_icd) {
+                bindICD.push({"icd_id": root.devices[j].ouput_icd[y], "type": "ouput"})
             }
-            deviceICDList[device_id] = bindICD
+            deviceICDList[root.devices[j].device_id] = bindICD
         }
 
         deviceJSONFile["DeviceICDList"] = deviceICDList

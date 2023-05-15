@@ -87,14 +87,6 @@ Item {
                     root._device.type = text
                     root.itemChanged("type", text)
 
-                    // 修改gDevices中的值
-                    for (var i in gDevices) {
-                        if (gDevices[i].device_id === root._device.device_id) {
-                            gDevices[i].type = text
-                            break
-                        }
-                    }
-
                     root._device.type = text
                     root.itemChanged("type", text)
                 }
@@ -112,14 +104,6 @@ Item {
             height: 25
             onTextChanged: {
                 if (root._device) {
-                    // 修改gDevices中的值
-                    for (var i in gDevices) {
-                        if (gDevices[i].device_id === root._device.device_id) {
-                            gDevices[i].device_id = text
-                            break
-                        }
-                    }
-
                     root._device.device_id = text
                     root.itemChanged("device_id", text)
                 }
@@ -359,14 +343,6 @@ Item {
                         }
 
                         root.itemChanged("icd_info", JSON.stringify(updateValue))
-
-                        // 修改gDevices
-                        for (var j in gDevices) {
-                            if (gDevices[j].device_id === root._device.device_id) {
-                                gDevices[j].input_icd = root._device.input_icd
-                                return
-                            }
-                        }
                     }
                 }
             } // CheckBox end
@@ -406,14 +382,6 @@ Item {
                             updateValue = {"opeator": "del", "type": "ouput", "icd_id": nowICD}
                         }
                         root.itemChanged("icd_info", JSON.stringify(updateValue))
-
-                        // 修改gDevices
-                        for (var j in gDevices) {
-                            if (gDevices[j].device_id === root._device.device_id) {
-                                gDevices[j].ouput_icd = root._device.ouput_icd
-                                return
-                            }
-                        }
                     }
                 }
             }
@@ -479,6 +447,7 @@ Item {
         } // end of rowDelegate
     } // end of TableView
 
+    // 加载函数
     function load(value) {
         _device = value
 
@@ -496,12 +465,12 @@ Item {
 
         table.model.clear()
         // 查询当前所有icd
-        for (var i in gPayloads) {
+        for (var i in payloads) {
             var d = {
                 // 判断该行input icd 是否已经被选择
                 "isInput": (()=> {
                                 for (var j in value.input_icd) {
-                                    if (value.input_icd[j] === gPayloads[i].id) {
+                                    if (value.input_icd[j] === payloads[i].id) {
                                         return true
                                     }
                                 }
@@ -510,14 +479,14 @@ Item {
                 // 判断该行ouput icd 是否已经被选择
                 "isOuput": (()=> {
                                 for (var j in value.ouput_icd) {
-                                    if (value.ouput_icd[j] === gPayloads[i].id) {
+                                    if (value.ouput_icd[j] === payloads[i].id) {
                                         return true
                                     }
                                 }
                                 return false
                             })(),
-                "icdName": gPayloads[i].name,
-                "icdValue": String(gPayloads[i].id),
+                "icdName": payloads[i].name,
+                "icdValue": String(payloads[i].id),
             }
             table.model.append(d)
         }

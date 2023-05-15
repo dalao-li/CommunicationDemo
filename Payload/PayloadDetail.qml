@@ -79,15 +79,6 @@ Item {
                 if (root._payload) {
                     root._payload.name = text
                     root.itemChanged("name", text)
-
-                    // 同步修改gICDInfo
-                    for (var i in gPayloads) {
-                        if (gPayloads[i].icd_id === root._payload.id) {
-                            gPayloads[i].name = text
-                            return
-                        }
-                    }
-                    // console.log("修改, 当前gICDInfo", JSON.stringify(gICDInfo))
                 }
             }
         }

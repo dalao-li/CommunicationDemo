@@ -116,15 +116,15 @@ Item {
                     if (!visible) {
                         return
                     }
-                    root.setValue(styleData.row, styleData.column, String(gPayloads[currentIndex].icd_id))
+                    root.setValue(styleData.row, styleData.column, String(payloads[currentIndex].icd_id))
                 }
 
                 model: {
                     var icdNameList = []
                     for (var i in canUseICD) {
-                        for (var j in gPayloads) {
-                            if (String(canUseICD[i]) === String(gPayloads[j].icd_id)) {
-                                icdNameList.push(gPayloads[j])
+                        for (var j in payloads) {
+                            if (String(canUseICD[i]) === String(payloads[j].icd_id)) {
+                                icdNameList.push(payloads[j])
                                 break
                             }
                         }
@@ -261,7 +261,7 @@ Item {
     // 增加新行
     function addSegment(row) {
         var info = {
-            "bind_icd": gPayloads[0].id,
+            "bind_icd": payloads[0].id,
             "condition": []
         }
 
@@ -276,9 +276,9 @@ Item {
 
     // 加载列表数据
     function load(values) {
-        for (var i in gDevices) {
-            if (values.device_id === gDevices[i].device_id) {
-                canUseICD = gDevices[i].input_icd
+        for (var i in devices) {
+            if (values.device_id === devices[i].device_id) {
+                canUseICD = devices[i].input_icd
                 break
             }
         }

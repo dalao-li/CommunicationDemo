@@ -5,8 +5,8 @@ import QtQuick.Dialogs 1.2
 Item {
     id: root
 
-    property int defaultHeight: 60
     property var _status
+    property int defaultHeight: 60
 
     height: defaultHeight
 
@@ -63,19 +63,19 @@ Item {
             id: idCompox
             width: 130
             height: 25
-            enabled: {
-                return count != 0
-            }
 
             textRole: "type"
 
-            model: gDevices
+            model: devices
 
             onCurrentIndexChanged: {
                 if (root._status) {
-                    var id = gDevices[idCompox.currentIndex].device_id
-                    root._status.device_id = id
-                    root.itemChanged("device_id", id)
+                    // 修改设备id
+                    var device = devices[idCompox.currentIndex]
+
+                    console.log("修改值", JSON.stringify(device))
+                    root._status.device_id = device.device_id
+                    root.itemChanged("device_id", device.device_id)
                 }
             }
         }
@@ -121,8 +121,8 @@ Item {
     function load(value) {
         _status = value
 
-        for (var i in gDevices) {
-            if (value.device_id === gDevices[i].device_id) {
+        for (var i in devices) {
+            if (value.device_id === devices[i].device_id) {
                 idCompox.currentIndex = i
                 break
             }
@@ -130,5 +130,6 @@ Item {
 
         typeNameField.text = value.type_name
         descField.text = value.desc
+
     }
 }

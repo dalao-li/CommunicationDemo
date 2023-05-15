@@ -28,16 +28,18 @@ ApplicationWindow {
 
     title: qsTr("通信Demo")
 
-    property var content: []
     property string path: ""
 
-    property var gPayloads: []
+    property var content: []
 
-    property var gDevices: []
+    // 全局共享变量
+    property var payloads: []
 
-    property var gStatus: []
+    property var devices: []
 
-    property var gActions: []
+    property var status: []
+
+    property var actions: []
 
 
     menuBar: MenuBar {
@@ -118,6 +120,7 @@ ApplicationWindow {
             title: "ICD编辑"
             PayloadEditor {
                 id: payloadEditor
+                payloads: mainWindow.payloads
             }
         }
 
@@ -126,6 +129,7 @@ ApplicationWindow {
             title: "设备类型"
             DeviceEditor {
                 id: device
+                devices: mainWindow.devices
             }
         }
 
@@ -134,6 +138,7 @@ ApplicationWindow {
             title: "设备状态"
             DeviceStatusEditor {
                 id: deviceStatus
+                status: mainWindow.status
             }
 
         }
@@ -143,6 +148,7 @@ ApplicationWindow {
             title: "设备动作"
             DeviceActionEditor {
                 id: deviceAction
+                actions: mainWindow.actions
             }
         }
     } // TabView end

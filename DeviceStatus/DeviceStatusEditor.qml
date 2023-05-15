@@ -30,16 +30,18 @@ ColumnLayout {
             DeviceStatusList {
                 id: listComponent
 
+                status: root.status
+
                 anchors.fill: parent
                 Layout.fillHeight: true
-
-                status: root.status
 
                 onCurrentIndexChanged: {
                     if (listComponent.currentIndex < 0) {
                         return
                     }
                     var data = root.status[listComponent.currentIndex]
+
+                    console.log("Status切换", JSON.stringify(data), "\n")
                     detailComponent.load(data)
                     segmentComponent.load(data)
                 }

@@ -78,11 +78,11 @@ Item {
 
             textRole: "type"
 
-            model: gDevices
+            model: devices
 
             onCurrentIndexChanged: {
                 if (root._action) {
-                    var nowDevice = gDevices[deviceIDCombox.currentIndex]
+                    var nowDevice = devices[deviceIDCombox.currentIndex]
                     // 修改device_id 同时修改 device_bind_id
                     root._action.device_id = nowDevice.device_id
                     root._action.device_bind_icd = nowDevice.input_icd
@@ -113,9 +113,9 @@ Item {
             model: {
                 var icdInfo = []
                 for (var i in _action.device_bind_icd) {
-                    for (var j in gPayloads) {
-                        if (String(_action.device_bind_icd[i]) === String(gPayloads[j].icd_id)) {
-                            icdInfo.push(gPayloads[j])
+                    for (var j in payloads) {
+                        if (String(_action.device_bind_icd[i]) === String(payloads[j].icd_id)) {
+                            icdInfo.push(payloads[j])
                             break
                         }
                     }
@@ -160,8 +160,8 @@ Item {
         var nowDeviceIDIndex = 0
         var nowICDIDIndex = 0
         // 获取device_id 下标
-        for (var i in gDevices) {
-            if (value.device_id === gDevices[i].device_id) {
+        for (var i in devices) {
+            if (value.device_id === devices[i].device_id) {
                 nowDeviceIDIndex = i
                 break
             }
