@@ -41,6 +41,7 @@ ColumnLayout {
                         return
                     }
                     var data = root.actions[listComponent.currentIndex]
+                    console.log("加载==>", JSON.stringify(data))
                     detailComponent.load(data)
                     segmentComponent.load(data)
                 }
@@ -70,18 +71,14 @@ ColumnLayout {
                         d["name"] = value
                     }
 
-                    if (id === "icd_id") {
-                        d["icd_id"] = value
+                    // 修改device
+                    if (id === "device") {
+                        d["device"] = Number(value)
                     }
 
-                    // 修改device_id
-                    if (id === "device_id") {
-                        d["device_id"] = value
-                    }
-
-                    // 修改bind_icd
-                    if (id === "bind_icd") {
-                        d["bind_icd"] = value
+                    // 修改bind_ouput_icd
+                    if (id === "bind_ouput_icd") {
+                        d["bind_ouput_icd"] = Number(value)
                     }
 
                     listComponent.model.set(listComponent.currentIndex, d)

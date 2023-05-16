@@ -73,9 +73,8 @@ Item {
                     // 修改设备id
                     var device = devices[idCompox.currentIndex]
 
-                    console.log("修改值", JSON.stringify(device))
-                    root._status.device_id = device.device_id
-                    root.itemChanged("device_id", device.device_id)
+                    root._status.device = device
+                    root.itemChanged("device", JSON.stringify(device))
                 }
             }
         }
@@ -120,9 +119,8 @@ Item {
 
     function load(value) {
         _status = value
-
         for (var i in devices) {
-            if (value.device_id === devices[i].device_id) {
+            if (value.device.device_id === devices[i].device_id) {
                 idCompox.currentIndex = i
                 break
             }

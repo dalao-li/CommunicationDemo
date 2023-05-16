@@ -3,8 +3,8 @@
  * @Version: 1.0
  * @Author: liyuanhao
  * @Date: 2023-05-09 19:05:47
- * @LastEditors: liyuanhao
- * @LastEditTime: 2023-05-09 19:05:47
+ * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2023-05-16 14:14:45
  */
 
 
@@ -209,9 +209,13 @@ Window {
 
     // 将已经保存的枚举值重新输入子界面
     function setEunmInfos(enumInfos) {
-        for (var i = 0; i < enumInfos.length; i++) {
-            // console.log("将已经保存的枚举值重新输入子界面", enumInfos[i])
-            table.model.insert(i, enumInfos[i])
+        for (var i in enumInfos) {
+            var info = {
+                "enumname": enumInfos[i].enumname,
+                "enumdata": enumInfos[i].enumdata
+            }
+            table.model.insert(i, info)
+            root.enumInfos.push(info)
         }
     }
 

@@ -74,15 +74,15 @@ ListView {
             }
 
             onClicked: {
-                // 默认是选第一个设备, 选择第一个icd
-                var defaultInfo = devices[0]
                 var info = {
                     "name": "动作" + String(root.actions.length),
                     "id": String(createID()),
                     "condition": [],
-                    "device_id": defaultInfo.device_id,
-                    "icd_id": defaultInfo.input_icd[0],
-                    "device_bind_icd": defaultInfo.input_icd
+                    // 默认是选第一个设备
+                    "device": 0,
+                    // 默认绑首个ouput_icd
+                    "bind_ouput_icd": 0,
+
                 }
                 root.actions.push(info)
                 root.model.append(info)

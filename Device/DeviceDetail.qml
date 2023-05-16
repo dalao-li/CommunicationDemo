@@ -43,19 +43,6 @@ Item {
             anchors.centerIn: parent
             text: "设备信息录入"
         }
-
-        // 点击折叠
-        MouseArea {
-            anchors.fill: parent
-            onClicked: {
-                if (root.height === defaultHeight) {
-                    root.height = title.height
-                } else {
-                    root.height = defaultHeight
-                }
-                flow.visible = !flow.visible
-            }
-        }
     } // title end
 
     Grid {
@@ -389,7 +376,7 @@ Item {
 
         TableViewColumn {
             id: isInput
-            visible: table.columsVisible[0]
+            visible: true
             role: "isInput"
             title: "输入选择"
             width: 160
@@ -397,7 +384,7 @@ Item {
 
         TableViewColumn {
             id: isOuput
-            visible: table.columsVisible[1]
+            visible: true
             role: "isOuput"
             title: "输出选择"
             width: 80
@@ -405,7 +392,7 @@ Item {
 
         TableViewColumn {
             id: icdName
-            visible: table.columsVisible[2]
+            visible: true
             role: "icdName"
             title: "ICD名称"
             width: 100
@@ -413,7 +400,7 @@ Item {
 
         TableViewColumn {
             id: icdValue
-            visible: table.columsVisible[3]
+            visible: true
             role: "icdValue"
             title: "ICD id"
             width: 80

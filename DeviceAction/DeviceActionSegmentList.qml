@@ -8,11 +8,18 @@ import "../Button"
 Item {
     id: root
 
-    property var actions: []
-    property var canUseICD : []
+    property var segments: []
 
-    property int _CONDITION_BIND_ICDICOLUMN: 0
-    property var _CONDTION_KEYS_COLUMN: 1
+    property var _device
+
+    property var _bindOuputICD
+
+    property var _TYPE_ID_COLUMN: 0
+    property var _OUPUT_ICD_INDEX_COLUMN: 1
+    property var _INPUT_ICD_COLUMN: 2
+    property var _INPUT_ICD_INDEX_COLUMN: 3
+    property var _DIFFERENCE_COLUMN: 4
+    property var _KEYS_COLUMN: 5
 
     signal itemChanged(string id, string value)
 
@@ -67,6 +74,42 @@ Item {
 
         // 如何绘制每一个单元格
         itemDelegate: Item {
+            Label {
+                id: label
+                anchors.fill: parent
+                visible: !styleData.selected || [_TYPE_ID_COLUMN, _OUPUT_ICD_INDEX_COLUMN, _INPUT_ICD_COLUMN, _INPUT_ICD_INDEX_COLUMN].includes(styleData.column)
+
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+
+                text: {
+                    if (!visible) {
+                        return ""
+                    }
+
+                    if (styleData.column === _TYPE_ID_COLUMN) {
+                        return String(styleData.value)
+
+                    }
+
+                    if (styleData.column === _OUPUT_ICD_INDEX_COLUMN) {
+                        var paload = payloads[_bindOuputICD]
+                        return paload.values[segments[styleData.row].ouput_icd_index].name
+                    }
+
+                    if (styleData.column === _INPUT_ICD_COLUMN) {
+                        return payloads[segments[styleData.row].bind_input_icd].name
+                    }
+
+                    if (styleData.column === _INPUT_ICD_INDEX_COLUMN) {
+                        var values = payloads[segments[styleData.row].bind_input_icd].values
+                        return values[segments[styleData.row].input_icd_index].name
+                    }
+
+                    return Number(styleData.value)
+                }
+            }
+
             TextField {
                 id: field
                 anchors {
@@ -74,7 +117,7 @@ Item {
                     margins: 1
                 }
 
-                property var validColumn: false
+                property var validColumn: styleData.column === _DIFFERENCE_COLUMN
 
                 visible: validColumn && styleData.selected
 
@@ -96,7 +139,7 @@ Item {
                 }
             } // TextField end
 
-            // conditon绑定ICD
+            // ouput_icd 中 index
             ComboBox {
                 id: typeBox
                 anchors {
@@ -104,11 +147,9 @@ Item {
                     margins: 1
                 }
 
-                property var validColumn: styleData.column === _CONDITION_BIND_ICDICOLUMN
+                property var validColumn: styleData.column === _OUPUT_ICD_INDEX_COLUMN
 
                 visible: validColumn && styleData.selected
-
-                textRole: "name"
 
                 currentIndex: validColumn ? Number(styleData.value) : 0
 
@@ -116,33 +157,96 @@ Item {
                     if (!visible) {
                         return
                     }
-                    root.setValue(styleData.row, styleData.column, String(payloads[currentIndex].icd_id))
+                    root.setValue(styleData.row, styleData.column, currentIndex)
                 }
 
                 model: {
-                    var icdNameList = []
-                    for (var i in canUseICD) {
-                        for (var j in payloads) {
-                            if (String(canUseICD[i]) === String(payloads[j].icd_id)) {
-                                icdNameList.push(payloads[j])
-                                break
+                    var res = []
+                    for (var i in payloads[_bindOuputICD].values) {
+                        res.push(payloads[_bindOuputICD].values[i].name)
+                    }
+                    return res
+                }
+            }
+
+            // input_icd
+            ComboBox {
+                id: inputICDBox
+                anchors {
+                    fill: parent
+                    margins: 1
+                }
+
+
+
+                property var validColumn: styleData.column === _INPUT_ICD_COLUMN
+
+                visible: validColumn && styleData.selected
+
+                currentIndex: validColumn ? Number(styleData.value) : 0
+
+                onCurrentIndexChanged: {
+                    if (!visible) {
+                        return
+                    }
+                    root.setValue(styleData.row, styleData.column, currentIndex)
+                }
+
+                model: {
+                    var res = []
+                    var device = devices[_device]
+                    for (var m in device.input_icd) {
+                        for (var n in payloads) {
+                            if (device.input_icd[m] === payloads[n].id) {
+                                res.push(payloads[n].name)
                             }
                         }
                     }
-                    return icdNameList
+                    return res
+                }
+            }
+
+            // input_icd 中 index
+            ComboBox {
+                id: inputICDIndexBox
+                anchors {
+                    fill: parent
+                    margins: 1
+                }
+
+                property var validColumn: styleData.column === _INPUT_ICD_INDEX_COLUMN
+
+                visible: validColumn && styleData.selected
+
+                currentIndex: validColumn ? Number(styleData.value) : 0
+
+                onCurrentIndexChanged: {
+                    if (!visible) {
+                        return
+                    }
+                    root.setValue(styleData.row, styleData.column, currentIndex)
+                }
+
+                model: {
+                    var res = []
+                    var payload = payloads[segments[styleData.row].bind_input_icd]
+                    for (var j in payload.values) {
+                        res.push(payload.values[j].name)
+                    }
+                    return res
                 }
             }
 
             // 添加condition
             Button {
                 id: enumBtn
-                text: qsTr("添加Condition")
+                text: qsTr("添加Keys")
                 anchors {
                     fill: parent
                     margins: 1
                 }
 
-                visible: styleData.column === __STATUS_LIST_COLUMN && styleData.selected
+                visible: styleData.column === _KEYS_COLUMN && styleData.selected
 
                 onClicked: {
                     var component = Qt.createComponent("DeviceActionEnumData.qml")
@@ -156,49 +260,60 @@ Item {
                         win.rootPage = root
 
                         // 存在枚举值
-                        if (actions[styleData.row].condition) {
-                            win.setEunmInfos(actions[styleData.row].condition)
+                        if (segments[styleData.row].condition) {
+                            win.setEunmInfos(segments[styleData.row].condition)
                         }
                     }
-                }
-            }
-
-            Label {
-                id: label
-                anchors.fill: parent
-                visible: false
-
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-
-                text: {
-                    if (!visible) {
-                        return ""
-                    }
-
-                    if (styleData.column === __TYPE_NAME_COLUMN || styleData.column === __DESC_COLUMN) {
-                        return String(styleData.value)
-
-                    }
-                    return String(JSON.stringify(styleData.value))
                 }
             }
         } // itemDelegate end
 
         TableViewColumn {
-            id: type
-            visible: table.columsVisible[_CONDITION_BIND_ICDICOLUMN]
-            role: "type"
-            title: "类型"
+            id: typeIDCol
+            visible: table.columsVisible[_TYPE_ID_COLUMN]
+            role: "index"
+            title: "TypeID"
             width: 100
         }
 
         TableViewColumn {
-            id: condition
-            visible: table.columsVisible[_CONDTION_KEYS_COLUMN]
-            role: "condition"
-            title: "状态列表"
-            width: 80
+            id: ouputICDIndexCol
+            visible: table.columsVisible[_OUPUT_ICD_INDEX_COLUMN]
+            role: "ouput_icd_index"
+            title: "输出ICD中index"
+            width: 160
+        }
+
+        TableViewColumn {
+            id: inputICDCol
+            visible: table.columsVisible[_INPUT_ICD_COLUMN]
+            role: "bind_input_icd"
+            title: "输入ICD"
+            width: 160
+        }
+
+        TableViewColumn {
+            id: inputICDIndexCol
+            visible: table.columsVisible[_INPUT_ICD_INDEX_COLUMN]
+            role: "input_icd_index"
+            title: "输入ICD中index"
+            width: 160
+        }
+
+        TableViewColumn {
+            id: differenceCol
+            visible: table.columsVisible[_DIFFERENCE_COLUMN]
+            role: "difference"
+            title: "difference"
+            width: 100
+        }
+
+        TableViewColumn {
+            id: keysColumn
+            visible: table.columsVisible[_KEYS_COLUMN]
+            role: ""
+            title: "keys"
+            width: 100
         }
 
         model: ListModel {}
@@ -249,7 +364,7 @@ Item {
                     name: "minus"
                     color: "black"
                     onClicked: {
-                        root.actions.splice(table.currentRow, 1)
+                        root.segments.splice(table.currentRow, 1)
                         table.model.remove(table.currentRow, 1)
                     }
                 }
@@ -258,62 +373,77 @@ Item {
     } // end of TableView
 
 
+    // 加载列表数据
+    function load(values) {
+        _device = values.device
+        _bindOuputICD = values.bind_ouput_icd
+        segments = values.condition
+
+        batchAdd.enabled = true
+
+        table.model.clear()
+        for (var i in segments) {
+            table.model.append({
+                                   "index": segments[i].index,
+                                   "ouput_icd_index": segments[i].ouput_icd_index,
+                                   "bind_input_icd": segments[i].bind_input_icd,
+                                   "input_icd_index": segments[i].input_icd_index,
+                                   "difference": segments[i].difference,
+                                   "keys": segments[i].keys
+                               })
+        }
+    }
+
     // 增加新行
     function addSegment(row) {
         var info = {
-            "bind_icd": payloads[0].id,
-            "condition": []
+            "index": String(row + 1),
+            "ouput_icd_index": 0,
+            "bind_input_icd": 0,
+            "input_icd_index": 0,
+            "difference": 0,
+            "keys": []
         }
 
-        root.actions.splice(row + 1, 0, info)
+        root.segments.splice(row + 1, 0, info)
         table.model.insert(row + 1, info)
     }
 
     // 获取枚举
     function getEnumdata(meaning) {
-        actions[table.currentRow].condition = meaning
-    }
-
-    // 加载列表数据
-    function load(values) {
-        for (var i in devices) {
-            if (values.device_id === devices[i].device_id) {
-                canUseICD = devices[i].input_icd
-                break
-            }
-        }
-
-        batchAdd.enabled = true
-
-        table.model.clear()
-
-        actions = values.monitor_status
-        for (var i in actions) {
-            table.model.append({
-                                   "bind_icd": actions[i].type_id,
-                                   "status_list": actions[i].condition,
-                               })
-        }
+        segments[table.currentRow].condition = meaning
     }
 
     // 修改某行某列的值
     function setValue(index, column, value) {
+        // console.log("修改信号", index, column, value)
         if (index < 0 || column < 0) {
             return
         }
 
-        var segment = root.actions[index]
+        var segment = root.segments[index]
         switch (column) {
-        case _CONDITION_BIND_ICDICOLUMN:
-            segment.bind_icd = value
-            table.model.setProperty(index, "bind_icd", value)
+        case _OUPUT_ICD_INDEX_COLUMN:
+            segment.ouput_icd_index = Number(value)
+            table.model.setProperty(index, "ouput_icd_index", Number(value))
             break
 
-        case _CONDTION_KEYS_COLUMN:
-            segment.condition = value
-            table.model.setProperty(index, "condition", value)
+        case _INPUT_ICD_COLUMN:
+            segment.bind_input_icd = Number(value)
+            table.model.setProperty(index, "bind_input_icd", Number(value))
             break
+        case _INPUT_ICD_INDEX_COLUMN:
+            segment.input_icd_index = Number(value)
+            table.model.setProperty(index, "input_icd_index", Number(value))
+           break
+
+        case _DIFFERENCE_COLUMN:
+            segment.difference = Number(value)
+            table.model.setProperty(index, "difference", Number(value))
+            break
+
         }
-        root.actions[index] = segment
+        root.segments[index] = segment
+        // console.log("修改完后", JSON.stringify(segments))
     }
 }

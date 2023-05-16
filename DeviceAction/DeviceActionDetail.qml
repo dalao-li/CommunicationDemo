@@ -15,9 +15,9 @@ import QtQuick.Dialogs 1.2
 Item {
     id: root
 
-    property int defaultHeight: 60
-
     property var _action : []
+
+    property int defaultHeight: 60
 
     signal itemChanged(string id, string value)
 
@@ -71,30 +71,32 @@ Item {
             verticalAlignment: Text.AlignVCenter
         }
 
+        // device信息
         ComboBox {
             id: deviceIDCombox
             width: 130
             height: 25
 
-            textRole: "type"
+            //textRole: "type"
 
-            model: devices
+            model: {
+                var res = []
+                for (var i in devices) {
+                    res.push(devices[i].type)
+                }
+                return res
+            }
 
             onCurrentIndexChanged: {
                 if (root._action) {
-                    var nowDevice = devices[deviceIDCombox.currentIndex]
-                    // 修改device_id 同时修改 device_bind_id
-                    root._action.device_id = nowDevice.device_id
-                    root._action.device_bind_icd = nowDevice.input_icd
-                    root.itemChanged("device_id", nowDevice.device_id)
-                    root.itemChanged("device_bind_icd", nowDevice.input_icd)
-                    // console.log("修改后", JSON.stringify(root._action))
+                    root._action.device = currentIndex
+                    root.itemChanged("device", currentIndex)
                 }
             }
         }
 
         Label {
-            text: "绑定ICD"
+            text: "绑定输出ICD"
             height: 25
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
@@ -108,28 +110,25 @@ Item {
                 return count != 0
             }
 
-            textRole: "name"
+            //textRole: "name"
 
             model: {
-                var icdInfo = []
-                for (var i in _action.device_bind_icd) {
+                var res = []
+                var ouputICD = devices[_action.device].ouput_icd
+                for (var i in ouputICD) {
                     for (var j in payloads) {
-                        if (String(_action.device_bind_icd[i]) === String(payloads[j].icd_id)) {
-                            icdInfo.push(payloads[j])
-                            break
+                        if (String(ouputICD[i]) === String(payloads[j].id)) {
+                            res.push(payloads[j].name)
                         }
                     }
                 }
-                return icdInfo
+                return res
             }
 
-            // textRole: "input_icd"
             onCurrentIndexChanged: {
                 if (root._action) {
-                    var nowICDId = _action.device_bind_icd[currentIndex]
-                    root._action.icd_id = nowICDId
-                    root.itemChanged("icd_id", nowICDId)
-                    // console.log("发送修改icd信号", nowICDId)
+                    root._action.bind_ouput_icd = currentIndex
+                    root.itemChanged("bind_ouput_icd", currentIndex)
                 }
             }
         }
@@ -157,29 +156,9 @@ Item {
     function load(value) {
         _action = value
 
-        var nowDeviceIDIndex = 0
-        var nowICDIDIndex = 0
-        // 获取device_id 下标
-        for (var i in devices) {
-            if (value.device_id === devices[i].device_id) {
-                nowDeviceIDIndex = i
-                break
-            }
-        }
-
-        // 获取icd_id 下标
-        for (var j in value.device_bind_icd) {
-            if (value.icd_icd === value.device_bind_icd[j]) {
-                nowICDIDIndex = j
-                break
-            }
-        }
 
         name.text = value.name
-        deviceIDCombox.currentIndex = nowDeviceIDIndex
-        icdCombox.currentIndex = nowICDIDIndex
-
-        console.log("DeviceActionDetail加载", JSON.stringify(value), "\n")
-
+        deviceIDCombox.currentIndex = value.device
+        icdCombox.currentIndex = value.bind_ouput_icd
     }
 }

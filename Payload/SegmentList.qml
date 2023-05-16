@@ -34,6 +34,8 @@ Item {
     property var _DESC_COLUMN: 10
     property var _MEANING_COLUMN: 11
 
+    property var _INDEX_COLUMN: 12
+
     // 数据类型枚举
     // "无符号整数", "单精度浮点", "双精度浮点", "字符串", "枚举", "有符号整数", "字符", "ASCII", "UNICODE"
     property var _UINT_TYPE: 0
@@ -45,8 +47,6 @@ Item {
     property var _CHAR_TYPE: 6
     property var _ASCII_TYPE: 7
     property var _UNICODE: 8
-
-
 
     signal itemChanged(string id, string value)
 
@@ -103,6 +103,19 @@ Item {
 
         // 如何绘制每一个单元格
         itemDelegate: Item {
+            Label {
+                id: indexLabel
+                anchors {
+                    fill: parent
+                    margins: 1
+                }
+
+                visible: true
+
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+            }
+
             TextField {
                 id: field
                 anchors {
@@ -175,8 +188,8 @@ Item {
 
                 visible: styleData.selected && validColumn
 
-                enabled: styleData.selected && ![_UINT_TYPE, _DOUBLE_TYPE, _CHAR_TYPE].includes(segments[styleData.row].type)
-
+                // enabled: styleData.selected && ![_UINT_TYPE, _DOUBLE_TYPE, _CHAR_TYPE].includes(segments[styleData.row].type)
+                enabled: true
 
                 value: validColumn ? Number(styleData.value) : 0
 
@@ -229,7 +242,11 @@ Item {
                     margins: 1
                 }
 
-                visible: styleData.selected && styleData.column === _MEANING_COLUMN && (segments[styleData.row].type === _ENUM_TYPE)
+                property var flag: {
+                    return styleData.selected && styleData.column === _MEANING_COLUMN && (segments[styleData.row].type === _ENUM_TYPE)
+                }
+
+                visible: flag
 
                 onClicked: {
                     var component = Qt.createComponent("SetEnumData.qml")
@@ -449,6 +466,7 @@ Item {
         segments = values
         for (var i in values) {
             table.model.append({
+                                   "index": values[i].index,
                                    "name": values[i].name,
                                    "offset": values[i].offset,
                                    "size": values[i].size,
@@ -461,7 +479,6 @@ Item {
                                    "meaning": values[i].meaning
                                })
         }
-        // console.log("加载全部", JSON.stringify(payloads))
     }
 
     // 增加新行
@@ -485,7 +502,7 @@ Item {
             "dim": 1,
             "amp": 0,
             "meaning": {},
-            // "btnvisible": false
+            "index": String(row + 1),
         }
         root.segments.splice(row + 1, 0, info)
         table.model.insert(row + 1, info)
@@ -511,7 +528,6 @@ Item {
     }
 
     function getEnumdata(meaning) {
-        // console.log("保存枚举", JSON.stringify(meaning))
         segments[table.currentRow].meaning = meaning
     }
 

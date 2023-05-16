@@ -75,7 +75,6 @@ ColumnLayout {
 
             SegmentList {
                 id: segmentComponent
-
                 anchors {
                     left: parent.left
                     right: parent.right

@@ -35,6 +35,7 @@ ColumnLayout {
                 devices: root.devices
 
                 onCurrentIndexChanged: {
+                    //console.log("Device切换", JSON.stringify(root.devices[deviceList.currentIndex]), "\n")
                     deviceDetail.load(root.devices[deviceList.currentIndex])
                 }
             }

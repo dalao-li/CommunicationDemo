@@ -73,7 +73,8 @@ ListView {
                     "desc": "",
                     "monitor_status": [],
                     // 默认是第一个设备
-                    "device_id": devices[0].device_id,
+                    "device": devices[0]
+
                 }
                 root.status.push(info)
                 root.model.append(info)
@@ -137,7 +138,7 @@ ListView {
         // 处理JSON
         for (var i in root.status) {
             var res = {}
-            res["id"] = root.status[i].device_id
+            res["id"] = root.status[i].device.device_id
             res["type_name"] = root.status[i].type_name
             res["desc"] = root.status[i].desc
             res["monitor_status"] = root.status[i].monitor_status
