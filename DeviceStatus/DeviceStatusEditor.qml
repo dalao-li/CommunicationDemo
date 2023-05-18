@@ -40,7 +40,6 @@ ColumnLayout {
                         return
                     }
                     var data = root.status[listComponent.currentIndex]
-                    // console.log("总体", JSON.stringify(data), "\n")
                     detailComponent.load(data)
                     segmentComponent.load(data)
                 }
@@ -62,6 +61,7 @@ ColumnLayout {
                 }
 
                 onItemChanged: {
+                    console.log("信号接受DeviceStatusDetail")
                     if (listComponent.currentIndex < 0) {
                         return
                     }
@@ -78,11 +78,6 @@ ColumnLayout {
                     if (id === "device") {
                         d["device"] = JSON.parse(value)
                     }
-
-                    if (id === "bind_icd") {
-
-                    }
-
                     listComponent.model.set(listComponent.currentIndex, d)
                 }
             }
@@ -95,19 +90,6 @@ ColumnLayout {
                     top: detailComponent.bottom
                     topMargin: 5
                     bottom: parent.bottom
-                }
-
-                onItemChanged: {
-                    if (id === "bind_icd") {
-                        var values = JSON.parse(value)
-                        var index = values.index
-                        var icd = values.bind_icd
-                        // 获取该icd下的
-
-                        console.log("index = ", index, "bind_icd", icd)
-                    }
-
-                    //listComponent.model.set(listComponent.currentIndex, d)
                 }
             }
         }

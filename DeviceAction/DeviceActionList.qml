@@ -79,9 +79,9 @@ ListView {
                     "id": String(createID()),
                     "condition": [],
                     // 默认是选第一个设备
-                    "device": 0,
+                    "device": devices[0],
                     // 默认绑首个ouput_icd
-                    "bind_ouput_icd": 0,
+                    "bind_ouput_icd": devices[0].ouput_icd[0],
 
                 }
                 root.actions.push(info)

@@ -41,7 +41,6 @@ ColumnLayout {
                         return
                     }
                     var data = root.actions[listComponent.currentIndex]
-                    console.log("加载==>", JSON.stringify(data))
                     detailComponent.load(data)
                     segmentComponent.load(data)
                 }
@@ -73,12 +72,12 @@ ColumnLayout {
 
                     // 修改device
                     if (id === "device") {
-                        d["device"] = Number(value)
+                        d["device"] = JSON.parse(value)
                     }
 
                     // 修改bind_ouput_icd
                     if (id === "bind_ouput_icd") {
-                        d["bind_ouput_icd"] = Number(value)
+                        d["bind_ouput_icd"] = value
                     }
 
                     listComponent.model.set(listComponent.currentIndex, d)

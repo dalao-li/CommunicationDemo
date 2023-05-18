@@ -14,12 +14,11 @@ Item {
 
     property var _bindOuputICD
 
-    property var _TYPE_ID_COLUMN: 0
-    property var _OUPUT_ICD_INDEX_COLUMN: 1
-    property var _INPUT_ICD_COLUMN: 2
-    property var _INPUT_ICD_INDEX_COLUMN: 3
-    property var _DIFFERENCE_COLUMN: 4
-    property var _KEYS_COLUMN: 5
+    property var _OUPUT_ICD_INDEX_COLUMN: 0
+    property var _INPUT_ICD_COLUMN: 1
+    property var _INPUT_ICD_INDEX_COLUMN: 2
+    property var _DIFFERENCE_COLUMN: 3
+    property var _KEYS_COLUMN: 4
 
     signal itemChanged(string id, string value)
 
@@ -74,38 +73,91 @@ Item {
 
         // 如何绘制每一个单元格
         itemDelegate: Item {
+
+            // ouput_icd
+            property var ouputICDList: getOuputICDList()
+
+            // input_icd
+            property var inputICDList: getInputICDList()
+
+            // ouput_icd index
+            property var ouputICDFieldList: {
+                //console.log("ouput test", segments[styleData.row].bind_icd)
+                if (styleData.row === undefined || segments[styleData.row] === undefined || segments[styleData.row].ouput_icd_index === undefined) {
+                    return []
+                }
+                return getFieldList(_bindOuputICD)
+            }
+
+            // input_icd index
+            property var inputICDFieldList: {
+                if (styleData.row === undefined || segments[styleData.row] === undefined || segments[styleData.row].input_icd_index === undefined) {
+                    return []
+                }
+                return getFieldList(table.model.get(styleData.row).bind_input_icd)
+            }
+
             Label {
                 id: label
                 anchors.fill: parent
-                visible: !styleData.selected || [_TYPE_ID_COLUMN, _OUPUT_ICD_INDEX_COLUMN, _INPUT_ICD_COLUMN, _INPUT_ICD_INDEX_COLUMN].includes(styleData.column)
+                visible: !styleData.selected && [_OUPUT_ICD_INDEX_COLUMN, _INPUT_ICD_COLUMN, _INPUT_ICD_INDEX_COLUMN].includes(styleData.column)
 
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
+
+                property var segment: {
+                    if (styleData.row === undefined) {
+                        return []
+                    }
+                    return segments[styleData.row]
+                }
 
                 text: {
                     if (!visible) {
                         return ""
                     }
 
-                    if (styleData.column === _TYPE_ID_COLUMN) {
-                        return String(styleData.value)
-
-                    }
-
                     if (styleData.column === _OUPUT_ICD_INDEX_COLUMN) {
-                        var paload = payloads[_bindOuputICD]
-                        return paload.values[segments[styleData.row].ouput_icd_index].name
+                        if (segment === [] || segment === undefined) {
+                            return ""
+                        }
+
+                        for (var j in payloads) {
+                            if (payloads[j].id === String(_bindOuputICD)) {
+                                var value = payloads[j].values[styleData.value]
+                                if (value === undefined) {
+                                    return ""
+                                }
+                                return value.name
+                            }
+                        }
                     }
 
                     if (styleData.column === _INPUT_ICD_COLUMN) {
-                        return payloads[segments[styleData.row].bind_input_icd].name
+                        if (segment === [] || segment === undefined) {
+                            return ""
+                        }
+                        for (var i in payloads) {
+                            if (payloads[i].id === styleData.value) {
+                                return payloads[i].name
+                            }
+                        }
                     }
 
                     if (styleData.column === _INPUT_ICD_INDEX_COLUMN) {
-                        var values = payloads[segments[styleData.row].bind_input_icd].values
-                        return values[segments[styleData.row].input_icd_index].name
+                        if (segment === [] || segment === undefined) {
+                            return ""
+                        }
+                        for (var k in payloads) {
+                            if (payloads[k].id === String(segment.bind_input_icd)) {
+                                var values = payloads[k].values[styleData.value]
+                                if (values === undefined) {
+                                    return ""
+                                }
+                                return values.name
+                            }
+                        }
                     }
-
                     return Number(styleData.value)
                 }
             }
@@ -147,25 +199,40 @@ Item {
                     margins: 1
                 }
 
-                property var validColumn: styleData.column === _OUPUT_ICD_INDEX_COLUMN
+                visible: (styleData.column === _OUPUT_ICD_INDEX_COLUMN) && styleData.selected
 
-                visible: validColumn && styleData.selected
-
-                currentIndex: validColumn ? Number(styleData.value) : 0
-
-                onCurrentIndexChanged: {
-                    if (!visible) {
-                        return
+                property var curIndex: {
+                    // 防止页面首次加载时错误
+                    if (styleData.row === undefined || segments[styleData.row] === undefined || segments[styleData.row].ouput_icd_index === undefined) {
+                        return -1
                     }
-                    root.setValue(styleData.row, styleData.column, currentIndex)
+
+                    //console.log("ouput_icd_index", segments[styleData.row].ouput_icd_index)
+                    for(var i in ouputICDFieldList){
+                        //console.log("ouputICDFieldList[i].value", ouputICDFieldList[i].value)
+                        if(String(segments[styleData.row].ouput_icd_index) === String(ouputICDFieldList[i].value)) {
+                            return i
+                        }
+                    }
+                    return -1
                 }
 
-                model: {
-                    var res = []
-                    for (var i in payloads[_bindOuputICD].values) {
-                        res.push(payloads[_bindOuputICD].values[i].name)
+                model: ouputICDFieldList
+
+                currentIndex: curIndex
+
+                onCurIndexChanged: {
+                    currentIndex = curIndex
+                }
+
+                onCurrentIndexChanged: {
+                    if (!visible || styleData.row === undefined || currentIndex < 0) {
+                        return
                     }
-                    return res
+                    console.log("发送ouput index修改", currentIndex)
+                    root.setValue(styleData.row, styleData.column, currentIndex)
+
+                    //console.log("发送完修改信号", JSON.stringify(segments))
                 }
             }
 
@@ -177,32 +244,30 @@ Item {
                     margins: 1
                 }
 
+                visible: (styleData.column === _INPUT_ICD_COLUMN) && styleData.selected
 
-
-                property var validColumn: styleData.column === _INPUT_ICD_COLUMN
-
-                visible: validColumn && styleData.selected
-
-                currentIndex: validColumn ? Number(styleData.value) : 0
-
-                onCurrentIndexChanged: {
-                    if (!visible) {
-                        return
-                    }
-                    root.setValue(styleData.row, styleData.column, currentIndex)
-                }
-
-                model: {
-                    var res = []
-                    var device = devices[_device]
-                    for (var m in device.input_icd) {
-                        for (var n in payloads) {
-                            if (device.input_icd[m] === payloads[n].id) {
-                                res.push(payloads[n].name)
-                            }
+                property var curIndex: {
+                    for (var i in inputICDList) {
+                        if (styleData.value === inputICDList[i].value) {
+                            return i
                         }
                     }
-                    return res
+                    return -1
+                }
+
+                model: inputICDList
+
+                currentIndex: curIndex
+
+                onCurIndexChanged: {
+                    currentIndex = curIndex
+                }
+
+                onCurrentIndexChanged: {
+                    if (!visible || styleData.row === undefined) {
+                        return
+                    }
+                    root.setValue(styleData.row, styleData.column, payloads[currentIndex].id)
                 }
             }
 
@@ -214,26 +279,31 @@ Item {
                     margins: 1
                 }
 
-                property var validColumn: styleData.column === _INPUT_ICD_INDEX_COLUMN
+                visible: (styleData.column === _INPUT_ICD_INDEX_COLUMN) && styleData.selected
 
-                visible: validColumn && styleData.selected
+                model: inputICDFieldList
 
-                currentIndex: validColumn ? Number(styleData.value) : 0
+                property var curIndex: {
+                    for(var i in inputICDFieldList){
+                        if(String(segments[styleData.row].input_icd_index) === String(inputICDFieldList[i].value)) {
+                            return i
+                        }
+                    }
+                    return -1
+                }
+
+                currentIndex: curIndex
+
+                onCurIndexChanged: {
+                    //console.log("input index", curIndex)
+                    currentIndex = curIndex
+                }
 
                 onCurrentIndexChanged: {
-                    if (!visible) {
+                    if (!visible || styleData.row === undefined) {
                         return
                     }
                     root.setValue(styleData.row, styleData.column, currentIndex)
-                }
-
-                model: {
-                    var res = []
-                    var payload = payloads[segments[styleData.row].bind_input_icd]
-                    for (var j in payload.values) {
-                        res.push(payload.values[j].name)
-                    }
-                    return res
                 }
             }
 
@@ -269,16 +339,8 @@ Item {
         } // itemDelegate end
 
         TableViewColumn {
-            id: typeIDCol
-            visible: table.columsVisible[_TYPE_ID_COLUMN]
-            role: "index"
-            title: "TypeID"
-            width: 100
-        }
-
-        TableViewColumn {
             id: ouputICDIndexCol
-            visible: table.columsVisible[_OUPUT_ICD_INDEX_COLUMN]
+            visible: true
             role: "ouput_icd_index"
             title: "输出ICD中index"
             width: 160
@@ -286,7 +348,7 @@ Item {
 
         TableViewColumn {
             id: inputICDCol
-            visible: table.columsVisible[_INPUT_ICD_COLUMN]
+            visible: true
             role: "bind_input_icd"
             title: "输入ICD"
             width: 160
@@ -294,7 +356,7 @@ Item {
 
         TableViewColumn {
             id: inputICDIndexCol
-            visible: table.columsVisible[_INPUT_ICD_INDEX_COLUMN]
+            visible: true
             role: "input_icd_index"
             title: "输入ICD中index"
             width: 160
@@ -302,7 +364,7 @@ Item {
 
         TableViewColumn {
             id: differenceCol
-            visible: table.columsVisible[_DIFFERENCE_COLUMN]
+            visible: true
             role: "difference"
             title: "difference"
             width: 100
@@ -310,7 +372,7 @@ Item {
 
         TableViewColumn {
             id: keysColumn
-            visible: table.columsVisible[_KEYS_COLUMN]
+            visible: true
             role: ""
             title: "keys"
             width: 100
@@ -375,9 +437,12 @@ Item {
 
     // 加载列表数据
     function load(values) {
+        segments = values.condition
+
         _device = values.device
         _bindOuputICD = values.bind_ouput_icd
-        segments = values.condition
+
+        //console.log("当前数据", JSON.stringify(segments))
 
         batchAdd.enabled = true
 
@@ -396,11 +461,13 @@ Item {
 
     // 增加新行
     function addSegment(row) {
+        // console.log("add", JSON.stringify(_device))
         var info = {
             "index": String(row + 1),
-            "ouput_icd_index": 0,
-            "bind_input_icd": 0,
-            "input_icd_index": 0,
+            "ouput_icd_index": "0",
+            // 默认绑定设备的input_icd的第一个
+            "bind_input_icd": _device.input_icd[0],
+            "input_icd_index": "0",
             "difference": 0,
             "keys": []
         }
@@ -408,6 +475,8 @@ Item {
         root.segments.splice(row + 1, 0, info)
         table.model.insert(row + 1, info)
     }
+
+
 
     // 获取枚举
     function getEnumdata(meaning) {
@@ -424,26 +493,80 @@ Item {
         var segment = root.segments[index]
         switch (column) {
         case _OUPUT_ICD_INDEX_COLUMN:
-            segment.ouput_icd_index = Number(value)
-            table.model.setProperty(index, "ouput_icd_index", Number(value))
+            segment.ouput_icd_index = String(value)
+            table.model.setProperty(index, "ouput_icd_index", String(value))
+            console.log("修改后", JSON.stringify(table.model.get(index)))
             break
 
         case _INPUT_ICD_COLUMN:
-            segment.bind_input_icd = Number(value)
-            table.model.setProperty(index, "bind_input_icd", Number(value))
+            segment.bind_input_icd = String(value)
+            table.model.setProperty(index, "bind_input_icd", String(value))
             break
         case _INPUT_ICD_INDEX_COLUMN:
-            segment.input_icd_index = Number(value)
-            table.model.setProperty(index, "input_icd_index", Number(value))
+            segment.input_icd_index = String(value)
+            table.model.setProperty(index, "input_icd_index", String(value))
            break
 
         case _DIFFERENCE_COLUMN:
             segment.difference = Number(value)
             table.model.setProperty(index, "difference", Number(value))
             break
-
         }
         root.segments[index] = segment
-        // console.log("修改完后", JSON.stringify(segments))
+        //console.log("修改后 root.segments[index] = ", JSON.stringify(root.segments[index]))
+    }
+
+    function getFieldList(bind_icd) {
+        //console.log("bind_icd = ", bind_icd)
+        var res = []
+        for (var i in payloads) {
+            if (String(bind_icd) === String(payloads[i].id)) {
+                for (var j in payloads[i].values) {
+                    var info = {
+                        text: payloads[i].values[j].name,
+                        value: payloads[i].values[j].index
+                    }
+                    res.push(info)
+                }
+            }
+        }
+        //console.log("res = ", res)
+        return res
+    }
+
+    function getInputICDList() {
+        var icd = []
+        // 遍历所有input_icd,获取他们的名称
+        for (var i in _device.input_icd) {
+            for (var j in payloads) {
+                if (String(_device.input_icd[i]) === String(payloads[j].id)) {
+                    var info = {
+                        text: payloads[j].name,
+                        value: payloads[j].id
+                    }
+                    icd.push(info)
+                }
+            }
+        }
+        return icd
+    }
+
+    function getOuputICDList() {
+        //console.log("getOuputICDList()", _device.ouput_icd)
+        var icd = []
+        // 遍历所有ouput,获取他们的名称
+        for (var i in _device.ouput_icd) {
+            for (var j in payloads) {
+                if (String(_device.ouput_icd[i]) === String(payloads[j].id)) {
+                    var info = {
+                        text: payloads[j].name,
+                        value: payloads[j].id
+                    }
+                    icd.push(info)
+                }
+            }
+        }
+        //console.log("res = ", JSON.stringify(icd))
+        return icd
     }
 }

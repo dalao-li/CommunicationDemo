@@ -15,7 +15,10 @@ import QtQuick.Dialogs 1.2
 Item {
     id: root
 
-    property var _action : []
+    property var _action: {
+        "device": devices[0],
+        "bind_ouput_icd": devices[0].ouput_icd[0]
+    }
 
     property int defaultHeight: 60
 
@@ -77,20 +80,14 @@ Item {
             width: 130
             height: 25
 
-            //textRole: "type"
+            textRole: "type"
 
-            model: {
-                var res = []
-                for (var i in devices) {
-                    res.push(devices[i].type)
-                }
-                return res
-            }
+            model: devices
 
             onCurrentIndexChanged: {
                 if (root._action) {
-                    root._action.device = currentIndex
-                    root.itemChanged("device", currentIndex)
+                    root._action.device = devices[currentIndex]
+                    root.itemChanged("device", JSON.stringify(devices[currentIndex]))
                 }
             }
         }
@@ -106,29 +103,36 @@ Item {
             id: icdCombox
             width: 130
             height: 25
-            enabled: {
-                return count != 0
-            }
 
-            //textRole: "name"
+            textRole: "text"
 
-            model: {
-                var res = []
-                var ouputICD = devices[_action.device].ouput_icd
-                for (var i in ouputICD) {
-                    for (var j in payloads) {
-                        if (String(ouputICD[i]) === String(payloads[j].id)) {
-                            res.push(payloads[j].name)
-                        }
+            property var icdList: getOuputICDList(_action.device.device_id)
+
+            property var curIndex: {
+                for (var i in icdList) {
+                    if (_action.bind_ouput_icd === icdList[i].value) {
+                        return i
                     }
                 }
-                return res
+                return -1
+            }
+
+            model: icdList
+
+            currentIndex: curIndex
+
+            onCurIndexChanged: {
+                currentIndex = curIndex
             }
 
             onCurrentIndexChanged: {
+                if (currentIndex < 0) {
+                    return
+                }
+
                 if (root._action) {
-                    root._action.bind_ouput_icd = currentIndex
-                    root.itemChanged("bind_ouput_icd", currentIndex)
+                    root._action.bind_ouput_icd = payloads[currentIndex].id
+                    root.itemChanged("bind_ouput_icd", payloads[currentIndex].id)
                 }
             }
         }
@@ -156,9 +160,41 @@ Item {
     function load(value) {
         _action = value
 
-
         name.text = value.name
-        deviceIDCombox.currentIndex = value.device
-        icdCombox.currentIndex = value.bind_ouput_icd
+
+        for (var i in devices) {
+            if (value.device.device_id === devices[i].device_id) {
+                deviceIDCombox.currentIndex = i
+                break
+            }
+        }
+    }
+
+    function getOuputICDList(device_id) {
+        if (_action === undefined || _action.device === undefined) {
+            return []
+        }
+
+        var icd = []
+        for (var i in devices) {
+            if (devices[i].device_id === device_id) {
+                var device =  devices[i]
+                break
+            }
+        }
+
+        // 遍历所有ouput_icd,获取他们的名称
+        for (var i in device.ouput_icd) {
+            for (var j in payloads) {
+                if (String(device.ouput_icd[i]) === String(payloads[j].id)) {
+                    var info = {
+                        text: payloads[j].name,
+                        value: payloads[j].id
+                    }
+                    icd.push(info)
+                }
+            }
+        }
+        return icd
     }
 }

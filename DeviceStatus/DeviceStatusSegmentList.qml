@@ -80,13 +80,14 @@ Item {
         // 如何绘制每一个单元格
         itemDelegate: Item {
 
+            // icd列表
             property var icdList: getICDList()
 
+            // field 列表
             property var fieldList: {
                 if (styleData.row === undefined || segments[styleData.row] === undefined || segments[styleData.row].bind_icd === undefined) {
                     return []
                 }
-                console.log("styleData.row", styleData.row, "segments[styleData.row].bind_icd", JSON.stringify(segments[styleData.row].bind_icd))
                 return getFieldList(table.model.get(styleData.row).bind_icd)
             }
 
@@ -111,8 +112,6 @@ Item {
                         return ""
                     }
 
-                    // console.log("styleData.row", styleData.row, "data", JSON.stringify(segments[styleData.row]))
-
                     if (styleData.column === _TYPE_NAME_COLUMN || styleData.column === _DESC_COLUMN || styleData.column === _STATUS_TYPE_COLUMN) {
                         return String(styleData.value)
                     }
@@ -136,9 +135,14 @@ Item {
 
                         for (var j in payloads) {
                             if (payloads[j].id === String(segment.bind_icd)) {
-                                // console.log("styleData.value", segment.field_index)
-                                // console.log("--->", payloads[j].values[segment.field_index].name)
-                                return payloads[j].values[styleData.value].name
+                                //console.log("--->", JSON.stringify(payloads[j].values[styleData.value]))
+                                var value = payloads[j].values[styleData.value]
+
+                                if (value === undefined) {
+                                    return ""
+                                }
+
+                                return value.name
                             }
                         }
                     }
@@ -230,7 +234,6 @@ Item {
                 visible: styleData.column === _FIELD_INDEX_COLUMN && styleData.selected
 
                 property var curIndex: {
-                    // console.log("===>", JSON.stringify(fieldList))
                     for(var i in fieldList){
                         if(String(segments[styleData.row].field_index) === String(fieldList[i].value)) {
                             return i
@@ -402,7 +405,7 @@ Item {
         for (var i in segments) {
             table.model.append({
                                    "type_id": segments[i].type_id,
-                                   // 在_device.input_icd中的下标
+                                   //
                                    "bind_icd": segments[i].bind_icd,
                                    // 在payloads中, 对应icd的values中 name组的下标
                                    "field_index": segments[i].field_index,
@@ -505,7 +508,6 @@ Item {
             }
         }
         return icd
-
     }
 
     function getFieldList(bind_icd) {
@@ -521,8 +523,6 @@ Item {
                 }
             }
         }
-
-        // console.log("field index", JSON.stringify(res))
         return res
     }
 }

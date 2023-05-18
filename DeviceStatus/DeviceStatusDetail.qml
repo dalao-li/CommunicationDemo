@@ -6,6 +6,7 @@ Item {
     id: root
 
     property var _status
+    property var _device
     property int defaultHeight: 60
 
     height: defaultHeight
@@ -71,10 +72,10 @@ Item {
             onCurrentIndexChanged: {
                 if (root._status) {
                     // 修改设备id
-                    var device = devices[idCompox.currentIndex]
-
-                    root._status.device = device
-                    root.itemChanged("device", JSON.stringify(device))
+                    var newDevice = devices[idCompox.currentIndex]
+                    root._status.device = newDevice
+                    root.itemChanged("device", JSON.stringify(newDevice))
+                    console.log("信号发出")
                 }
             }
         }
@@ -128,6 +129,5 @@ Item {
 
         typeNameField.text = value.type_name
         descField.text = value.desc
-
     }
 }
