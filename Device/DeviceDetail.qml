@@ -15,13 +15,19 @@ import Qt.labs.settings 1.0
 import DesktopControls 0.1 as Desktop
 
 
-Item {
+Column {
     id: root
+//    anchors.left: parent.left;
+//    anchors.leftMargin: 4;
+//    anchors.bottom: parent.bottom;
+//    anchors.bottomMargin: 4;
+    width: 1000
+    height: 1500
+    spacing: 4;
 
     property int defaultHeight: 60
     property var _device
 
-    // 列名枚举
     property var _INPUT_ICD_COLUMN: 0
     property var _OUPUT_ICD_COLUMN: 1
     property var _ICD_NAME_COLUMN: 2
@@ -32,10 +38,11 @@ Item {
     // 标题
     Rectangle {
         id: title
-        anchors {
-            left: parent.left
-            right: parent.right
-        }
+//        anchors {
+//            left: parent.left
+//            right: parent.right
+//        }
+        width: parent.width
         height: 32
         color: "#e5e5e5"
 
@@ -47,12 +54,15 @@ Item {
 
     Grid {
         id: infoList
-        anchors {
-            left: parent.left
-            leftMargin: 10
-            top: title.bottom
-            topMargin: 10
-        }
+        width: parent.width
+        height: 250
+
+//        anchors {
+//            left: parent.left
+//            leftMargin: 10
+//            top: title.bottom
+//            topMargin: 10
+//        }
 
         columns: 2
         rowSpacing: 15
@@ -95,7 +105,6 @@ Item {
                     root.itemChanged("device_id", text)
                 }
             }
-
         }
 
         // control type
@@ -242,12 +251,14 @@ Item {
 
     Rectangle {
         id: icdLabel
-        anchors {
-            left: parent.left
-            right: parent.right
-            top: infoList.bottom
-            topMargin: 10
-        }
+        width: parent.width
+//        anchors {
+//            left: parent.left
+//            right: parent.right
+//            top: infoList.bottom
+//            topMargin: 10
+
+//        }
 
         color: "#8E8E8E"
 
@@ -261,12 +272,14 @@ Item {
 
     TableView {
         id: table
-        anchors {
-            top: icdLabel.bottom
-            // bottom: parent.bottom
-            left: parent.left
-            right: parent.right
-        }
+        width: parent.width
+        height: 1000
+//        anchors {
+//            top: icdLabel.bottom
+//            left: parent.left
+//            right: parent.right
+//            bottom: parent.bottom
+//        }
 
         frameVisible: false
 
@@ -278,21 +291,22 @@ Item {
                     fill: parent
                     margins: 1
                 }
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
 
-                property var validColumn: [_ICD_NAME_COLUMN, _ICD_ID_COLUMN].includes(styleData.column)
-
-                visible: validColumn
+                visible: [_ICD_NAME_COLUMN, _ICD_ID_COLUMN].includes(styleData.column)
 
                 text: {
-                    if (validColumn) {
+                    if (visible) {
                         return styleData.value
                     }
                     return ""
                 }
-
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
             } // TextField end
+
+//            CheckBox {
+//                id: icdSelect
+//            }
 
             // input icd 选择
             CheckBox {
@@ -314,7 +328,6 @@ Item {
                         if (checkedState === Qt.Checked) {
                             root._device.input_icd.push(nowICD)
                             updateValue = {"opeator": "add", "type": "input", "icd_id":nowICD}
-
                         }
 
                         // 取消

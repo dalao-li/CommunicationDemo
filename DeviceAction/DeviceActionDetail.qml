@@ -106,7 +106,13 @@ Item {
 
             textRole: "text"
 
-            property var icdList: getOuputICDList(_action.device.device_id)
+            property var icdList: {
+                if (_action.device === undefined) {
+                    return
+                }
+
+                getOuputICDList(_action.device.device_id)
+            }
 
             property var curIndex: {
                 for (var i in icdList) {
@@ -146,7 +152,7 @@ Item {
 
         TextField {
             id: name
-            width: 100
+            width: 200
             height: 25
             onTextChanged: {
                 if (root._action) {

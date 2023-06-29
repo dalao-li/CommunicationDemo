@@ -431,7 +431,7 @@ Item {
             // 默认绑第一个icd
             "bind_icd": _device.input_icd[0],
             // field index默认为工程0
-            "field_index": "0",
+            "field_index": 0,
             "type": row + 1,
             "type_name": "状态" + String(row + 1),
             "status_type": 0,
@@ -476,7 +476,7 @@ Item {
             break
         case _FIELD_INDEX_COLUMN:
             segment.field_index = String(value)
-            table.model.setProperty(index, "field_index", String(value))
+            table.model.setProperty(index, "field_index", value)
             break
         case _TYPE_NAME_COLUMN:
             segment.type_name = value

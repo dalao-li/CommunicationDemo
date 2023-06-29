@@ -268,7 +268,7 @@ Item {
                 verticalAlignment: Text.AlignVCenter
 
                 text: {
-                    if (!visible) {
+                    if (!visible || styleData.value === undefined) {
                         return ""
                     }
 

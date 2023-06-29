@@ -39,6 +39,20 @@ ListView {
         }
     }
 
+    // 导入文件
+    FileDialog {
+        id: actionDialog
+        title: "Please choose a file"
+        nameFilters: ["json files (*.json)", "All files (*)"]
+        onAccepted: {
+            var path = String(actionDialog.fileUrls).substring(8)
+            readJSONFile(path)
+        }
+        onRejected: {
+            console.log("Canceled")
+        }
+    }
+
     // 表头部分
     header: Rectangle {
         height: 32
@@ -88,6 +102,15 @@ ListView {
                 root.model.append(info)
             }
         } // BatchAddButton end
+
+        Button {
+            width: 120
+            height: 32
+            text: "设备动作导入"
+            onClicked: {
+                actionDialog.open()
+            } // onClicked end
+        }
     } // header end
 
     delegate: Label {
@@ -138,6 +161,59 @@ ListView {
         onReleased: mouse.accepted = false
         onDoubleClicked: mouse.accepted = false
         onPressAndHold: mouse.accepted = false
+    }
+
+    // 导入设备信息
+    function readJSONFile(path) {
+        if (path === "") {
+            return
+        }
+
+        // 读取JSON
+        var data = Excutor.query({"read": path})
+        for (var i in data) {
+            var device_id = data[i].id
+            var actions = data[i].actions
+
+            for (var j in actions) {
+                var info = {
+                    "name": actions[j].name,
+                    "id": actions[j].id,
+                    "condition": actions[j].condition,
+                    "device": (()=>{
+                                   var device_id = data[i].id
+                                   for (var k in devices) {
+                                       if (devices[k].device_id === device_id) {
+                                           return devices[k]
+                                       }
+                                   }
+                               })(),
+                    "bind_ouput_icd": actions[j].id,
+
+                }
+            }
+
+
+            root.actions.push(info)
+            root.model.append(info)
+
+            var info = {
+                "type_name": data[i].type_name,
+                "desc": data[i].desc,
+                "monitor_status": data[i].monitor_status,
+                "device": (()=> {
+                               var device_id = data[i].id
+                               for (var j in devices) {
+                                   if (devices[j].device_id === device_id) {
+                                       return devices[j]
+                                   }
+                               }
+                           })()
+            }
+
+            root.actions.push(info)
+            root.model.append(info)
+        }
     }
 
     // 生成随机ID

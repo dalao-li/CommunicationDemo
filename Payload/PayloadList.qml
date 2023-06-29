@@ -41,6 +41,24 @@ ListView {
         }
     }
 
+    // 导入文件
+    FileDialog {
+        id: fileDialog
+        title: "Please choose a file"
+        nameFilters: ["payloads files (*.payloads)"]
+        onAccepted: {
+            var fpath = String(fileDialog.fileUrls)
+            path = fpath.substring(8)
+            content = Excutor.query({ "payloads": path })
+            getTabItem(0).load()
+            getTabItem(1).stopListen()
+            getTabItem(2).load(content)
+        }
+        onRejected: {
+            console.log("Canceled")
+        }
+    }
+
     header: Rectangle {
         height: 32
         width: root.width
@@ -107,7 +125,7 @@ ListView {
                 verticalCenter: parent.verticalCenter
             }
 
-            // 移除
+            // 移除按钮
             AwesomeButton {
                 id: remove
                 name: "minus"

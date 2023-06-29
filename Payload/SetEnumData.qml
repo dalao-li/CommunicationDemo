@@ -211,13 +211,14 @@ Window {
         var info = {}
         // 判断键名是否存在, 若不存在说明是外部导入数据, 需要处理
         if (!enumInfos.hasOwnProperty("enumname") && !enumInfos.hasOwnProperty("enumdata")) {
+            var index = 0
             for (var i in enumInfos) {
                 info = {
                     "enumname": i,
                     "enumdata": enumInfos[i]
                 }
                 //console.log("info ", info)
-                table.model.insert(i, info)
+                table.model.insert(index++, info)
                 root.enumInfos.push(info)
             }
             return

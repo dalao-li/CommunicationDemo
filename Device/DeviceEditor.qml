@@ -41,17 +41,17 @@ ColumnLayout {
         }
 
         Rectangle {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            color: "#f0f0f0"
-
+            //            Layout.fillWidth: true
+            //            Layout.fillHeight: true
+            //            color: "#f0f0f0"
+            //            implicitWidth: 200
             DeviceDetail {
                 id: deviceDetail
-                anchors {
-                    top: parent.top
-                    left: parent.left
-                    right: parent.right
-                }
+                //                anchors {
+                //                    top: parent.top
+                //                    left: parent.left
+                //                    right: parent.right
+                //                }
 
                 onItemChanged: {
                     if (deviceList.currentIndex < 0) {

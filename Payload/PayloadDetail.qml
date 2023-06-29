@@ -73,7 +73,7 @@ Item {
 
         TextField {
             id: nameField
-            width: 100
+            width: 200
             height: 25
             onTextChanged: {
                 if (root._payload) {
@@ -144,7 +144,7 @@ Item {
 
         TextField {
             id: icdIDField
-            width: 40
+            width: 100
             height: 25
             text: ""
             inputMask: ">HHHH"
@@ -175,7 +175,7 @@ Item {
     function load(value) { 
         _payload = value
         nameField.text = value.name
-        console.log("value.id ", value.id)
+        //console.log("value.id ", value.id)
         icdIDField.text = value.id
 
         //splitValue(Number(value.id))

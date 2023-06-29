@@ -41,53 +41,90 @@ ApplicationWindow {
 
     property var actions: []
 
+    property var _SEND_TAB_INDEX: 0
+    property var _RECEIVE_TAB_INDEX: 1
+    property var _PAYLOAD_TAB_INDEX: 2
+    property var _DEVICE_TAB_INDEX: 3
+    property var _DEVICE_STATUS_TAB_INDEX: 4
+    property var _DEVICE_ACTION_TAB_INDEX: 5
+
+    property var currentTabIndex: 0
+
 
     menuBar: MenuBar {
         Menu {
-            title: qsTr("&File")
-            MenuItem {
-                text: "New"
-                shortcut: "Ctrl+N"
-            }
+            title: qsTr("&文件操作")
+            //            MenuItem {
+            //                text: "New"
+            //                shortcut: "Ctrl+N"
+            //            }
 
             MenuItem {
-                text: "Open"
-                shortcut: "Ctrl+O"
+                text: "导入ICD"
                 onTriggered: {
-                    fileDialog.open()
+                    currentTabIndex = _PAYLOAD_TAB_INDEX
+                    importFileDialog.open()
                 }
             }
 
-            MenuItem {
-                text: "Save"
-                shortcut: "Ctrl+S"
-                onTriggered: {
-                    if (path === "")
-                        newfileDialog.open()
-                    else
-                        getTabItem(2).save()
-                }
-            }
+//            MenuItem {
+//                text: "导入设备信息"
+//                onTriggered: {
+//                    currentTabIndex = _DEVICE_TAB_INDEX
+//                    importFileDialog.open()
+//                }
+//            }
 
-            MenuItem {
-                text: "Save As"
-                shortcut: "Ctrl+Alt+S"
-                onTriggered: {
-                    newfileDialog.open()
-                }
-            }
+//            MenuItem {
+//                text: "导入设备状态"
+//                onTriggered: {
+//                    currentTabIndex = _DEVICE_STATUS_TAB_INDEX
+//                    importFileDialog.open()
+//                }
+//            }
 
-            MenuSeparator {
+//            MenuItem {
+//                text: "导入设备动作"
+//                onTriggered: {
+//                    currentTabIndex = _DEVICE_ACTION_TAB_INDEX
+//                    importFileDialog.open()
+//                }
+//            }
 
-            }
+            //            MenuItem {
+            //                text: "Open"
+            //                shortcut: "Ctrl+O"
+            //                onTriggered: {
+            //                    fileDialog.open()
+            //                }
+            //            }
 
-            MenuItem {
-                text: "Quit"
-                shortcut: "Ctrl+Q"
-                onTriggered: {
-                    Qt.quit()
-                }
-            }
+            //            MenuItem {
+            //                text: "Save"
+            //                shortcut: "Ctrl+S"
+            //                onTriggered: {
+            //                    if (path === "")
+            //                        newfileDialog.open()
+            //                    else
+            //                        getTabItem(2).save()
+            //                }
+            //            }
+
+            //            MenuItem {
+            //                text: "Save As"
+            //                shortcut: "Ctrl+Alt+S"
+            //                onTriggered: {
+            //                    newfileDialog.open()
+            //                }
+            //            }
+
+            //            MenuItem {
+            //                text: "Quit"
+            //                shortcut: "Ctrl+Q"
+            //                onTriggered: {
+            //                    Qt.quit()
+            //                }
+            //            }
         }
     }
 
@@ -191,6 +228,24 @@ ApplicationWindow {
             console.log("Canceled")
         }
     }
+
+    FileDialog {
+        id: importFileDialog
+        title: "请选择文件"
+        nameFilters: ["payloads files (*.payloads)", "json files (*.json)", "All files (*)"]
+        onAccepted: {
+            var fpath = String(importFileDialog.fileUrls)
+            path = fpath.substring(8)
+            content = Excutor.query({ "payloads": path })
+            //            getTabItem(0).load()
+            //            getTabItem(1).stopListen()
+            getTabItem(currentTabIndex).load(content)
+        }
+        onRejected: {
+            console.log("取消")
+        }
+    }
+
 
     function getTabItem(index) {
         var tab = tabView.getTab(index)

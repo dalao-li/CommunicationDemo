@@ -37,6 +37,20 @@ ListView {
         }
     }
 
+    // 导入文件
+    FileDialog {
+        id: deviceDialog
+        title: "Please choose a file"
+        nameFilters: ["json files (*.json)", "All files (*)"]
+        onAccepted: {
+            var path = String(deviceDialog.fileUrls).substring(8)
+            readJSONFile(path)
+        }
+        onRejected: {
+            console.log("Canceled")
+        }
+    }
+
     header: Rectangle {
         height: 32
         width: root.width
@@ -45,7 +59,12 @@ ListView {
         // 保存按钮
         AwesomeIcon {
             id: save
-            anchors.verticalCenter: parent.verticalCenter
+            anchors {
+                right: batchAdd.left
+                rightMargin: 5
+                verticalCenter: parent.verticalCenter
+            }
+
             size: 20
             name: "save"
             color: "black"
@@ -80,6 +99,15 @@ ListView {
                 root.model.append(info)
             }
         } // BatchAddButton end
+
+        Button {
+            width: 120
+            height: 32
+            text: "设备状态导入"
+            onClicked: {
+                deviceDialog.open()
+            } // onClicked end
+        }
     } // header end
 
     delegate: Label {
@@ -131,6 +159,36 @@ ListView {
         onDoubleClicked: mouse.accepted = false
         onPressAndHold: mouse.accepted = false
     }
+
+    // 导入设备信息
+    function readJSONFile(path) {
+        if (path === "") {
+            return
+        }
+
+        // 读取JSON
+        var data = Excutor.query({"read": path})
+
+        for (var i in data) {
+            var info = {
+                "type_name": data[i].type_name,
+                "desc": data[i].desc,
+                "monitor_status": data[i].monitor_status,
+                "device": (()=> {
+                               var device_id = data[i].id
+                               for (var j in devices) {
+                                   if (devices[j].device_id === device_id) {
+                                       return devices[j]
+                                   }
+                               }
+                           })()
+            }
+
+            root.status.push(info)
+            root.model.append(info)
+        }
+    }
+
 
     // 导出
     function saveJSONFile(path) {
