@@ -29,7 +29,6 @@ Window {
     signal itemChanged
     signal enumSave
 
-
     id: root
 
     width: 800
@@ -209,11 +208,27 @@ Window {
 
     // 将已经保存的枚举值重新输入子界面
     function setEunmInfos(enumInfos) {
+        var info = {}
+        // 判断键名是否存在, 若不存在说明是外部导入数据, 需要处理
+        if (!enumInfos.hasOwnProperty("enumname") && !enumInfos.hasOwnProperty("enumdata")) {
+            for (var i in enumInfos) {
+                info = {
+                    "enumname": i,
+                    "enumdata": enumInfos[i]
+                }
+                //console.log("info ", info)
+                table.model.insert(i, info)
+                root.enumInfos.push(info)
+            }
+            return
+        }
+
         for (var i in enumInfos) {
-            var info = {
+            info = {
                 "enumname": enumInfos[i].enumname,
                 "enumdata": enumInfos[i].enumdata
             }
+            console.log("2info ", JSON.stringify(info))
             table.model.insert(i, info)
             root.enumInfos.push(info)
         }

@@ -153,7 +153,7 @@ Flickable {
                 text: detail.data
                 onTextChanged: {
                     detail.data = text
-                    console.log("---> detail.data = " + detail.data)
+                    //console.log("---> detail.data = " + detail.data)
                     root.dataChanged(detail)
                 }
             }

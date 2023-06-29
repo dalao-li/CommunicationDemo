@@ -18,7 +18,7 @@ Item {
     property var _INPUT_ICD_COLUMN: 1
     property var _INPUT_ICD_INDEX_COLUMN: 2
     property var _DIFFERENCE_COLUMN: 3
-    property var _KEYS_COLUMN: 4
+    property var _DESC_COLUMN: 4
 
     signal itemChanged(string id, string value)
 
@@ -82,7 +82,6 @@ Item {
 
             // ouput_icd index
             property var ouputICDFieldList: {
-                //console.log("ouput test", segments[styleData.row].bind_icd)
                 if (styleData.row === undefined || segments[styleData.row] === undefined || segments[styleData.row].ouput_icd_index === undefined) {
                     return []
                 }
@@ -100,7 +99,7 @@ Item {
             Label {
                 id: label
                 anchors.fill: parent
-                visible: !styleData.selected && [_OUPUT_ICD_INDEX_COLUMN, _INPUT_ICD_COLUMN, _INPUT_ICD_INDEX_COLUMN].includes(styleData.column)
+                visible: !styleData.selected && [_OUPUT_ICD_INDEX_COLUMN, _INPUT_ICD_COLUMN, _INPUT_ICD_INDEX_COLUMN, _DIFFERENCE_COLUMN, _DESC_COLUMN].includes(styleData.column)
 
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
@@ -158,6 +157,11 @@ Item {
                             }
                         }
                     }
+
+                    if (styleData.column === _DESC_COLUMN) {
+                        return styleData.value
+                    }
+
                     return Number(styleData.value)
                 }
             }
@@ -207,9 +211,7 @@ Item {
                         return -1
                     }
 
-                    //console.log("ouput_icd_index", segments[styleData.row].ouput_icd_index)
                     for(var i in ouputICDFieldList){
-                        //console.log("ouputICDFieldList[i].value", ouputICDFieldList[i].value)
                         if(String(segments[styleData.row].ouput_icd_index) === String(ouputICDFieldList[i].value)) {
                             return i
                         }
@@ -229,9 +231,8 @@ Item {
                     if (!visible || styleData.row === undefined || currentIndex < 0) {
                         return
                     }
-                    console.log("发送ouput index修改", currentIndex)
+                    //console.log("发送ouput index修改", currentIndex)
                     root.setValue(styleData.row, styleData.column, currentIndex)
-
                     //console.log("发送完修改信号", JSON.stringify(segments))
                 }
             }
@@ -295,7 +296,6 @@ Item {
                 currentIndex: curIndex
 
                 onCurIndexChanged: {
-                    //console.log("input index", curIndex)
                     currentIndex = curIndex
                 }
 
@@ -307,35 +307,38 @@ Item {
                 }
             }
 
-            // 添加condition
-            Button {
-                id: enumBtn
-                text: qsTr("添加Keys")
+            TextField {
+                id: descField
                 anchors {
                     fill: parent
                     margins: 1
                 }
 
-                visible: styleData.column === _KEYS_COLUMN && styleData.selected
+                property var validColumn:  styleData.column === _DESC_COLUMN
 
-                onClicked: {
-                    var component = Qt.createComponent("DeviceActionEnumData.qml")
-                    if (component.status === Component.Error) {
-                        console.debug("Error:"+ component.errorString())
+                visible: validColumn && styleData.selected
+
+                enabled: {
+                    return true
+                }
+
+                text: {
+                    if (validColumn) {
+                        return styleData.value
+                    }
+                    return qsTr("")
+                }
+
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+
+                onTextChanged: {
+                    if (!visible || styleData.row === undefined) {
                         return
                     }
-                    if (component.status === Component.Ready) {
-                        var win = component.createObject()
-                        win.show()
-                        win.rootPage = root
-
-                        // 存在枚举值
-                        if (segments[styleData.row].condition) {
-                            win.setEunmInfos(segments[styleData.row].condition)
-                        }
-                    }
+                    root.setValue(styleData.row, styleData.column, descField.text)
                 }
-            }
+            } // TextField end
         } // itemDelegate end
 
         TableViewColumn {
@@ -371,10 +374,10 @@ Item {
         }
 
         TableViewColumn {
-            id: keysColumn
+            id: descCol
             visible: true
-            role: ""
-            title: "keys"
+            role: "desc"
+            title: "描述"
             width: 100
         }
 
@@ -442,8 +445,6 @@ Item {
         _device = values.device
         _bindOuputICD = values.bind_ouput_icd
 
-        //console.log("当前数据", JSON.stringify(segments))
-
         batchAdd.enabled = true
 
         table.model.clear()
@@ -454,7 +455,7 @@ Item {
                                    "bind_input_icd": segments[i].bind_input_icd,
                                    "input_icd_index": segments[i].input_icd_index,
                                    "difference": segments[i].difference,
-                                   "keys": segments[i].keys
+                                   "desc": segments[i].desc
                                })
         }
     }
@@ -469,18 +470,29 @@ Item {
             "bind_input_icd": _device.input_icd[0],
             "input_icd_index": "0",
             "difference": 0,
-            "keys": []
+            "desc": "",
+            "ouputFieldList": getFieldList()
         }
 
         root.segments.splice(row + 1, 0, info)
         table.model.insert(row + 1, info)
     }
 
+    function clear() {
+        table.model.clear()
+    }
 
+    function updateBindOuputICD(newOuputICD) {
+        _bindOuputICD = newOuputICD
+    }
+
+    function updateDevice(newDevice) {
+        _device = newDevice
+    }
 
     // 获取枚举
     function getEnumdata(meaning) {
-        segments[table.currentRow].condition = meaning
+        segments[table.currentRow].keys = meaning
     }
 
     // 修改某行某列的值
@@ -495,12 +507,13 @@ Item {
         case _OUPUT_ICD_INDEX_COLUMN:
             segment.ouput_icd_index = String(value)
             table.model.setProperty(index, "ouput_icd_index", String(value))
-            console.log("修改后", JSON.stringify(table.model.get(index)))
             break
 
         case _INPUT_ICD_COLUMN:
             segment.bind_input_icd = String(value)
             table.model.setProperty(index, "bind_input_icd", String(value))
+
+            // 同步修改input icd index
             break
         case _INPUT_ICD_INDEX_COLUMN:
             segment.input_icd_index = String(value)
@@ -511,13 +524,17 @@ Item {
             segment.difference = Number(value)
             table.model.setProperty(index, "difference", Number(value))
             break
+
+        case _DESC_COLUMN:
+            segment.desc = value
+            table.model.setProperty(index, "desc", value)
+            break
         }
         root.segments[index] = segment
-        //console.log("修改后 root.segments[index] = ", JSON.stringify(root.segments[index]))
     }
 
+    // 根据ICD获取field
     function getFieldList(bind_icd) {
-        //console.log("bind_icd = ", bind_icd)
         var res = []
         for (var i in payloads) {
             if (String(bind_icd) === String(payloads[i].id)) {
@@ -530,7 +547,6 @@ Item {
                 }
             }
         }
-        //console.log("res = ", res)
         return res
     }
 
@@ -552,7 +568,6 @@ Item {
     }
 
     function getOuputICDList() {
-        //console.log("getOuputICDList()", _device.ouput_icd)
         var icd = []
         // 遍历所有ouput,获取他们的名称
         for (var i in _device.ouput_icd) {
@@ -566,7 +581,6 @@ Item {
                 }
             }
         }
-        //console.log("res = ", JSON.stringify(icd))
         return icd
     }
 }

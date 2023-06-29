@@ -61,7 +61,7 @@ ColumnLayout {
                 }
 
                 onItemChanged: {
-                    console.log("信号接受DeviceStatusDetail")
+                    //console.log("信号接受DeviceStatusDetail")
                     if (listComponent.currentIndex < 0) {
                         return
                     }
@@ -77,6 +77,9 @@ ColumnLayout {
 
                     if (id === "device") {
                         d["device"] = JSON.parse(value)
+                        // 修改设备名, 直接清空segmentComponent
+                        segmentComponent.updateDevice(JSON.parse(value))
+                        segmentComponent.clear()
                     }
                     listComponent.model.set(listComponent.currentIndex, d)
                 }

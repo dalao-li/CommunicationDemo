@@ -41,16 +41,13 @@ ListView {
         }
     }
 
-    // 表头部分
     header: Rectangle {
         height: 32
         width: root.width
         color: "#8E8E8E"
 
-        // 保存按钮
         AwesomeIcon {
             id: save
-
             size: 20
             name: "save"
             color: "black"
@@ -110,7 +107,7 @@ ListView {
                 verticalCenter: parent.verticalCenter
             }
 
-            // 移除按钮
+            // 移除
             AwesomeButton {
                 id: remove
                 name: "minus"

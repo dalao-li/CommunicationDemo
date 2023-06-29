@@ -165,7 +165,54 @@ ListView {
     function saveActionInfo(path) {
         var data = root.actions
         var dataList = []
+
         // 处理JSON
+        // TODO 按设备划分, 同设备下的action放在一个actions里
+        for (var i in data) {
+            var res = {}
+            var action = []
+
+            // device_id
+            var deviceID = data[i].device.device_id
+            var ouputICD = data[i].bind_ouput_icd
+            var name = data[i].name
+            var condition = data[i].condition
+
+            var resCondition = []
+            // segment中的每一行数据
+            // 分类规则为将同input_icd的分到一个{}里
+            var temp = {}
+            // "input_icd value" : [{"in_index": , "", "out_index": "...", "desc": "...", "difference": "..."], {...}}
+            for (var j in condition) {
+                var ouputICDIndex = condition[j].ouput_icd_index
+                var inputICD = condition[j].input_icd
+                var inputICDIndex = condition[j].input_icd_index
+                var desc = condition[j].desc
+                var difference = condition[j].difference
+
+                // 如果这个input_icd已经存在, 就将数据存到它的值下
+                if (temp.hasOwnProperty(inputICD)) {
+                    temp[inputICD].push({"in_index": inputICDIndex, "out_index": ouputICDIndex, "desc": desc, "difference": difference})
+                }
+                else {
+                    temp[inputICD] = []
+                }
+            }
+
+            // 处理temp格式
+            for (var k in temp) {
+                var id = k
+                var keys = temp[k]
+                resCondition.push({"id": k, "keys": keys})
+            }
+
+            action.push({
+                        "id": ouputICD, "name": name, "condition": resCondition
+
+                        })
+
+            dataList.push({"id": deviceID, "actions": action})
+        }
 
 
         Excutor.query({"command": "write",

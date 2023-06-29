@@ -69,7 +69,7 @@ Item {
             text: "字段"
         }
 
-        // 右上角增加按钮
+        // 右上角增加
         Row {
             anchors {
                 verticalCenter: parent.verticalCenter
@@ -89,7 +89,6 @@ Item {
         }
     } // Rectangle end
 
-    // 除表头之外的表格内容
     TableView {
         id: table
         anchors {
@@ -242,11 +241,7 @@ Item {
                     margins: 1
                 }
 
-                property var flag: {
-                    return styleData.selected && styleData.column === _MEANING_COLUMN && (segments[styleData.row].type === _ENUM_TYPE)
-                }
-
-                visible: flag
+                visible: styleData.selected && styleData.column === _MEANING_COLUMN && segments[styleData.row].type === _ENUM_TYPE
 
                 onClicked: {
                     var component = Qt.createComponent("SetEnumData.qml")
@@ -257,7 +252,7 @@ Item {
                         windows.rootPage = root
 
                         if (segments[styleData.row].meaning) {
-                            // console.log("存在枚举", JSON.stringify(segments[styleData.row].meaning))
+                            //console.log("存在枚举", JSON.stringify(segments[styleData.row].meaning))
                             windows.setEunmInfos(segments[styleData.row].meaning)
                         }
                     }
@@ -465,6 +460,7 @@ Item {
         // 按共享传递
         segments = values
         for (var i in values) {
+            //console.log("data = ", JSON.stringify(values[i]))
             table.model.append({
                                    "index": values[i].index,
                                    "name": values[i].name,

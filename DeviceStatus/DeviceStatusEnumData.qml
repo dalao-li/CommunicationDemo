@@ -23,6 +23,8 @@ Window {
     property var _ICON_COLUMN: 2
     property var _COLOR_COLUMN: 3
 
+    property var colorArray: ["red", "yellow", "green", "blue", "gray"]
+
     signal itemChanged
     signal enumSave
 
@@ -103,7 +105,7 @@ Window {
                         margins: 1
                     }
 
-                    visible: [_VALUE_COLUMN, _SHOWINFO_COLUMN, _COLOR_COLUMN, _ICON_COLUMN].includes(styleData.column)
+                    visible: [_VALUE_COLUMN, _SHOWINFO_COLUMN, _ICON_COLUMN].includes(styleData.column)
 
                     text: styleData.value
 
@@ -115,6 +117,40 @@ Window {
                             return
                         }
                         updateValue(styleData.row, styleData.column, field.text)
+                    }
+                }
+
+                ComboBox {
+                    id: colorBox
+                    anchors {
+                        fill: parent
+                        margins: 1
+                    }
+
+                    visible: styleData.column === _COLOR_COLUMN
+
+                    property var curIndex: {
+                        for (var i in colorArray) {
+                            //console.log("i = ", i, "color ", colorArray[i])
+                            if (colorArray[i] === enumInfos[styleData.row].color) {
+                                return i
+                            }
+                        }
+                        return -1
+                    }
+
+                    model: colorArray
+
+                    onCurIndexChanged: {
+                        currentIndex = curIndex
+                    }
+
+                    onCurrentIndexChanged: {
+                        if (!visible) {
+                            return
+                        }
+                        //console.log("currIndex", colorBox.currentIndex)
+                        root.updateValue(styleData.row, styleData.column, colorBox.currentIndex)
                     }
                 }
             }
@@ -199,13 +235,12 @@ Window {
         //setEunmInfos
     }
 
-    // 添加枚举值
     function addEnum(row) {
         var info = {
             "value": "",
             "showinfo": "",
             "icon": "",
-            "color": ""
+            "color": "red"
         }
         root.enumInfos.push(info)
         table.model.insert(row + 1, info)
@@ -213,7 +248,8 @@ Window {
 
     // 将已经保存的枚举值重新输入子界面
     function setEunmInfos(enumInfos) {
-        for (var i = 0; i < enumInfos.length; i++) {
+        root.enumInfos = enumInfos
+        for (var i = 0; i < enumInfos.length; ++i) {
             table.model.insert(i, enumInfos[i])
         }
     }
@@ -239,9 +275,11 @@ Window {
             enuminfo.icon = value
             break
         case _COLOR_COLUMN:
-            enuminfo.color = value
-            table.model.setProperty(index, "color", value)
+            enuminfo.color = colorArray[value]
+            console.log("color ", enuminfo.color)
+            table.model.setProperty(index, "color", colorArray[value])
             break
         }
+        root.enumInfos[index] = enuminfo
     }
 }

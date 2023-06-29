@@ -71,11 +71,9 @@ Item {
 
             onCurrentIndexChanged: {
                 if (root._status) {
-                    // 修改设备id
                     var newDevice = devices[idCompox.currentIndex]
                     root._status.device = newDevice
                     root.itemChanged("device", JSON.stringify(newDevice))
-                    console.log("信号发出")
                 }
             }
         }

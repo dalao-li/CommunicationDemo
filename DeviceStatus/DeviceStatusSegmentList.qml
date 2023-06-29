@@ -112,42 +112,42 @@ Item {
                         return ""
                     }
 
-                    if (styleData.column === _TYPE_NAME_COLUMN || styleData.column === _DESC_COLUMN || styleData.column === _STATUS_TYPE_COLUMN) {
-                        return String(styleData.value)
-                    }
-
-                    if (styleData.column === _BIND_ICD_COLUMN) {
-                        if (segment === [] || segment === undefined) {
-                            return ""
-                        }
-
-                        for (var i in payloads) {
-                            if (payloads[i].id === styleData.value) {
-                                return payloads[i].name
+                    switch (styleData.column) {
+                        case _TYPE_NAME_COLUMN:
+                        case _DESC_COLUMN:
+                        case _STATUS_TYPE_COLUMN:
+                            return String(styleData.value)
+                        case _BIND_ICD_COLUMN:
+                            if (segment === [] || segment === undefined) {
+                                return ""
                             }
-                        }
-                    }
 
-                    if (styleData.column === _FIELD_INDEX_COLUMN) {
-                        if (segment === [] || segment === undefined) {
-                            return ""
-                        }
-
-                        for (var j in payloads) {
-                            if (payloads[j].id === String(segment.bind_icd)) {
-                                //console.log("--->", JSON.stringify(payloads[j].values[styleData.value]))
-                                var value = payloads[j].values[styleData.value]
-
-                                if (value === undefined) {
-                                    return ""
+                            for (var i in payloads) {
+                                if (payloads[i].id === styleData.value) {
+                                    return payloads[i].name
                                 }
-
-                                return value.name
                             }
-                        }
-                    }
+                            break
+                        case _FIELD_INDEX_COLUMN:
+                            if (segment === [] || segment === undefined) {
+                                return ""
+                            }
 
-                    return String(JSON.stringify(styleData.value))
+                            for (var j in payloads) {
+                                if (payloads[j].id === String(segment.bind_icd)) {
+                                    var value = payloads[j].values[styleData.value]
+                                    if (value === undefined) {
+                                        return ""
+                                    }
+                                    return value.name
+                                }
+                            }
+                            break
+
+                        default:
+                            return String(JSON.stringify(styleData.value))
+                    }
+                    return ""
                 }
             }
 
@@ -214,9 +214,12 @@ Item {
                 }
 
                 onCurrentIndexChanged: {
-                    if (!visible || styleData.row === undefined) {
+                    if (!visible || styleData.row === undefined || currentIndex < 0) {
                         return
                     }
+
+                    //console.log("currentIndex = ", currentIndex, )
+                    // 更新当前bind_icd
                     root.setValue(styleData.row, styleData.column, payloads[currentIndex].id)
                 }
             }
@@ -252,8 +255,6 @@ Item {
                 }
 
                 onCurrentIndexChanged: {
-                    //console.log("触发切换信号")
-                    //console.log("当前currentIndex", currentIndex)
                     if (!visible || styleData.row === undefined) {
                         return
                     }
@@ -283,6 +284,7 @@ Item {
                         win.rootPage = root
 
                         if (segments[styleData.row].status_list) {
+                            //console.log("加载=>", JSON.stringify(segments[styleData.row].status_list))
                             win.setEunmInfos(segments[styleData.row].status_list)
                         }
                     }
@@ -394,7 +396,7 @@ Item {
         } // end of rowDelegate
     } // end of TableView
 
-    // 加载列表数据
+    // 加载列表
     function load(values) {
         segments = values.monitor_status
         // 设置device信息
@@ -422,7 +424,7 @@ Item {
         }
     }
 
-    // 增加新行
+    // 增加
     function addSegment(row) {
         var info = {
             "type_id": row + 1,
@@ -444,6 +446,11 @@ Item {
         table.model.insert(row + 1, info)
     }
 
+    function updateDevice(newDevice) {
+        _device = newDevice
+    }
+
+    // 获取枚举
     function getEnumdata(meaning) {
         segments[table.currentRow].status_list = meaning
     }
@@ -455,7 +462,6 @@ Item {
         }
 
         var segment = root.segments[index]
-
         if (segment === undefined) {
             return
         }
@@ -464,14 +470,13 @@ Item {
         case _BIND_ICD_COLUMN:
             segment.bind_icd = value
             table.model.setProperty(index, "bind_icd", value)
-            // 同步修改改行的field_list
+            // 同步修改该行的field_list
             segment.field_list = getFieldList(value)
+            table.model.setProperty(index, "fidle_list", segment.field_list)
             break
         case _FIELD_INDEX_COLUMN:
-            //console.log("修改field_index为: ", String(value))
             segment.field_index = String(value)
             table.model.setProperty(index, "field_index", String(value))
-            //console.log("修改后model值为", JSON.stringify(table.model.get(index)))
             break
         case _TYPE_NAME_COLUMN:
             segment.type_name = value
@@ -491,6 +496,10 @@ Item {
             break
         }
         root.segments[index] = segment
+    }
+
+    function clear() {
+        table.model.clear()
     }
 
     function getICDList() {

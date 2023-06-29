@@ -28,10 +28,12 @@ Window {
 
     property var rootPage
 
-    property var __VALUE_COLUMN: 0
-    property var __SHOWINFO_COLUMN: 1
-    property var __ICON_COLUMN: 2
-    property var __COLOR_COLUMN: 3
+    property var _VALUE_COLUMN: 0
+    property var _SHOWINFO_COLUMN: 1
+    property var _ICON_COLUMN: 2
+    property var _COLOR_COLUMN: 3
+
+    property var colorArray: ["red", "yellow", "green", "blue", "gray"]
 
     signal itemChanged
     signal enumSave
@@ -113,7 +115,7 @@ Window {
                         margins: 1
                     }
 
-                    visible: [__VALUE_COLUMN, __SHOWINFO_COLUMN, __ICON_COLUMN, __COLOR_COLUMN].includes(styleData.column)
+                    visible: [_VALUE_COLUMN, _SHOWINFO_COLUMN, _ICON_COLUMN].includes(styleData.column)
 
                     text: styleData.value
 
@@ -125,6 +127,40 @@ Window {
                             return
                         }
                         updateValue(styleData.row, styleData.column, field.text)
+                    }
+                }
+
+                ComboBox {
+                    id: colorBox
+                    anchors {
+                        fill: parent
+                        margins: 1
+                    }
+
+                    visible: styleData.column === _COLOR_COLUMN
+
+                    property var curIndex: {
+                        for (var i in colorArray) {
+                            //console.log("i = ", i, "color ", colorArray[i])
+                            if (colorArray[i] === enumInfos[styleData.row].color) {
+                                return i
+                            }
+                        }
+                        return -1
+                    }
+
+                    model: colorArray
+
+                    onCurIndexChanged: {
+                        currentIndex = curIndex
+                    }
+
+                    onCurrentIndexChanged: {
+                        if (!visible) {
+                            return
+                        }
+                        //console.log("currIndex", colorBox.currentIndex)
+                        root.updateValue(styleData.row, styleData.column, colorBox.currentIndex)
                     }
                 }
             }
@@ -215,7 +251,7 @@ Window {
             "value": "",
             "showinfo": "",
             "icon": "",
-            "color": ""
+            "color": "red"
         }
         root.enumInfos.push(info)
         table.model.insert(row + 1, info)
@@ -234,23 +270,24 @@ Window {
 
         var enuminfo = root.enumInfos[index]
         switch (column) {
-        case __VALUE_COLUMN:
+        case _VALUE_COLUMN:
             // value
             enuminfo.value = value
             table.model.setProperty(index, "value", value)
             break
-        case __SHOWINFO_COLUMN:
+        case _SHOWINFO_COLUMN:
             // showinfo
             enuminfo.showinfo = value
             table.model.setProperty(index, "showinfo", value)
             break
-        case __ICON_COLUMN:
+        case _ICON_COLUMN:
             enuminfo.icon = value
             table.model.setProperty(index, "icon", value)
             break
-        case __COLOR_COLUMN:
-            enuminfo.color = value
-            table.model.setProperty(index, "color", value)
+        case _COLOR_COLUMN:
+            enuminfo.color = colorArray[value]
+            console.log("color ", enuminfo.color)
+            table.model.setProperty(index, "color", colorArray[value])
             break
         }
     }

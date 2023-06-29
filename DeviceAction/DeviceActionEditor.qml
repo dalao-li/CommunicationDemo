@@ -22,7 +22,6 @@ ColumnLayout {
         Layout.fillHeight: true
         Layout.fillWidth: true
 
-        // 侧边栏
         Rectangle {
             implicitWidth: 200
             Layout.fillHeight: true
@@ -73,11 +72,18 @@ ColumnLayout {
                     // 修改device
                     if (id === "device") {
                         d["device"] = JSON.parse(value)
+
+                        // 修改device时, 同步修改
+                        segmentComponent.clear()
+                        segmentComponent.updateDevice(JSON.parse(value))
                     }
 
                     // 修改bind_ouput_icd
                     if (id === "bind_ouput_icd") {
                         d["bind_ouput_icd"] = value
+
+                        segmentComponent.clear()
+                        segmentComponent.updateDevice(value)
                     }
 
                     listComponent.model.set(listComponent.currentIndex, d)

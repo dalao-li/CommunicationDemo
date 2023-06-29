@@ -98,11 +98,7 @@ Item {
             text: ""
             inputMask: ">HH"
 
-            onTextChanged: {
-                // 清除上次输入的值
-                icdIDField.value &= 0xFFFFFF
-                icdIDField.value |= (parseInt(text, 16) << 24)
-            }
+            onTextChanged: calculateICDID()
         }
 
         Label {
@@ -118,10 +114,7 @@ Item {
             height: 25
             inputMask: ">HH"
             text: ""
-            onTextChanged: {
-                icdIDField.value &= 0xFF00FFFF
-                icdIDField.value |= (parseInt(text, 16) << 16)
-            }
+            onTextChanged: calculateICDID()
         }
 
         Label {
@@ -138,13 +131,10 @@ Item {
             text: ""
             inputMask: ">HHHH"
 
-            onTextChanged: {
-                icdIDField.value &= (0xFFFF0000)
-                icdIDField.value |= (parseInt(text, 16))
-            }
+            onTextChanged: calculateICDID()
         }
 
-        // icd id
+        // ICD的id
         Label {
             text: "ID"
             height: 25
@@ -152,27 +142,44 @@ Item {
             verticalAlignment: Text.AlignVCenter
         }
 
-        SpinBox {
+        TextField {
             id: icdIDField
-            width: 80
+            width: 40
             height: 25
-            //value:
-            maximumValue: 99999999999
-            onValueChanged: {
+            text: ""
+            inputMask: ">HHHH"
+
+            onTextChanged: {
                 if (root._payload) {
-                    root._payload.id = String(value)
-                    root.itemChanged("id", String(value))
+                    root._payload.id = text
+                    root.itemChanged("id", text)
                 }
             }
-        } 
+        }
+
     } // end flow
 
+    // 根据工厂ID, 设备ID, 数据ID计算ICDID
+    function calculateICDID() {
+        var factoryValue = Number(factoryID.text)
+        var deviceValue = Number(deviceID.text)
+        var dataValue = Number(dataID.text)
 
-    // 加载函数
-    function load(value) {
+        var value = 0
+        value |= (parseInt(factoryValue, 16) << 24)
+        value |= (parseInt(deviceValue, 16) << 16)
+        value |= (parseInt(dataValue, 16))
+        icdIDField.text = String(value)
+    }
+
+    function load(value) { 
         _payload = value
         nameField.text = value.name
-        icdIDField.value = Number(value.id)
+        console.log("value.id ", value.id)
+        icdIDField.text = value.id
+
+        //splitValue(Number(value.id))
+
     }
 
     function analyzePays(value) {

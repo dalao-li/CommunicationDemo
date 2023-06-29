@@ -43,7 +43,6 @@ Item {
         MouseArea {
             anchors.fill: parent
             onClicked: {
-                // 折叠
                 if (root.height === defaultHeight) {
                     root.height = title.height
                 } else {
@@ -92,6 +91,7 @@ Item {
             }
         }
 
+        // ouputICD信息
         Label {
             text: "绑定输出ICD"
             height: 25
@@ -183,7 +183,7 @@ Item {
             }
         }
 
-        // 遍历所有ouput_icd,获取他们的名称
+        // 遍历所有ouput_icd, 获取他们的名称
         for (var i in device.ouput_icd) {
             for (var j in payloads) {
                 if (String(device.ouput_icd[i]) === String(payloads[j].id)) {
