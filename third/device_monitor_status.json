@@ -1,0 +1,1117 @@
+[
+	{
+		"id": "YYBKZDevice",
+		"type_name": "液压泵设备状态",
+		"desc": "",
+		"monitor_status": [
+			{
+				"type_id": 1,
+				"bind_icd": "50397185",
+				"field_index": 0,
+				"type": "online",
+				"type_name": "系统在线状态",
+				"status_type": 0,
+				"desc": "0-离线、1-在线",
+				"status_list": [
+					{
+						"value": 0,
+						"showinfo": "心跳",
+						"icon": "red",
+						"color": "red"
+					},
+					{
+						"value": 1,
+						"showinfo": "心跳",
+						"icon": "green",
+						"color": "green"
+					}
+				]
+			},
+			{
+				"type_id": 2,
+				"bind_icd": "50397185",
+				"field_index": 1,
+				"type": "control_mode",
+				"type_name": "总控使能状态",
+				"status_type": 0,
+				"desc": "0-本机控制；1-总控控制",
+				"status_list": [
+					{
+						"value": 0,
+						"showinfo": "本机控制",
+						"icon": "blue",
+						"color": "blue"
+					},
+					{
+						"value": 1,
+						"showinfo": "总控控制",
+						"icon": "green",
+						"color": "green"
+					}
+				]
+			},
+			{
+				"type_id": 3,
+				"bind_icd": "50397185",
+				"field_index": 10,
+				"type": "DJ1state",
+				"type_name": "1P电机状态",
+				"status_type": 0,
+				"desc": "0-停止、1-启动",
+				"status_list": [
+					{
+						"value": 0,
+						"showinfo": "1P停止",
+						"icon": "red",
+						"color": "red"
+					},
+					{
+						"value": 1,
+						"showinfo": "1P启动",
+						"icon": "green",
+						"color": "green"
+					}
+				]
+			},
+			{
+				"type_id": 4,
+				"bind_icd": "50397185",
+				"field_index": 11,
+				"type": "DJ2state",
+				"type_name": "2P电机状态",
+				"status_type": 0,
+				"desc": "0-停止、1-启动",
+				"status_list": [
+					{
+						"value": 0,
+						"showinfo": "2P停止",
+						"icon": "red",
+						"color": "red"
+					},
+					{
+						"value": 1,
+						"showinfo": "2P启动",
+						"icon": "green",
+						"color": "green"
+					}
+				]
+			},
+			{
+				"type_id": 5,
+				"bind_icd": "50397185",
+				"field_index": 12,
+				"type": "DJ3state",
+				"type_name": "3P电机状态",
+				"status_type": 0,
+				"desc": "0-停止、1-启动",
+				"status_list": [
+					{
+						"value": 0,
+						"showinfo": "3P停止",
+						"icon": "red",
+						"color": "red"
+					},
+					{
+						"value": 1,
+						"showinfo": "3P启动",
+						"icon": "green",
+						"color": "green"
+					}
+				]
+			},
+			{
+				"type_id": 6,
+				"bind_icd": "50397185",
+				"field_index": 13,
+				"type": "DJ4state",
+				"type_name": "4P电机状态",
+				"status_type": 0,
+				"desc": "0-停止、1-启动",
+				"status_list": [
+					{
+						"value": 0,
+						"showinfo": "4P停止",
+						"icon": "red",
+						"color": "red"
+					},
+					{
+						"value": 1,
+						"showinfo": "4P启动",
+						"icon": "green",
+						"color": "green"
+					}
+				]
+			},
+			{
+				"type_id": 7,
+				"bind_icd": "50397185",
+				"field_index": 2,
+				"type": "FJ1state",
+				"type_name": "1P电机风机状态",
+				"status_type": 0,
+				"desc": "0-停止、1-启动",
+				"status_list": [
+					{
+						"value": 0,
+						"showinfo": "1P风机运行",
+						"icon": "red",
+						"color": "red"
+					},
+					{
+						"value": 1,
+						"showinfo": "1P风机停止",
+						"icon": "green",
+						"color": "green"
+					},
+					{
+						"value": 2,
+						"showinfo": "1P风机故障",
+						"icon": "green",
+						"color": "green"
+					}
+				]
+			},
+			{
+				"type_id": 8,
+				"bind_icd": "50397185",
+				"field_index": 3,
+				"type": "FJ2state",
+				"type_name": "2P电机风机状态",
+				"status_type": 0,
+				"desc": "0-停止、1-启动",
+				"status_list": [
+					{
+						"value": 0,
+						"showinfo": "2P风机运行",
+						"icon": "red",
+						"color": "red"
+					},
+					{
+						"value": 1,
+						"showinfo": "2P风机停止",
+						"icon": "green",
+						"color": "green"
+					},
+					{
+						"value": 2,
+						"showinfo": "2P风机故障",
+						"icon": "green",
+						"color": "green"
+					}
+				]
+			},
+			{
+				"type_id": 9,
+				"bind_icd": "50397185",
+				"field_index": 4,
+				"type": "FJ3state",
+				"type_name": "3P电机风机状态",
+				"status_type": 0,
+				"desc": "0-停止、1-启动",
+				"status_list": [
+					{
+						"value": 0,
+						"showinfo": "3P风机运行",
+						"icon": "red",
+						"color": "red"
+					},
+					{
+						"value": 1,
+						"showinfo": "3P风机停止",
+						"icon": "green",
+						"color": "green"
+					},
+					{
+						"value": 2,
+						"showinfo": "3P风机故障",
+						"icon": "green",
+						"color": "green"
+					}
+				]
+			},
+			{
+				"type_id": 10,
+				"bind_icd": "50397185",
+				"field_index": 5,
+				"type": "FJ1state",
+				"type_name": "4P电机风机状态",
+				"status_type": 0,
+				"desc": "0-停止、1-启动",
+				"status_list": [
+					{
+						"value": 0,
+						"showinfo": "4P风机运行",
+						"icon": "red",
+						"color": "red"
+					},
+					{
+						"value": 1,
+						"showinfo": "4P风机停止",
+						"icon": "green",
+						"color": "green"
+					},
+					{
+						"value": 2,
+						"showinfo": "4P风机故障",
+						"icon": "green",
+						"color": "green"
+					}
+				]
+			},
+			{
+				"type_id": 11,
+				"bind_icd": "50397185",
+				"field_index": 6,
+				"type": "BP1state",
+				"type_name": "1P电机变频故障",
+				"status_type": 0,
+				"desc": "0-正常,1-故障",
+				"status_list": [
+					{
+						"value": 0,
+						"showinfo": "1P变频正常",
+						"icon": "green",
+						"color": "green"						
+					},
+					{
+						"value": 1,
+						"showinfo": "1P变频故障",
+						"icon": "red",
+						"color": "red"
+					}
+				]
+			},
+			{
+				"type_id": 12,
+				"bind_icd": "50397185",
+				"field_index": 7,
+				"type": "BP2state",
+				"type_name": "2P电机变频故障",
+				"status_type": 0,
+				"desc": "0-正常,1-故障",
+				"status_list": [
+					{
+						"value": 0,
+						"showinfo": "2P变频正常",
+						"icon": "green",
+						"color": "green"
+					},
+					{
+						"value": 1,
+						"showinfo": "2P变频故障",
+						"icon": "red",
+						"color": "red"
+					}
+				]
+			},
+			{
+				"type_id": 13,
+				"bind_icd": "50397185",
+				"field_index": 8,
+				"type": "BP3state",
+				"type_name": "3P电机变频故障",
+				"status_type": 0,
+				"desc": "0-正常,1-故障",
+				"status_list": [
+					{
+						"value": 0,
+						"showinfo": "3P变频正常",
+						"icon": "green",
+						"color": "green"
+
+					},
+					{
+						"value": 1,
+						"showinfo": "3P变频故障",
+						"icon": "red",
+						"color": "red"
+					}
+				]
+			},
+			{
+				"type_id": 14,
+				"bind_icd": "50397185",
+				"field_index": 9,
+				"type": "BP4state",
+				"type_name": "4P电机变频故障",
+				"status_type": 0,
+				"desc": "0-正常,1-故障",
+				"status_list": [
+					{
+						"value": 0,
+						"showinfo": "4P变频正常",
+						"icon": "green",
+						"color": "green"
+					},
+					{
+						"value": 1,
+						"showinfo": "4P变频故障",
+						"icon": "red",
+						"color": "red"
+					}
+				]
+			},
+			{
+				"type_id": 15,
+				"bind_icd": "50397185",
+				"field_index": 14,
+				"type": "BP1state",
+				"type_name": "1P电机超温状态",
+				"status_type": 0,
+				"desc": "0-正常,1-超温",
+				"status_list": [
+					{
+						"value": 0,
+						"showinfo": "1P温度正常",
+						"icon": "green",
+						"color": "green"						
+					},
+					{
+						"value": 1,
+						"showinfo": "1P超温",
+						"icon": "red",
+						"color": "red"
+					}
+				]
+			},
+			{
+				"type_id": 16,
+				"bind_icd": "50397185",
+				"field_index": 15,
+				"type": "BP2state",
+				"type_name": "2P电机超温状态",
+				"status_type": 0,
+				"desc": "0-正常,1-超温",
+				"status_list": [
+					{
+						"value": 0,
+						"showinfo": "2P温度正常",
+						"icon": "green",
+						"color": "green"						
+					},
+					{
+						"value": 1,
+						"showinfo": "2P超温",
+						"icon": "red",
+						"color": "red"
+					}
+				]
+			},
+			{
+				"type_id": 17,
+				"bind_icd": "50397185",
+				"field_index": 16,
+				"type": "BP3state",
+				"type_name": "3P电机超温状态",
+				"status_type": 0,
+				"desc": "0-正常,1-超温",
+				"status_list": [
+					{
+						"value": 0,
+						"showinfo": "3P温度正常",
+						"icon": "green",
+						"color": "green"						
+					},
+					{
+						"value": 1,
+						"showinfo": "3P超温",
+						"icon": "red",
+						"color": "red"
+					}
+				]
+			},
+			{
+				"type_id": 18,
+				"bind_icd": "50397185",
+				"field_index": 17,
+				"type": "BP4state",
+				"type_name": "4P电机超温状态",
+				"status_type": 0,
+				"desc": "0-正常,1-超温",
+				"status_list": [
+					{
+						"value": 0,
+						"showinfo": "4P温度正常",
+						"icon": "green",
+						"color": "green"						
+					},
+					{
+						"value": 1,
+						"showinfo": "4P超温",
+						"icon": "red",
+						"color": "red"
+					}
+				]
+			}
+		]
+	},
+	{
+		"id": "WKKZDevice",
+		"type_name": "温控系统状态",
+		"desc": "",
+		"monitor_status": [
+			{
+				"type_id": 1,
+				"bind_icd": "33619969",
+				"field_index": 0,
+				"type": "online",
+				"type_name": "在线状态",
+				"status_type": 0,
+				"desc": "心跳",
+				"status_list": [
+					{
+						"value": 0,
+						"showinfo": "心跳",
+						"icon": "red",
+						"color": "red"
+					},
+					{
+						"value": 1,
+						"showinfo": "心跳",
+						"icon": "green",
+						"color": "green"
+					}
+				]
+			},
+			{
+				"type_id": 2,
+				"bind_icd": "33619969",
+				"type": "control_mode",
+				"field_index": 1,
+				"type_name": "总控使能状态",
+				"status_type": 0,
+				"desc": "0-本机控制,1-总控控制",
+				"status_list": [
+					{
+						"value": 0,
+						"showinfo": "本机控制",
+						"icon": "blue",
+						"color": "blue"
+					},
+					{
+						"value": 1,
+						"showinfo": "总控控制",
+						"icon": "green",
+						"color": "green"
+					}
+				]
+			},
+			{
+				"type_id": 3,
+				"bind_icd": "33619969",
+				"type": "1running",
+				"field_index": 2,
+				"type_name": "1#左系统运行状态",
+				"status_type": 0,
+				"desc": "0-停止、1-运行",
+				"status_list": [
+					{
+						"value": 0,
+						"showinfo": "1#左系统停止",
+						"icon": "red",
+						"color": "red"
+					},
+					{
+						"value": 1,
+						"showinfo": "1#左系统运行",
+						"icon": "green",
+						"color": "green"
+					}
+				]
+			},
+			{
+				"type_id": 4,
+				"bind_icd": "33619969",
+				"type": "2running",
+				"field_index": 3,
+				"type_name": "2#右系统运行状态",
+				"status_type": 0,
+				"desc": "0-停止、1-运行",
+				"status_list": [
+					{
+						"value": 0,
+						"showinfo": "2#右系统停止",
+						"icon": "red",
+						"color": "red"
+					},
+					{
+						"value": 1,
+						"showinfo": "2#右系统运行",
+						"icon": "green",
+						"color": "green"
+					}
+				]
+			},
+			{
+				"type_id": 5,
+				"bind_icd": "33619969",
+				"type": "3running",
+				"field_index": 4,
+				"type_name": "3#风机系统运行状态",
+				"status_type": 0,
+				"desc": "0-停止、1-运行",
+				"status_list": [
+					{
+						"value": 0,
+						"showinfo": "3#风机停止",
+						"icon": "red",
+						"color": "red"
+					},
+					{
+						"value": 1,
+						"showinfo": "3#风机运行",
+						"icon": "green",
+						"color": "green"
+					}
+				]
+			},
+			{
+				"type_id": 6,
+				"bind_icd": "33619969",
+				"type": "warning",
+				"field_index": 5,
+				"type_name": "报警指示灯",
+				"status_type": 0,
+				"desc": "0-正常、1-异常",
+				"status_list": [
+					{
+						"value": 0,
+						"showinfo": "正常",
+						"icon": "white",
+						"color": "white"
+					},
+					{
+						"value": 1,
+						"showinfo": "异常",
+						"icon": "red",
+						"color": "red"
+					}
+				]
+			}
+		]
+	},
+	{
+		"id": "YYNYFZMNDDevice",
+		"type_name": "液压负载模拟系统状态",
+		"desc": "",
+		"monitor_status": [
+			{
+				"type_id": 1,
+				"bind_icd": "16842753",
+				"field_index": 0,
+				"type": "online",
+				"type_name": "系统在线状态",
+				"status_type": 0,
+				"desc": "心跳信号",
+				"status_list": [
+					{
+						"value": 0,
+						"showinfo": "心跳",
+						"icon": "red",
+						"color": "red"
+					},
+					{
+						"value": 1,
+						"showinfo": "心跳",
+						"icon": "green",
+						"color": "green"
+					}
+				]
+			},
+			{
+				"type_id": 2,
+				"bind_icd": "16842753",
+				"field_index": 1,
+				"type": "control_mode",
+				"type_name": "总控使能状态",
+				"status_type": 0,
+				"desc": "0-本机控制；1-总控控制",
+				"status_list": [
+					{
+						"value": 0,
+						"showinfo": "本机控制",
+						"icon": "blue",
+						"color": "blue"
+					},
+					{
+						"value": 1,
+						"showinfo": "总控控制",
+						"icon": "green",
+						"color": "green"
+					}
+				]
+			},
+			{
+				"type_id": 3,
+				"bind_icd": "16842753",
+				"field_index": 2,
+				"type": "running1",
+				"type_name": "1#系统运行状态",
+				"status_type": 0,
+				"desc": "0-停止、1-运行",
+				"status_list": [
+					{
+						"value": 0,
+						"showinfo": "1#系统停止",
+						"icon": "red",
+						"color": "red"
+					},
+					{
+						"value": 1,
+						"showinfo": "1#系统运行",
+						"icon": "green",
+						"color": "green"
+					}
+				]
+			},
+			{
+				"type_id": 4,
+				"bind_icd": "16842753",
+				"field_index": 16,
+				"type": "running2",
+				"type_name": "2#系统运行状态",
+				"status_type": 0,
+				"desc": "0-停止、1-运行",
+				"status_list": [
+					{
+						"value": 0,
+						"showinfo": "2#系统停止",
+						"icon": "red",
+						"color": "red"
+					},
+					{
+						"value": 1,
+						"showinfo": "2#系统运行",
+						"icon": "green",
+						"color": "green"
+					}
+				]
+			},
+			{
+				"type_id": 5,
+				"bind_icd": "16842753",
+				"field_index": 30,
+				"type": "running3",
+				"type_name": "3#系统运行状态",
+				"status_type": 0,
+				"desc": "0-停止、1-运行",
+				"status_list": [
+					{
+						"value": 0,
+						"showinfo": "3#系统停止",
+						"icon": "red",
+						"color": "red"
+					},
+					{
+						"value": 1,
+						"showinfo": "3#系统运行",
+						"icon": "green",
+						"color": "green"
+					}
+				]
+			}
+		]
+	},
+	{
+		"id": "FTDevice",
+		"type_name": "反推系统状态",
+		"desc": "",
+		"monitor_status": [
+			{
+				"type_id": 1,
+				"bind_icd": "67174401",
+				"field_index": 0,
+				"type": "online",
+				"type_name": "系统在线状态",
+				"status_type": 0,
+				"desc": "心跳信号",
+				"status_list": [
+					{
+						"value": 0,
+						"showinfo": "心跳",
+						"icon": "red",
+						"color": "red"
+					},
+					{
+						"value": 1,
+						"showinfo": "心跳",
+						"icon": "green",
+						"color": "green"
+					}
+				]
+			},
+			{
+				"type_id": 2,
+				"bind_icd": "67174401",
+				"field_index": 1,
+				"type": "control_mode",
+				"type_name": "总控使能状态",
+				"status_type": 0,
+				"desc": "0-本机控制；1-总控控制",
+				"status_list": [
+					{
+						"value": 1,
+						"showinfo": "本机控制",
+						"icon": "blue",
+						"color": "blue"
+					},
+					{
+						"value": 0,
+						"showinfo": "总控控制",
+						"icon": "green",
+						"color": "green"
+					}
+				]
+			},
+			{
+				"type_id": 3,
+				"bind_icd": "67174401",
+				"field_index": 3,
+				"type": "lockState",
+				"type_name": "同步锁开关状态",
+				"status_type": 0,
+				"desc": "0-停止、1-运行",
+				"status_list": [
+					{
+						"value": 0,
+						"showinfo": "同步锁关",
+						"icon": "red",
+						"color": "red"
+					},
+					{
+						"value": 1,
+						"showinfo": "同步锁开",
+						"icon": "green",
+						"color": "green"
+					}
+				]
+			},
+			{
+				"type_id": 4,
+				"bind_icd": "67174401",
+				"field_index": 4,
+				"type": "running",
+				"type_name": "系统运行状态",
+				"status_type": 0,
+				"desc": "0-停止、1-运行",
+				"status_list": [
+					{
+						"value": 0,
+						"showinfo": "全关",
+						"icon": "red",
+						"color": "red"
+					},
+					{
+						"value": 1,
+						"showinfo": "1#系统运行",
+						"icon": "green",
+						"color": "green"
+					},
+					{
+						"value": 2,
+						"showinfo": "2#系统运行",
+						"icon": "green",
+						"color": "green"
+					},
+					{
+						"value": 3,
+						"showinfo": "全开",
+						"icon": "green",
+						"color": "green"
+					}
+					
+				]
+			}
+		]
+	},
+	{
+		"id": "YYZGMNQDevice",
+		"type_name": "液压综管模拟器状态",
+		"desc": "",
+		"monitor_status": [
+			{
+				"type_id": 1,
+				"bind_icd": "100728833",
+				"field_index": 0,
+				"type": "online",
+				"type_name": "系统在线状态",
+				"status_type": 0,
+				"desc": "心跳信号",
+				"status_list": [
+					{
+						"value": 0,
+						"showinfo": "心跳",
+						"icon": "red",
+						"color": "red"
+					},
+					{
+						"value": 1,
+						"showinfo": "心跳",
+						"icon": "green",
+						"color": "green"
+					}
+				]
+			},
+			{
+				"type_id": 2,
+				"bind_icd": "100728833",
+				"field_index": 1,
+				"type": "control_mode",
+				"type_name": "总控使能状态",
+				"status_type": 0,
+				"desc": "0-本机控制；1-总控控制",
+				"status_list": [
+					{
+						"value": 0,
+						"showinfo": "本机控制",
+						"icon": "blue",
+						"color": "blue"
+					},
+					{
+						"value": 1,
+						"showinfo": "总控控制",
+						"icon": "green",
+						"color": "green"
+					}
+				]
+			},
+			{
+				"type_id": 3,
+				"bind_icd": "100728833",
+				"field_index": 6,
+				"type": "lockState1",
+				"type_name": "1主泵运行状态",
+				"status_type": 0,
+				"desc": "0-运行、1-未运行",
+				"status_list": [
+					{
+						"value": 0,
+						"showinfo": "1主泵运行",
+						"icon": "green",
+						"color": "green"
+					},
+					{
+						"value": 1,
+						"showinfo": "1主泵未运行",
+						"icon": "red",
+						"color": "red"
+					}
+				]
+			},
+			{
+				"type_id": 4,
+				"bind_icd": "100728833",
+				"field_index": 7,
+				"type": "lockState2",
+				"type_name": "3主泵运行状态",
+				"status_type": 0,
+				"desc": "0-运行、1-未运行",
+				"status_list": [
+					{
+						"value": 0,
+						"showinfo": "3主泵运行",
+						"icon": "green",
+						"color": "green"
+					},
+					{
+						"value": 1,
+						"showinfo": "3主泵未运行",
+						"icon": "red",
+						"color": "red"
+					}
+				]
+			},
+			{
+				"type_id": 5,
+				"bind_icd": "100728833",
+				"field_index": 8,
+				"type": "lockState3",
+				"type_name": "2主泵运行状态",
+				"status_type": 0,
+				"desc": "0-运行、1-未运行",
+				"status_list": [
+					{
+						"value": 0,
+						"showinfo": "2主泵运行",
+						"icon": "green",
+						"color": "green"
+					},
+					{
+						"value": 1,
+						"showinfo": "2主泵未运行",
+						"icon": "red",
+						"color": "red"
+					}
+				]
+			},
+			{
+				"type_id": 6,
+				"bind_icd": "100728833",
+				"field_index": 9,
+				"type": "lockState4",
+				"type_name": "4主泵运行状态",
+				"status_type": 0,
+				"desc": "0-运行、1-未运行",
+				"status_list": [
+					{
+						"value": 0,
+						"showinfo": "4主泵运行",
+						"icon": "green",
+						"color": "green"
+					},
+					{
+						"value": 1,
+						"showinfo": "4主泵未运行",
+						"icon": "red",
+						"color": "red"
+					}
+				]
+			},
+			{
+				"type_id": 7,
+				"bind_icd": "100728833",
+				"field_index": 33,
+				"type": "lockState5",
+				"type_name": "电动泵1C运行状态",
+				"status_type": 0,
+				"desc": "0-运行、1-未运行",
+				"status_list": [
+					{
+						"value": 0,
+						"showinfo": "电动泵1C运行",
+						"icon": "green",
+						"color": "green"
+					},
+					{
+						"value": 1,
+						"showinfo": "电动泵1C未运行",
+						"icon": "red",
+						"color": "red"
+					}
+				]
+			},
+			{
+				"type_id": 8,
+				"bind_icd": "100728833",
+				"field_index": 11,
+				"type": "lockState6",
+				"type_name": "电动泵2C运行状态",
+				"status_type": 0,
+				"desc": "0-运行、1-未运行",
+				"status_list": [
+					{
+						"value": 0,
+						"showinfo": "电动泵2C运行",
+						"icon": "green",
+						"color": "green"
+					},
+					{
+						"value": 1,
+						"showinfo": "电动泵2C未运行",
+						"icon": "red",
+						"color": "red"
+					}
+				]
+			},
+			{
+				"type_id": 9,
+				"bind_icd": "100728833",
+				"field_index": 12,
+				"type": "lockState7",
+				"type_name": "电动泵3A运行状态",
+				"status_type": 0,
+				"desc": "0-运行、1-未运行",
+				"status_list": [
+					{
+						"value": 0,
+						"showinfo": "电动泵3A运行",
+						"icon": "green",
+						"color": "green"
+					},
+					{
+						"value": 1,
+						"showinfo": "电动泵3A未运行",
+						"icon": "red",
+						"color": "red"
+					}
+				]
+			},
+			{
+				"type_id": 10,
+				"bind_icd": "100728833",
+				"field_index": 13,
+				"type": "lockState8",
+				"type_name": "电动泵3B运行状态",
+				"status_type": 0,
+				"desc": "0-运行、1-未运行",
+				"status_list": [
+					{
+						"value": 0,
+						"showinfo": "电动泵3B运行",
+						"icon": "green",
+						"color": "green"
+					},
+					{
+						"value": 1,
+						"showinfo": "电动泵3B未运行",
+						"icon": "red",
+						"color": "red"
+					}
+				]
+			}
+		]
+	},
+	{
+		"id": "GPDMNDDevice",
+		"type_name": "供配电系统状态",
+		"desc": "",
+		"monitor_status": [
+			{
+				"type_id": 1,
+				"bind_icd": "83951617",
+				"field_index": 0,
+				"type": "online",
+				"type_name": "系统在线状态",
+				"status_type": 0,
+				"desc": "心跳信号",
+				"status_list": [
+					{
+						"value": 0,
+						"showinfo": "心跳",
+						"icon": "red",
+						"color": "red"
+					},
+					{
+						"value": 1,
+						"showinfo": "心跳",
+						"icon": "green",
+						"color": "green"
+					}
+				]
+			},
+			{
+				"type_id": 2,
+				"bind_icd": "83951617",
+				"field_index": 1,
+				"type": "control_mode",
+				"type_name": "总控使能状态",
+				"status_type": 0,
+				"desc": "0-本机控制；1-总控控制",
+				"status_list": [
+					{
+						"value": 0,
+						"showinfo": "本机控制",
+						"icon": "blue",
+						"color": "blue"
+					},
+					{
+						"value": 1,
+						"showinfo": "总控控制",
+						"icon": "green",
+						"color": "green"
+					}
+				]
+			}
+		]
+	}
+]

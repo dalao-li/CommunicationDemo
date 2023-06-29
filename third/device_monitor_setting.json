@@ -1,0 +1,148 @@
+{
+	"monitor_device_type": [
+		{
+			"type": "液压能源负载模拟系统",
+			"control_type":"controlled",
+			"device_id": "YYNYFZMNDDevice",
+			"bus_type": "udp",
+			"icon": "fuzaimoni",
+			"ip": "192.168.0.200",
+			"send_port": "2010",
+			"control_port": "2011",
+			"rfm2g_id":"",
+			"address":""
+		},
+		{
+			"type": "液压泵控制系统",
+			"control_type":"controlled",
+			"device_id": "YYBKZDevice",
+			"bus_type": "udp",
+			"icon": "yeyabeng",
+			"ip": "192.168.0.51",
+			"send_port": "2006",
+			"control_port": "2007",
+			"rfm2g_id":"",
+			"address":""
+		},
+		{
+			"type": "温控控制系统",
+			"control_type":"controlled",
+			"device_id": "WKKZDevice",
+			"bus_type": "udp",
+			"icon": "wenkong",
+			"ip": "192.168.0.8",
+			"send_port": "2008",
+			"control_port": "2009",
+			"rfm2g_id":"",
+			"address":""
+		},
+		{
+			"type": "反推设备系统",
+			"control_type":"controlled",
+			"device_id": "FTDevice",
+			"bus_type": "udp",
+			"icon": "wenkong",
+			"ip": "192.168.0.1",
+			"send_port": "2000",
+			"control_port": "2001",
+			"rfm2g_id":"",
+			"address":""
+		},
+		{
+			"type": "液压综管模拟器",
+			"control_type":"controlled",
+			"device_id": "YYZGMNQDevice",
+			"bus_type": "udp",
+			"icon": "wenkong",
+			"ip": "192.168.0.50",
+			"send_port": "2022",
+			"control_port": "2021",
+			"rfm2g_id":"",
+			"address":""
+		},
+		{
+			"type": "供配电系统",
+			"control_type":"controlled",
+			"device_id": "GPDMNDDevice",
+			"bus_type": "udp",
+			"icon": "gongpeidian",
+			"ip": "192.168.0.20",
+			"send_port": "2016",
+			"control_port": "2017",
+			"rfm2g_id":"",
+			"address":""
+		}	
+	],
+	"bus_type_list": [
+		{
+			"text": "UDP通信",
+			"bus_type": "udp"
+		},
+		{
+			"text": "反射内存",
+			"bus_type": "rfm2g"
+		},
+		{
+			"text": "ModbusTcp通信",
+			"bus_type": "modbustcp"
+		}
+	],
+	"DeviceICDList": {
+		"YYNYFZMNDDevice": [
+			{
+				"icd_id": "16842753",
+				"type": "output"
+			},
+			{
+				"icd_id": "16842754",
+				"type": "input"
+			}
+		],
+		"WKKZDevice": [
+			{
+				"icd_id": "33619969",
+				"type": "output"
+			},		
+			{
+				"icd_id": "33619970",
+				"type": "input"
+			}
+		],
+		"YYBKZDevice": [
+			{
+				"icd_id": "50397185",
+				"type": "output"
+			},
+			{
+				"icd_id": "50397186",
+				"type": "input"
+			}
+		],
+		"FTDevice": [
+			{
+				"icd_id": "67174401",
+				"type": "output"
+			},
+			{
+				"icd_id": "67174402",
+				"type": "input"
+			}
+		],
+		"YYZGMNQDevice": [
+			{
+				"icd_id": "100728833",
+				"type": "output"
+			},
+			{
+				"icd_id": "100728834",
+				"type": "input"
+			}
+		],
+		"GPDMNDDevice": [
+			{
+				"icd_id": "83951617",
+				"type": "output"
+			}
+		]
+	}
+}
