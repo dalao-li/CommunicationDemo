@@ -19,12 +19,18 @@ Item {
     property var segments: []
     property var _device
 
+    // 列枚举名
     property var _BIND_ICD_COLUMN: 0
     property var _FIELD_INDEX_COLUMN: 1
     property var _TYPE_NAME_COLUMN: 2
     property var _STATUS_TYPE_COLUMN: 3
     property var _DESC_COLUMN: 4
     property var _STATUS_LIST_COLUMN: 5
+
+    // icd列表
+    property var icdList: {
+        return getICDList()
+    }
 
     signal itemChanged(string id, string value)
 
@@ -75,14 +81,60 @@ Item {
             right: parent.right
         }
 
+        TableViewColumn {
+            id: bindICD
+            visible: true
+            role: "bind_icd"
+            title: "绑定ICD"
+            width: 80
+        }
+
+        TableViewColumn {
+            id: fieldIndex
+            visible: true
+            role: "field_index"
+            title: "ICD域"
+            width: 120
+        }
+
+        TableViewColumn {
+            id: typeName
+            visible: true
+            role: "type_name"
+            title: "类别名"
+            width: 100
+        }
+
+        TableViewColumn {
+            id: statusType
+            visible: true
+            role: "status_type"
+            title: "status_type"
+            width: 160
+        }
+
+        TableViewColumn {
+            id: desc
+            visible: true
+            role: "desc"
+            title: "描述"
+            width: 80
+        }
+
+        TableViewColumn {
+            id: statusList
+            visible: true
+            role: "status_list"
+            title: "状态列表"
+            width: 80
+        }
+
+        model: ListModel {}
+
         frameVisible: false
 
         // 如何绘制每一个单元格
         itemDelegate: Item {
-
-            // icd列表
-            property var icdList: getICDList()
-
             // field 列表
             property var fieldList: {
                 if (styleData.row === undefined || segments[styleData.row] === undefined || segments[styleData.row].bind_icd === undefined) {
@@ -94,58 +146,42 @@ Item {
             Label {
                 id: label
                 anchors.fill: parent
-                visible: !styleData.selected && [_BIND_ICD_COLUMN, _FIELD_INDEX_COLUMN, _TYPE_NAME_COLUMN, _DESC_COLUMN, _STATUS_TYPE_COLUMN].includes(styleData.column)
+                visible: !styleData.selected || [_BIND_ICD_COLUMN, _FIELD_INDEX_COLUMN, _TYPE_NAME_COLUMN, _DESC_COLUMN, _STATUS_TYPE_COLUMN].includes(styleData.column)
 
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
 
-                property var segment: {
-                    if (styleData.row === undefined) {
-                        return []
-                    }
-
-                    return segments[styleData.row]
-                }
-
                 text: {
-                    if (!visible) {
+                    if (!visible || styleData.row === undefined || segments[styleData.row] === undefined || segments[styleData.row] === []) {
                         return ""
                     }
 
                     switch (styleData.column) {
-                        case _TYPE_NAME_COLUMN:
-                        case _DESC_COLUMN:
-                        case _STATUS_TYPE_COLUMN:
-                            return String(styleData.value)
-                        case _BIND_ICD_COLUMN:
-                            if (segment === [] || segment === undefined) {
-                                return ""
+                    case _STATUS_TYPE_COLUMN:
+                    case _TYPE_NAME_COLUMN:
+                    case _DESC_COLUMN:
+                        return String(styleData.value)
+                    case _BIND_ICD_COLUMN:
+                        for (var i in payloads) {
+                            if (payloads[i].id === styleData.value) {
+                                return payloads[i].name
                             }
-
-                            for (var i in payloads) {
-                                if (payloads[i].id === styleData.value) {
-                                    return payloads[i].name
+                        }
+                        break
+                    case _FIELD_INDEX_COLUMN:
+                        for (var j in payloads) {
+                            if (payloads[j].id === String(segments[styleData.row].bind_icd)) {
+                                var value = payloads[j].values[styleData.value]
+                                if (value === undefined) {
+                                    return ""
                                 }
+                                return value.name
                             }
-                            break
-                        case _FIELD_INDEX_COLUMN:
-                            if (segment === [] || segment === undefined) {
-                                return ""
-                            }
+                        }
+                        break
 
-                            for (var j in payloads) {
-                                if (payloads[j].id === String(segment.bind_icd)) {
-                                    var value = payloads[j].values[styleData.value]
-                                    if (value === undefined) {
-                                        return ""
-                                    }
-                                    return value.name
-                                }
-                            }
-                            break
-
-                        default:
-                            return String(JSON.stringify(styleData.value))
+                    default:
+                        return ""
                     }
                     return ""
                 }
@@ -194,11 +230,11 @@ Item {
 
                 textRole: "text"
 
-                visible: styleData.column === _BIND_ICD_COLUMN && styleData.selected
+                visible: styleData.selected && styleData.column === _BIND_ICD_COLUMN
 
                 property var curIndex: {
                     for (var i in icdList) {
-                        if (styleData.value === icdList[i].value) {
+                        if (String(segments[styleData.row].bind_icd) === icdList[i].value) {
                             return i
                         }
                     }
@@ -217,8 +253,6 @@ Item {
                     if (!visible || styleData.row === undefined || currentIndex < 0) {
                         return
                     }
-
-                    //console.log("currentIndex = ", currentIndex, )
                     // 更新当前bind_icd
                     root.setValue(styleData.row, styleData.column, payloads[currentIndex].id)
                 }
@@ -234,7 +268,7 @@ Item {
 
                 textRole: "text"
 
-                visible: styleData.column === _FIELD_INDEX_COLUMN && styleData.selected
+                visible: styleData.selected && styleData.column === _FIELD_INDEX_COLUMN
 
                 property var curIndex: {
                     for(var i in fieldList){
@@ -250,7 +284,6 @@ Item {
                 currentIndex: curIndex
 
                 onCurIndexChanged: {
-                    // console.log("component_bindDevice curIndex : "+curIndex)
                     currentIndex = curIndex
                 }
 
@@ -270,7 +303,7 @@ Item {
                     margins: 1
                 }
 
-                visible: (styleData.column === _STATUS_LIST_COLUMN) && styleData.selected
+                visible: styleData.column === _STATUS_LIST_COLUMN && styleData.selected
 
                 onClicked: {
                     var component = Qt.createComponent("DeviceStatusEnumData.qml")
@@ -291,56 +324,6 @@ Item {
                 }
             }
         } // itemDelegate end
-
-        TableViewColumn {
-            id: bindICD
-            visible: true
-            role: "bind_icd"
-            title: "绑定ICD"
-            width: 80
-        }
-
-        TableViewColumn {
-            id: fieldIndex
-            visible: true
-            role: "field_index"
-            title: "ICD域"
-            width: 120
-        }
-
-        TableViewColumn {
-            id: typeName
-            visible: true
-            role: "type_name"
-            title: "类别名"
-            width: 100
-        }
-
-        TableViewColumn {
-            id: statusType
-            visible: true
-            role: "status_type"
-            title: "status_type"
-            width: 160
-        }
-
-        TableViewColumn {
-            id: desc
-            visible: true
-            role: "desc"
-            title: "描述"
-            width: 80
-        }
-
-        TableViewColumn {
-            id: statusList
-            visible: true
-            role: "statusList"
-            title: "状态列表"
-            width: 80
-        }
-
-        model: ListModel {}
 
         // 行背景
         rowDelegate: Item {
@@ -401,6 +384,7 @@ Item {
         segments = values.monitor_status
         // 设置device信息
         _device = values.device
+        console.log("_device", JSON.stringify(_device))
 
         batchAdd.enabled = true
         table.model.clear()
@@ -416,7 +400,7 @@ Item {
                                    "status_type": segments[i].status_type,
                                    "desc": segments[i].desc,
                                    "status_list": segments[i].status_list,
-                                   // input_icd id列表
+                                   // output_icd id列表
                                    "icd_list": getICDList(),
                                    // ICD下field的index
                                    "field_list": getFieldList(segments[i].bind_icd)
@@ -429,7 +413,7 @@ Item {
         var info = {
             "type_id": row + 1,
             // 默认绑第一个icd
-            "bind_icd": _device.input_icd[0],
+            "bind_icd": _device.output_icd[0],
             // field index默认为工程0
             "field_index": 0,
             "type": row + 1,
@@ -437,10 +421,10 @@ Item {
             "status_type": 0,
             "desc": "",
             "status_list": [],
-            // input_icd id列表
+            // output_icd id列表
             "icd_list": getICDList(),
             // ICD下field的index
-            "field_list": getFieldList(_device.input_icd[0])
+            "field_list": getFieldList(_device.output_icd[0])
         }
         root.segments.splice(row + 1, 0, info)
         table.model.insert(row + 1, info)
@@ -475,7 +459,7 @@ Item {
             table.model.setProperty(index, "fidle_list", segment.field_list)
             break
         case _FIELD_INDEX_COLUMN:
-            segment.field_index = String(value)
+            segment.field_index = value
             table.model.setProperty(index, "field_index", value)
             break
         case _TYPE_NAME_COLUMN:
@@ -500,14 +484,26 @@ Item {
 
     function clear() {
         table.model.clear()
+        root.segments = []
     }
 
     function getICDList() {
+        if (_device.output_icd === undefined) {
+            //console.log("_device.output_icd is undefined")
+            return []
+        }
+
+        if (_device.output_icd === []) {
+            //console.log("_device.output_icd is []")
+            return []
+        }
+        //console.log("_device.output_icd is", _device.output_icd)
+
         var icd = []
-        // 遍历所有input_icd,获取他们的名称
-        for (var i in _device.input_icd) {
+        // 遍历所有output_icd,获取他们的名称
+        for (var i in _device.output_icd) {
             for (var j in payloads) {
-                if (String(_device.input_icd[i]) === String(payloads[j].id)) {
+                if (String(_device.output_icd[i]) === String(payloads[j].id)) {
                     var info = {
                         text: payloads[j].name,
                         value: payloads[j].id
@@ -520,17 +516,21 @@ Item {
     }
 
     function getFieldList(bind_icd) {
+        var values = (()=>{
+                          for (var i in payloads) {
+                              if (String(bind_icd) === String(payloads[i].id)) {
+                                  return payloads[i].values
+                              }
+                          }
+                      })()
+
         var res = []
-        for (var i in payloads) {
-            if (String(bind_icd) === String(payloads[i].id)) {
-                for (var j in payloads[i].values) {
-                    var info = {
-                        text: payloads[i].values[j].name,
-                        value: payloads[i].values[j].index
-                    }
-                    res.push(info)
-                }
+        for (var i in values) {
+            var info = {
+                text: values[i].name,
+                value: i
             }
+            res.push(info)
         }
         return res
     }

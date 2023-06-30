@@ -94,8 +94,8 @@ ListView {
                     "condition": [],
                     // 默认是选第一个设备
                     "device": devices[0],
-                    // 默认绑首个ouput_icd
-                    "bind_ouput_icd": devices[0].ouput_icd[0],
+                    // 默认绑首个output_icd
+                    "bind_output_icd": devices[0].output_icd[0],
 
                 }
                 root.actions.push(info)
@@ -188,27 +188,8 @@ ListView {
                                        }
                                    }
                                })(),
-                    "bind_ouput_icd": actions[j].id,
-
+                    "bind_output_icd": actions[j].id,
                 }
-            }
-
-
-            root.actions.push(info)
-            root.model.append(info)
-
-            var info = {
-                "type_name": data[i].type_name,
-                "desc": data[i].desc,
-                "monitor_status": data[i].monitor_status,
-                "device": (()=> {
-                               var device_id = data[i].id
-                               for (var j in devices) {
-                                   if (devices[j].device_id === device_id) {
-                                       return devices[j]
-                                   }
-                               }
-                           })()
             }
 
             root.actions.push(info)
@@ -250,7 +231,7 @@ ListView {
 
             // device_id
             var deviceID = data[i].device.device_id
-            var ouputICD = data[i].bind_ouput_icd
+            var ouputICD = data[i].bind_output_icd
             var name = data[i].name
             var condition = data[i].condition
 
@@ -260,7 +241,7 @@ ListView {
             var temp = {}
             // "input_icd value" : [{"in_index": , "", "out_index": "...", "desc": "...", "difference": "..."], {...}}
             for (var j in condition) {
-                var ouputICDIndex = condition[j].ouput_icd_index
+                var ouputICDIndex = condition[j].output_icd_index
                 var inputICD = condition[j].input_icd
                 var inputICDIndex = condition[j].input_icd_index
                 var desc = condition[j].desc

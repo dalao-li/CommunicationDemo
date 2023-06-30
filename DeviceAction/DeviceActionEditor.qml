@@ -40,6 +40,7 @@ ColumnLayout {
                         return
                     }
                     var data = root.actions[listComponent.currentIndex]
+                    //console.log("=>", JSON.stringify(data))
                     detailComponent.load(data)
                     segmentComponent.load(data)
                 }

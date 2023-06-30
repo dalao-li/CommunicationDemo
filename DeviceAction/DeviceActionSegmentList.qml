@@ -14,7 +14,7 @@ Item {
 
     property var _bindOuputICD
 
-    property var _OUPUT_ICD_INDEX_COLUMN: 0
+    property var _output_icd_INDEX_COLUMN: 0
     property var _INPUT_ICD_COLUMN: 1
     property var _INPUT_ICD_INDEX_COLUMN: 2
     property var _DIFFERENCE_COLUMN: 3
@@ -74,15 +74,15 @@ Item {
         // 如何绘制每一个单元格
         itemDelegate: Item {
 
-            // ouput_icd
+            // output_icd
             property var ouputICDList: getOuputICDList()
 
             // input_icd
             property var inputICDList: getInputICDList()
 
-            // ouput_icd index
+            // output_icd index
             property var ouputICDFieldList: {
-                if (styleData.row === undefined || segments[styleData.row] === undefined || segments[styleData.row].ouput_icd_index === undefined) {
+                if (styleData.row === undefined || segments[styleData.row] === undefined || segments[styleData.row].output_icd_index === undefined) {
                     return []
                 }
                 return getFieldList(_bindOuputICD)
@@ -99,7 +99,7 @@ Item {
             Label {
                 id: label
                 anchors.fill: parent
-                visible: !styleData.selected && [_OUPUT_ICD_INDEX_COLUMN, _INPUT_ICD_COLUMN, _INPUT_ICD_INDEX_COLUMN, _DIFFERENCE_COLUMN, _DESC_COLUMN].includes(styleData.column)
+                visible: !styleData.selected || [_output_icd_INDEX_COLUMN, _INPUT_ICD_COLUMN, _INPUT_ICD_INDEX_COLUMN, _DIFFERENCE_COLUMN, _DESC_COLUMN].includes(styleData.column)
 
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
@@ -112,57 +112,58 @@ Item {
                 }
 
                 text: {
+                    //console.log("segment,", JSON.stringify(segment))
                     if (!visible) {
                         return ""
                     }
 
-                    if (styleData.column === _OUPUT_ICD_INDEX_COLUMN) {
-                        if (segment === [] || segment === undefined) {
-                            return ""
-                        }
+//                    if (styleData.column === _output_icd_INDEX_COLUMN) {
+//                        if (segment === [] || segment === undefined) {
+//                            return ""
+//                        }
 
-                        for (var j in payloads) {
-                            if (payloads[j].id === String(_bindOuputICD)) {
-                                var value = payloads[j].values[styleData.value]
-                                if (value === undefined) {
-                                    return ""
-                                }
-                                return value.name
-                            }
-                        }
-                    }
+//                        for (var j in payloads) {
+//                            if (payloads[j].id === String(_bindOuputICD)) {
+//                                var value = payloads[j].values[Number(styleData.value)]
+//                                if (value === undefined) {
+//                                    return ""
+//                                }
+//                                return value.name
+//                            }
+//                        }
+//                    }
 
-                    if (styleData.column === _INPUT_ICD_COLUMN) {
-                        if (segment === [] || segment === undefined) {
-                            return ""
-                        }
-                        for (var i in payloads) {
-                            if (payloads[i].id === styleData.value) {
-                                return payloads[i].name
-                            }
-                        }
-                    }
+//                    if (styleData.column === _INPUT_ICD_COLUMN) {
+//                        if (segment === [] || segment === undefined) {
+//                            return ""
+//                        }
+//                        for (var i in payloads) {
+//                            if (payloads[i].id === styleData.value) {
+//                                return payloads[i].name
+//                            }
+//                        }
+//                    }
 
-                    if (styleData.column === _INPUT_ICD_INDEX_COLUMN) {
-                        if (segment === [] || segment === undefined) {
-                            return ""
-                        }
-                        for (var k in payloads) {
-                            if (payloads[k].id === String(segment.bind_input_icd)) {
-                                var values = payloads[k].values[styleData.value]
-                                if (values === undefined) {
-                                    return ""
-                                }
-                                return values.name
-                            }
-                        }
-                    }
+//                    if (styleData.column === _INPUT_ICD_INDEX_COLUMN) {
+//                        if (segment === [] || segment === undefined) {
+//                            return ""
+//                        }
+//                        for (var k in payloads) {
+//                            if (payloads[k].id === String(segment.bind_input_icd)) {
+//                                var values = payloads[k].values[Number(styleData.value)]
+//                                if (values === undefined) {
+//                                    return ""
+//                                }
+//                                return values.name
+//                            }
+//                        }
+//                    }
 
-                    if (styleData.column === _DESC_COLUMN) {
-                        return styleData.value
-                    }
+//                    if (styleData.column === _DESC_COLUMN) {
+//                        return styleData.value
+//                    }
 
-                    return Number(styleData.value)
+                    return styleData.value
                 }
             }
 
@@ -195,7 +196,7 @@ Item {
                 }
             } // TextField end
 
-            // ouput_icd 中 index
+            // output_icd 中 index
             ComboBox {
                 id: typeBox
                 anchors {
@@ -203,16 +204,16 @@ Item {
                     margins: 1
                 }
 
-                visible: (styleData.column === _OUPUT_ICD_INDEX_COLUMN) && styleData.selected
+                visible: (styleData.column === _output_icd_INDEX_COLUMN) && styleData.selected
 
                 property var curIndex: {
                     // 防止页面首次加载时错误
-                    if (styleData.row === undefined || segments[styleData.row] === undefined || segments[styleData.row].ouput_icd_index === undefined) {
+                    if (styleData.row === undefined || segments[styleData.row] === undefined || segments[styleData.row].out_index === undefined) {
                         return -1
                     }
 
                     for(var i in ouputICDFieldList){
-                        if(String(segments[styleData.row].ouput_icd_index) === String(ouputICDFieldList[i].value)) {
+                        if(String(segments[styleData.row].out_index) === String(ouputICDFieldList[i].value)) {
                             return i
                         }
                     }
@@ -231,9 +232,7 @@ Item {
                     if (!visible || styleData.row === undefined || currentIndex < 0) {
                         return
                     }
-                    //console.log("发送ouput index修改", currentIndex)
                     root.setValue(styleData.row, styleData.column, currentIndex)
-                    //console.log("发送完修改信号", JSON.stringify(segments))
                 }
             }
 
@@ -286,7 +285,7 @@ Item {
 
                 property var curIndex: {
                     for(var i in inputICDFieldList){
-                        if(String(segments[styleData.row].input_icd_index) === String(inputICDFieldList[i].value)) {
+                        if(String(segments[styleData.row].in_index) === String(inputICDFieldList[i].value)) {
                             return i
                         }
                     }
@@ -344,7 +343,7 @@ Item {
         TableViewColumn {
             id: ouputICDIndexCol
             visible: true
-            role: "ouput_icd_index"
+            role: "out_index"
             title: "输出ICD中index"
             width: 160
         }
@@ -360,7 +359,7 @@ Item {
         TableViewColumn {
             id: inputICDIndexCol
             visible: true
-            role: "input_icd_index"
+            role: "in_index"
             title: "输入ICD中index"
             width: 160
         }
@@ -443,20 +442,28 @@ Item {
         segments = values.condition
 
         _device = values.device
-        _bindOuputICD = values.bind_ouput_icd
+        _bindOuputICD = values.bind_output_icd
 
         batchAdd.enabled = true
 
         table.model.clear()
         for (var i in segments) {
-            table.model.append({
-                                   "index": segments[i].index,
-                                   "ouput_icd_index": segments[i].ouput_icd_index,
-                                   "bind_input_icd": segments[i].bind_input_icd,
-                                   "input_icd_index": segments[i].input_icd_index,
-                                   "difference": segments[i].difference,
-                                   "desc": segments[i].desc
-                               })
+            var data = segments[i]
+            var inputICD = data.id
+            var keys = data.keys
+
+            for (var j in keys) {
+                var d = {
+                    //"index": segments[i].index,
+                    "out_index": keys[j].out_index,
+                    "bind_input_icd": inputICD,
+                    "in_index": keys[j].in_index,
+                    "difference": keys[j].difference,
+                    "desc": keys[j].desc
+                }
+                //console.log(JSON.stringify(d))
+                table.model.append(d)
+            }
         }
     }
 
@@ -465,11 +472,11 @@ Item {
         // console.log("add", JSON.stringify(_device))
         var info = {
             "index": String(row + 1),
-            "ouput_icd_index": "0",
+            "out_index": "0",
             // 默认绑定设备的input_icd的第一个
             "bind_input_icd": _device.input_icd[0],
-            "input_icd_index": "0",
-            "difference": 0,
+            "in_index": "0",
+            "difference": "0",
             "desc": "",
             "ouputFieldList": getFieldList()
         }
@@ -504,9 +511,9 @@ Item {
 
         var segment = root.segments[index]
         switch (column) {
-        case _OUPUT_ICD_INDEX_COLUMN:
-            segment.ouput_icd_index = String(value)
-            table.model.setProperty(index, "ouput_icd_index", String(value))
+        case _output_icd_INDEX_COLUMN:
+            segment.outindex = String(value)
+            table.model.setProperty(index, "out_index", String(value))
             break
 
         case _INPUT_ICD_COLUMN:
@@ -517,7 +524,7 @@ Item {
             break
         case _INPUT_ICD_INDEX_COLUMN:
             segment.input_icd_index = String(value)
-            table.model.setProperty(index, "input_icd_index", String(value))
+            table.model.setProperty(index, "in_index", String(value))
            break
 
         case _DIFFERENCE_COLUMN:
@@ -569,10 +576,10 @@ Item {
 
     function getOuputICDList() {
         var icd = []
-        // 遍历所有ouput,获取他们的名称
-        for (var i in _device.ouput_icd) {
+        // 遍历所有ouput icd,获取他们的名称
+        for (var i in _device.output_icd) {
             for (var j in payloads) {
-                if (String(_device.ouput_icd[i]) === String(payloads[j].id)) {
+                if (String(_device.output_icd[i]) === String(payloads[j].id)) {
                     var info = {
                         text: payloads[j].name,
                         value: payloads[j].id

@@ -70,7 +70,7 @@ ColumnLayout {
                         }
 
                         if (v["type"] === "ouput") {
-                            d["ouput_icd"] = root.devices[deviceList.currentIndex].ouput_icd
+                            d["output_icd"] = root.devices[deviceList.currentIndex].output_icd
                         }
                     }
 

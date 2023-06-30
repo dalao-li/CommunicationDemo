@@ -29,7 +29,7 @@ Column {
     property var _device
 
     property var _INPUT_ICD_COLUMN: 0
-    property var _OUPUT_ICD_COLUMN: 1
+    property var _output_icd_COLUMN: 1
     property var _ICD_NAME_COLUMN: 2
     property var _ICD_ID_COLUMN: 3
 
@@ -355,7 +355,7 @@ Column {
                     margins: 1
                 }
 
-                visible: styleData.column === _OUPUT_ICD_COLUMN
+                visible: styleData.column === _output_icd_COLUMN
 
                 checked: styleData.value
 
@@ -365,20 +365,20 @@ Column {
                         var updateValue = {}
                         // 勾选
                         if (checkedState === Qt.Checked) {
-                            if (styleData.column === _OUPUT_ICD_COLUMN) {
-                                root._device.ouput_icd.push(nowICD)
+                            if (styleData.column === _output_icd_COLUMN) {
+                                root._device.output_icd.push(nowICD)
                                 updateValue = {"opeator": "add", "type": "ouput", "icd_id": nowICD}
                             }
                         }
                         // 取消
                         else {
                             var newList = []
-                            for (var i = 0; i < root._device.ouput_icd.length; ++i) {
-                                if (root._device.ouput_icd[i] !== nowICD) {
-                                    newList.push(root._device.ouput_icd[i])
+                            for (var i = 0; i < root._device.output_icd.length; ++i) {
+                                if (root._device.output_icd[i] !== nowICD) {
+                                    newList.push(root._device.output_icd[i])
                                 }
                             }
-                            root._device.ouput_icd = newList
+                            root._device.output_icd = newList
                             updateValue = {"opeator": "del", "type": "ouput", "icd_id": nowICD}
                         }
                         root.itemChanged("icd_info", JSON.stringify(updateValue))
@@ -478,8 +478,8 @@ Column {
                             })(),
                 // 判断该行ouput icd 是否已经被选择
                 "isOuput": (()=> {
-                                for (var j in value.ouput_icd) {
-                                    if (value.ouput_icd[j] === payloads[i].id) {
+                                for (var j in value.output_icd) {
+                                    if (value.output_icd[j] === payloads[i].id) {
                                         return true
                                     }
                                 }

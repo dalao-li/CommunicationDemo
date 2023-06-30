@@ -17,7 +17,7 @@ Item {
 
     property var _action: {
         "device": devices[0],
-        "bind_ouput_icd": devices[0].ouput_icd[0]
+        "bind_output_icd": devices[0].output_icd[0]
     }
 
     property int defaultHeight: 60
@@ -108,15 +108,15 @@ Item {
 
             property var icdList: {
                 if (_action.device === undefined) {
-                    return
+                    return []
                 }
-
-                getOuputICDList(_action.device.device_id)
+                return getOuputICDList(_action.device.device_id)
             }
 
             property var curIndex: {
                 for (var i in icdList) {
-                    if (_action.bind_ouput_icd === icdList[i].value) {
+                    console.log("_action.bind_output_icd", _action.bind_output_icd, "icdList[i].value", icdList[i].value)
+                    if (_action.bind_output_icd === icdList[i].value) {
                         return i
                     }
                 }
@@ -137,8 +137,8 @@ Item {
                 }
 
                 if (root._action) {
-                    root._action.bind_ouput_icd = payloads[currentIndex].id
-                    root.itemChanged("bind_ouput_icd", payloads[currentIndex].id)
+                    root._action.bind_output_icd = payloads[currentIndex].id
+                    root.itemChanged("bind_output_icd", payloads[currentIndex].id)
                 }
             }
         }
@@ -165,7 +165,6 @@ Item {
 
     function load(value) {
         _action = value
-
         name.text = value.name
 
         for (var i in devices) {
@@ -189,10 +188,10 @@ Item {
             }
         }
 
-        // 遍历所有ouput_icd, 获取他们的名称
-        for (var i in device.ouput_icd) {
+        // 遍历所有output_icd, 获取他们的名称
+        for (var i in device.output_icd) {
             for (var j in payloads) {
-                if (String(device.ouput_icd[i]) === String(payloads[j].id)) {
+                if (String(device.output_icd[i]) === String(payloads[j].id)) {
                     var info = {
                         text: payloads[j].name,
                         value: payloads[j].id

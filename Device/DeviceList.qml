@@ -1,40 +1,4 @@
 /*
- *                                                     __----~~~~~~~~~~~------___
- *                                    .  .   ~~//====......          __--~ ~~
- *                    -.            \_|//     |||\\  ~~~~~~::::... /~
- *                 ___-==_       _-~o~  \/    |||  \\            _/~~-
- *         __---~~~.==~||\=_    -_--~/_-~|-   |\\   \\        _/~
- *     _-~~     .=~    |  \\-_    '-~7  /-   /  ||    \      /
- *   .~       .~       |   \\ -_    /  /-   /   ||      \   /
- *  /  ____  /         |     \\ ~-_/  /|- _/   .||       \ /
- *  |~~    ~~|--~~~~--_ \     ~==-/   | \~--===~~        .\
- *           '         ~-|      /|    |-~\~~       __--~~
- *                       |-~~-_/ |    |   ~\_   _-~            /\
- *                            /  \     \__   \/~                \__
- *                        _--~ _/ | .-~~____--~-/                  ~~==.
- *                       ((->/~   '.|||' -_|    ~~-/ ,              . _||
- *                                  -_     ~\      ~~---l__i__i__i--~~_/
- *                                  _-~-__   ~)  \--______________--~~
- *                                //.-~~~-~_--~- |-------~~~~~~~~
- *                                       //.-~~~--\
- *                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * 
- *                               神兽保佑            永无BUG
- */
-
-/*
- *           佛曰:  
- *                   写字楼里写字间，写字间里程序员；  
- *                   程序人员写程序，又拿程序换酒钱。  
- *                   酒醒只在网上坐，酒醉还来网下眠；  
- *                   酒醉酒醒日复日，网上网下年复年。  
- *                   但愿老死电脑间，不愿鞠躬老板前；  
- *                   奔驰宝马贵者趣，公交自行程序员。  
- *                   别人笑我忒疯癫，我笑自己命太贱；  
- *                   不见满街漂亮妹，哪个归得程序员？
- */
-
-/*
  * @Description:
  * @Version: 1.0
  * @Author: liyuanhao
@@ -135,7 +99,7 @@ ListView {
                     "rfm2g_id": "",
                     "address": "",
                     "input_icd": [],
-                    "ouput_icd": [],
+                    "output_icd": [],
                 }
                 root.devices.push(info)
                 root.model.append(info)
@@ -202,7 +166,6 @@ ListView {
     }
 
     // 生成随机ID
-    
     function createID() {
         const MAX = 65535
         const MIN = 0
@@ -232,7 +195,20 @@ ListView {
         deviceJSONFile = Excutor.query({"read": path})
 
         var data = deviceJSONFile["monitor_device_type"]
+        var deviceICDList = deviceJSONFile["DeviceICDList"]
         for (var i in data) {
+            var icdList = deviceICDList[data[i].device_id]
+            var inputList = []
+            var ouputList = []
+            for (var j in icdList) {
+                if (icdList[j].type === "input") {
+                    inputList.push(icdList[j].icd_id)
+                }
+                if (icdList[j].type === "output") {
+                    ouputList.push(icdList[j].icd_id)
+                }
+            }
+
             var info = {
                 "type": data[i].type,
                 "device_id": data[i].device_id,
@@ -254,8 +230,8 @@ ListView {
                 "rfm2g_id": data[i].rfm2g_id,
                 "address": data[i].address,
                 // 附加信息
-                "input_icd": [],
-                "ouput_icd": [],
+                "input_icd": inputList,
+                "output_icd": ouputList,
             }
 
             root.devices.push(info)
@@ -306,8 +282,8 @@ ListView {
             for (var x in root.devices[j].input_icd) {
                 bindICD.push({"icd_id": root.devices[j].input_icd[x], "type": "input"})
             }
-            for (var y in root.devices[j].ouput_icd) {
-                bindICD.push({"icd_id": root.devices[j].ouput_icd[y], "type": "ouput"})
+            for (var y in root.devices[j].output_icd) {
+                bindICD.push({"icd_id": root.devices[j].output_icd[y], "type": "ouput"})
             }
             deviceICDList[root.devices[j].device_id] = bindICD
         }

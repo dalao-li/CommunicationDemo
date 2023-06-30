@@ -245,14 +245,12 @@ Item {
 
                 onClicked: {
                     var component = Qt.createComponent("SetEnumData.qml")
-                    // console.debug("Error:"+ component.errorString() )
                     if (component.status === Component.Ready) {
                         var windows = component.createObject()
                         windows.show()
                         windows.rootPage = root
 
                         if (segments[styleData.row].meaning) {
-                            //console.log("存在枚举", JSON.stringify(segments[styleData.row].meaning))
                             windows.setEunmInfos(segments[styleData.row].meaning)
                         }
                     }
@@ -638,5 +636,10 @@ Item {
                           "path": file,
                           "content": Framework.formatJSON(JSON.stringify(config))
                       })
+    }
+
+    function clear() {
+        table.model.clear()
+        root.segments = []
     }
 }

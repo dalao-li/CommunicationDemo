@@ -64,17 +64,19 @@ ColumnLayout {
                 }
 
                 onItemChanged: {
+                    var d = {}
                     if (listComponent.currentIndex < 0) {
                         return
                     }
 
                     if (id === "name") {
-                        listComponent.model.set(listComponent.currentIndex, {"name": value})
+                        d = {"name": value}
                     }
 
                     if (id === "id") {
-                        listComponent.model.set(listComponent.currentIndex, {"id": value})
+                        d = {"id": value}
                     }
+                    listComponent.model.set(listComponent.currentIndex, d)
                 }
             }
 
@@ -93,7 +95,6 @@ ColumnLayout {
     }
 
     function load(config) {
-        //console.log("-->", JSON.stringify(config))
         listComponent.model.clear()
         for (var i = 0; i < config.length; ++i) {
             var payload = config[i]
@@ -103,7 +104,6 @@ ColumnLayout {
         listComponent.currentIndex = 0
 
         var payloadValue = getPayload(listComponent.currentIndex, listComponent.busType)
-        //console.log("-->", JSON.stringify(payloadValue))
         detailComponent.load(payloadValue)
         segmentComponent.load(payloadValue.values)
     }
@@ -140,17 +140,20 @@ ColumnLayout {
 
     // 按照总线类型bus更改index的载荷数据
     function setPayload(index, busType, value) {
-        if (!busType)
+        if (!busType) {
             return root.payloads[index] = value
+        }
 
         var counter = -1
         for (var i=0; i<root.payloads.length; ++i) {
             var payload = root.payloads[i]
-            if (payload.bus_type === busType)
+            if (payload.bus_type === busType) {
                 ++counter
+            }
 
-            if (index === counter)
+            if (index === counter) {
                 return root.payloads[i] = value
+            }
         }
     }
 }
