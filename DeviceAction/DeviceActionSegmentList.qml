@@ -468,8 +468,7 @@ Item {
                 "difference": segments[i].difference,
                 "desc": segments[i].desc
             }
-
-            console.log("segments", JSON.stringify(segments))
+            //console.log("segments", JSON.stringify(segments))
             table.model.append(info)
         }
     }
