@@ -87,7 +87,7 @@ Item {
 
         TextField {
             id: typeNameField
-            width: 200
+            width: 100
             height: 25
             onTextChanged: {
                 if (root._status) {

@@ -232,7 +232,7 @@ ApplicationWindow {
     FileDialog {
         id: importFileDialog
         title: "请选择文件"
-        nameFilters: ["payloads files (*.payloads)", "json files (*.json)", "All files (*)"]
+        nameFilters: ["json files (*.json)", "payloads files (*.payloads)", "All files (*)"]
         onAccepted: {
             var fpath = String(importFileDialog.fileUrls)
             path = fpath.substring(8)

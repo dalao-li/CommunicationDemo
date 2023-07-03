@@ -58,26 +58,32 @@ ColumnLayout {
                         return
                     }
 
-                    var d = {}
-                    if (["control_type", "bus_type"].includes(id)) {
-                        d[id] = Number(value)
+                    var curIndex = deviceList.currentIndex
+
+                    if (id === "control_type") {
+                        deviceList.model.set(curIndex, {"control_type": Number(value)})
+                        return
                     }
 
-                    else if (id === "icd_info") {
-                        var v = JSON.parse(value)
-                        if (v["type"] === "input") {
-                            d["input_icd"] = root.devices[deviceList.currentIndex].input_icd
+                    if (id === "bus_type") {
+                        deviceList.model.set(curIndex, {"bus_type": Number(value)})
+                        return
+                    }
+
+                    if (id === "update_icd") {
+                        var info = JSON.parse(value)
+                        if (info["type"] === "input") {
+                            root.devices[curIndex].input_icd = info["icdList"]
+                            deviceList.model.set(curIndex, {"input_icd": info["icdList"]})
                         }
-
-                        if (v["type"] === "ouput") {
-                            d["output_icd"] = root.devices[deviceList.currentIndex].output_icd
+                        if (info["type"] === "output") {
+                            root.devices[curIndex].output_icd = info["icdList"]
+                            deviceList.model.set(curIndex, {"output_icd": info["icdList"]})
                         }
+                        return
                     }
 
-                    else {
-                        d[id] = value
-                    }
-                    deviceList.model.set(deviceList.currentIndex, d)
+                    deviceList.model.set(curIndex, {id: value})
                 }
             }
         }

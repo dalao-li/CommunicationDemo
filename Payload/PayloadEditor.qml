@@ -64,19 +64,19 @@ ColumnLayout {
                 }
 
                 onItemChanged: {
-                    var d = {}
+                    var data = {}
                     if (listComponent.currentIndex < 0) {
                         return
                     }
 
                     if (id === "name") {
-                        d = {"name": value}
+                        data = {"name": value}
                     }
 
                     if (id === "id") {
-                        d = {"id": value}
+                        data = {"id": value}
                     }
-                    listComponent.model.set(listComponent.currentIndex, d)
+                    listComponent.model.set(listComponent.currentIndex, data)
                 }
             }
 
@@ -98,14 +98,16 @@ ColumnLayout {
         listComponent.model.clear()
         for (var i = 0; i < config.length; ++i) {
             var payload = config[i]
-            payloads.push(payload)
+            //console.log("payload", JSON.stringify(payload))
+            root.payloads.push(payload)
             listComponent.model.append({name: payload.name})
         }
         listComponent.currentIndex = 0
 
-        var payloadValue = getPayload(listComponent.currentIndex, listComponent.busType)
-        detailComponent.load(payloadValue)
-        segmentComponent.load(payloadValue.values)
+        //var payloadValue = getPayload(listComponent.currentIndex, listComponent.busType)
+//        var data = root.payloads[]
+//        detailComponent.load(payloadValue)
+//        segmentComponent.load(payloadValue.values)
     }
 
 

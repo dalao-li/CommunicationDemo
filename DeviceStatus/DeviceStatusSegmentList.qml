@@ -17,7 +17,7 @@ import "../Button"
 Item {
     id: root
     property var segments: []
-    property var _device
+    property var _device: devices[0]
 
     // 列枚举名
     property var _BIND_ICD_COLUMN: 0
@@ -29,6 +29,7 @@ Item {
 
     // icd列表
     property var icdList: {
+        //console.log("getICDList", JSON.stringify(getICDList()))
         return getICDList()
     }
 
@@ -43,9 +44,9 @@ Item {
             top: parent.top
         }
 
-        color: "#8E8E8E"
-
         height: 32
+
+        color: "#8E8E8E"
 
         Label {
             anchors.centerIn: parent
@@ -85,7 +86,7 @@ Item {
             id: bindICD
             visible: true
             role: "bind_icd"
-            title: "绑定ICD"
+            title: "绑定输出ICD"
             width: 80
         }
 
@@ -135,14 +136,6 @@ Item {
 
         // 如何绘制每一个单元格
         itemDelegate: Item {
-            // field 列表
-            property var fieldList: {
-                if (styleData.row === undefined || segments[styleData.row] === undefined || segments[styleData.row].bind_icd === undefined) {
-                    return []
-                }
-                return getFieldList(table.model.get(styleData.row).bind_icd)
-            }
-
             Label {
                 id: label
                 anchors.fill: parent
@@ -233,6 +226,10 @@ Item {
                 visible: styleData.selected && styleData.column === _BIND_ICD_COLUMN
 
                 property var curIndex: {
+                    if (styleData.row === undefined || segments[styleData.row] === undefined || segments[styleData.row].bind_icd === undefined) {
+                        return -1
+                    }
+
                     for (var i in icdList) {
                         if (String(segments[styleData.row].bind_icd) === icdList[i].value) {
                             return i
@@ -254,7 +251,7 @@ Item {
                         return
                     }
                     // 更新当前bind_icd
-                    root.setValue(styleData.row, styleData.column, payloads[currentIndex].id)
+                    root.setValue(styleData.row, styleData.column, icdList[currentIndex].value)
                 }
             }
 
@@ -269,6 +266,14 @@ Item {
                 textRole: "text"
 
                 visible: styleData.selected && styleData.column === _FIELD_INDEX_COLUMN
+
+                // field 列表
+                property var fieldList: {
+                    if (styleData.row === undefined || segments[styleData.row] === undefined || segments[styleData.row].bind_icd === undefined) {
+                        return []
+                    }
+                    return getFieldList(segments[styleData.row].bind_icd)
+                }
 
                 property var curIndex: {
                     for(var i in fieldList){
@@ -317,7 +322,6 @@ Item {
                         win.rootPage = root
 
                         if (segments[styleData.row].status_list) {
-                            //console.log("加载=>", JSON.stringify(segments[styleData.row].status_list))
                             win.setEunmInfos(segments[styleData.row].status_list)
                         }
                     }
@@ -382,16 +386,13 @@ Item {
     // 加载列表
     function load(values) {
         segments = values.monitor_status
-        // 设置device信息
         _device = values.device
-        console.log("_device", JSON.stringify(_device))
 
         batchAdd.enabled = true
         table.model.clear()
         for (var i in segments) {
             table.model.append({
                                    "type_id": segments[i].type_id,
-                                   //
                                    "bind_icd": segments[i].bind_icd,
                                    // 在payloads中, 对应icd的values中 name组的下标
                                    "field_index": segments[i].field_index,
@@ -412,7 +413,7 @@ Item {
     function addSegment(row) {
         var info = {
             "type_id": row + 1,
-            // 默认绑第一个icd
+            // 默认绑首个icd
             "bind_icd": _device.output_icd[0],
             // field index默认为工程0
             "field_index": 0,
@@ -489,18 +490,14 @@ Item {
 
     function getICDList() {
         if (_device.output_icd === undefined) {
-            //console.log("_device.output_icd is undefined")
             return []
         }
 
         if (_device.output_icd === []) {
-            //console.log("_device.output_icd is []")
             return []
         }
-        //console.log("_device.output_icd is", _device.output_icd)
 
         var icd = []
-        // 遍历所有output_icd,获取他们的名称
         for (var i in _device.output_icd) {
             for (var j in payloads) {
                 if (String(_device.output_icd[i]) === String(payloads[j].id)) {

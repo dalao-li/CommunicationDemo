@@ -100,6 +100,102 @@ Item {
 
         frameVisible: false
 
+        TableViewColumn {
+            id: nameCol
+            visible: table.columsVisible[0]
+            role: "name"
+            title: "名称"
+            width: 160
+        }
+
+        TableViewColumn {
+            id: offsetCol
+            visible: table.columsVisible[1]
+            role: "offset"
+            title: "偏移"
+            width: 80
+        }
+
+        TableViewColumn {
+            id: sizeCol
+            visible: table.columsVisible[2]
+            role: "size"
+            title: "大小"
+            width: 80
+        }
+
+        TableViewColumn {
+            id: typeCol
+            visible: table.columsVisible[3]
+            role: "type"
+            title: "类型"
+            width: 100
+        }
+
+        TableViewColumn {
+            id: maskCol
+            visible: table.columsVisible[4]
+            role: "mask"
+            title: "掩码"
+            width: 100
+        }
+
+        TableViewColumn {
+            id: orderCol
+            visible: table.columsVisible[5]
+            role: "order"
+            title: "大/小端"
+            width: 80
+        }
+
+        TableViewColumn {
+            id: dimCol
+            visible: table.columsVisible[6]
+            role: "dim"
+            title: "量纲"
+            width: 80
+        }
+
+        TableViewColumn {
+            id: ampCol
+            visible: table.columsVisible[7]
+            role: "amp"
+            title: "幅值"
+            width: 80
+        }
+
+        TableViewColumn {
+            id: bitstartCol
+            visible: table.columsVisible[8] && 0
+            role: "bitstart"
+            title: "bitstart"
+            width: 80
+        }
+
+        TableViewColumn {
+            id: bitlengthCol
+            visible: table.columsVisible[9] && 0
+            role: "bitlength"
+            title: "bitlength"
+            width: 80
+        }
+
+        TableViewColumn {
+            id: descCol
+            visible: table.columsVisible[10]
+            role: "desc"
+            title: "描述"
+            width: 250
+        }
+
+        TableViewColumn {
+            id: enumdataCol
+            visible: table.columsVisible[11]
+            role: "meaning"
+            title: "枚举值"
+            width: 80
+        }
+
         // 如何绘制每一个单元格
         itemDelegate: Item {
             Label {
@@ -251,6 +347,7 @@ Item {
                         windows.rootPage = root
 
                         if (segments[styleData.row].meaning) {
+                            console.log("segments[styleData.row].meaning", JSON.stringify(segments[styleData.row].meaning))
                             windows.setEunmInfos(segments[styleData.row].meaning)
                         }
                     }
@@ -265,25 +362,32 @@ Item {
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
 
+                property var select: {
+                    if (styleData.value === undefined) {
+                        return ""
+                    }
+                    return styleData.value
+                }
+
                 text: {
-                    if (!visible || styleData.value === undefined) {
+                    if (!visible || select === undefined) {
                         return ""
                     }
 
                     if (styleData.column === _NAME_COLUMN || styleData.column === _DESC_COLUMN) {
-                        return String(styleData.value)
+                        return select
                     }
 
                     if (styleData.column === _TYPE_COLUMN) {
                         var dts = ["无符号整数", "单精度浮点", "双精度浮点", "字符串", "枚举", "有符号整数", "字符", "ASCII", "UNICODE"]
-                        return dts[Number(styleData.value)]
+                        return dts[Number(select)]
                     }
 
                     if (styleData.column === _ORDER_COLUMN) {
-                        return Number(styleData.value) === 0 ? "小端" : "大端"
+                        return Number(select) === 0 ? "小端" : "大端"
                     }
 
-                    return String(JSON.stringify(styleData.value))
+                    return String(JSON.stringify(select))
                 }
             }
         } // itemDelegate end
@@ -292,102 +396,6 @@ Item {
             var apppath = Excutor.query({ "apppath": "" })
             var config = Excutor.query({ "read": apppath + "/config/persistence.soft" })
             return config.payload_editor.segments
-        }
-
-        TableViewColumn {
-            id: nameCol
-            visible: table.columsVisible[0]
-            role: "name"
-            title: "名称"
-            width: 160
-        }
-
-        TableViewColumn {
-            id: offsetCol
-            visible: table.columsVisible[1]
-            role: "offset"
-            title: "偏移"
-            width: 80
-        }
-
-        TableViewColumn {
-            id: sizeCol
-            visible: table.columsVisible[2]
-            role: "size"
-            title: "大小"
-            width: 80
-        }
-
-        TableViewColumn {
-            id: typeCol
-            visible: table.columsVisible[3]
-            role: "type"
-            title: "类型"
-            width: 100
-        }
-
-        TableViewColumn {
-            id: maskCol
-            visible: table.columsVisible[4]
-            role: "mask"
-            title: "掩码"
-            width: 100
-        }
-
-        TableViewColumn {
-            id: orderCol
-            visible: table.columsVisible[5]
-            role: "order"
-            title: "大/小端"
-            width: 80
-        }
-
-        TableViewColumn {
-            id: dimCol
-            visible: table.columsVisible[6]
-            role: "dim"
-            title: "量纲"
-            width: 80
-        }
-
-        TableViewColumn {
-            id: ampCol
-            visible: table.columsVisible[7]
-            role: "amp"
-            title: "幅值"
-            width: 80
-        }
-
-        TableViewColumn {
-            id: bitstartCol
-            visible: table.columsVisible[8] && 0
-            role: "bitstart"
-            title: "bitstart"
-            width: 80
-        }
-
-        TableViewColumn {
-            id: bitlengthCol
-            visible: table.columsVisible[9] && 0
-            role: "bitlength"
-            title: "bitlength"
-            width: 80
-        }
-
-        TableViewColumn {
-            id: descCol
-            visible: table.columsVisible[10]
-            role: "desc"
-            title: "描述"
-            width: 250
-        }
-
-        TableViewColumn {
-            id: enumdataCol
-            visible: table.columsVisible[11]
-            role: "meaning"
-            title: "枚举值"
-            width: 80
         }
 
         model: ListModel {}
@@ -458,7 +466,6 @@ Item {
         // 按共享传递
         segments = values
         for (var i in values) {
-            //console.log("data = ", JSON.stringify(values[i]))
             table.model.append({
                                    "index": values[i].index,
                                    "name": values[i].name,
@@ -522,7 +529,9 @@ Item {
     }
 
     function getEnumdata(meaning) {
+        console.log("meaning", JSON.stringify(meaning))
         segments[table.currentRow].meaning = meaning
+        updateValue(table.currentRow, _MEANING_COLUMN, meaning)
     }
 
     // 修改某行某列的值

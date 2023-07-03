@@ -17,10 +17,6 @@ import DesktopControls 0.1 as Desktop
 
 Column {
     id: root
-//    anchors.left: parent.left;
-//    anchors.leftMargin: 4;
-//    anchors.bottom: parent.bottom;
-//    anchors.bottomMargin: 4;
     width: 1000
     height: 1500
     spacing: 4;
@@ -29,7 +25,7 @@ Column {
     property var _device
 
     property var _INPUT_ICD_COLUMN: 0
-    property var _output_icd_COLUMN: 1
+    property var _OUTPUT_ICD_COLUMN: 1
     property var _ICD_NAME_COLUMN: 2
     property var _ICD_ID_COLUMN: 3
 
@@ -38,10 +34,6 @@ Column {
     // 标题
     Rectangle {
         id: title
-//        anchors {
-//            left: parent.left
-//            right: parent.right
-//        }
         width: parent.width
         height: 32
         color: "#e5e5e5"
@@ -56,13 +48,6 @@ Column {
         id: infoList
         width: parent.width
         height: 250
-
-//        anchors {
-//            left: parent.left
-//            leftMargin: 10
-//            top: title.bottom
-//            topMargin: 10
-//        }
 
         columns: 2
         rowSpacing: 15
@@ -252,17 +237,9 @@ Column {
     Rectangle {
         id: icdLabel
         width: parent.width
-//        anchors {
-//            left: parent.left
-//            right: parent.right
-//            top: infoList.bottom
-//            topMargin: 10
-
-//        }
+        height: 32
 
         color: "#8E8E8E"
-
-        height: 32
 
         Label {
             anchors.centerIn: parent
@@ -273,119 +250,9 @@ Column {
     TableView {
         id: table
         width: parent.width
-        height: 1000
-//        anchors {
-//            top: icdLabel.bottom
-//            left: parent.left
-//            right: parent.right
-//            bottom: parent.bottom
-//        }
+        height: 800
 
         frameVisible: false
-
-        // 如何绘制每一个单元格
-        itemDelegate: Item {
-            Label {
-                id: field
-                anchors {
-                    fill: parent
-                    margins: 1
-                }
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-
-                visible: [_ICD_NAME_COLUMN, _ICD_ID_COLUMN].includes(styleData.column)
-
-                text: {
-                    if (visible) {
-                        return styleData.value
-                    }
-                    return ""
-                }
-            } // TextField end
-
-//            CheckBox {
-//                id: icdSelect
-//            }
-
-            // input icd 选择
-            CheckBox {
-                id: inputCheck
-                anchors {
-                    fill: parent
-                    margins: 1
-                }
-
-                checked: styleData.value
-
-                visible: styleData.column === _INPUT_ICD_COLUMN
-
-                onClicked: {
-                    if (root._device) {
-                        // 勾选
-                        var updateValue = {}
-                        var nowICD = table.model.get(styleData.row).icdValue
-                        if (checkedState === Qt.Checked) {
-                            root._device.input_icd.push(nowICD)
-                            updateValue = {"opeator": "add", "type": "input", "icd_id":nowICD}
-                        }
-
-                        // 取消
-                        else {
-                            var newList = []
-                            for (var i = 0; i < root._device.input_icd.length; ++i) {
-                                if (root._device.input_icd[i] !== nowICD) {
-                                    newList.push(root._device.input_icd[i])
-                                }
-                            }
-                            root._device.input_icd = newList
-                            updateValue = {"opeator": "del", "type": "input", "icd_id": nowICD}
-                        }
-
-                        root.itemChanged("icd_info", JSON.stringify(updateValue))
-                    }
-                }
-            } // CheckBox end
-
-            // ouput icd选择
-            CheckBox {
-                id: ouputCheck
-                anchors {
-                    fill: parent
-                    margins: 1
-                }
-
-                visible: styleData.column === _output_icd_COLUMN
-
-                checked: styleData.value
-
-                onClicked: {
-                    if (root._device) {
-                        var nowICD = table.model.get(styleData.row).icdValue
-                        var updateValue = {}
-                        // 勾选
-                        if (checkedState === Qt.Checked) {
-                            if (styleData.column === _output_icd_COLUMN) {
-                                root._device.output_icd.push(nowICD)
-                                updateValue = {"opeator": "add", "type": "ouput", "icd_id": nowICD}
-                            }
-                        }
-                        // 取消
-                        else {
-                            var newList = []
-                            for (var i = 0; i < root._device.output_icd.length; ++i) {
-                                if (root._device.output_icd[i] !== nowICD) {
-                                    newList.push(root._device.output_icd[i])
-                                }
-                            }
-                            root._device.output_icd = newList
-                            updateValue = {"opeator": "del", "type": "ouput", "icd_id": nowICD}
-                        }
-                        root.itemChanged("icd_info", JSON.stringify(updateValue))
-                    }
-                }
-            }
-        } // itemDelegate end
 
         TableViewColumn {
             id: isInput
@@ -420,6 +287,110 @@ Column {
         }
 
         model: ListModel {}
+
+        // 如何绘制每一个单元格
+        itemDelegate: Item {
+            Label {
+                id: field
+                anchors {
+                    fill: parent
+                    margins: 1
+                }
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+
+                visible: [_ICD_NAME_COLUMN, _ICD_ID_COLUMN].includes(styleData.column)
+
+                text: {
+                    if (visible) {
+                        return styleData.value
+                    }
+                    return ""
+                }
+            } // TextField end
+
+            // input icd 选择
+            CheckBox {
+                id: inputCheck
+                anchors {
+                    fill: parent
+                    margins: 1
+                }
+
+                property var select: styleData.value
+
+                checked: select
+
+                visible: styleData.column === _INPUT_ICD_COLUMN
+
+                onClicked: {
+                    if (root._device) {
+                        var updateValue = {}
+                        var nowICD = table.model.get(styleData.row).icdValue
+                        // 勾选
+                        if (checkedState === Qt.Checked) {
+                            root._device.input_icd.push(nowICD)
+                        }
+
+                        // 取消
+                        else {
+                            var index = (()=>{
+                                             for (var i in root._device.input_icd) {
+                                                 if (root._device.input_icd[i] === nowICD) {
+                                                     return i
+                                                 }
+                                             }
+                                             return -1
+                                         })()
+                            root._device.input_icd.splice(index, 1)
+                        }
+
+                        root.itemChanged("update_icd",
+                                         JSON.stringify({"type": "input", "icdList": root._device.input_icd}))
+                    }
+                }
+            } // CheckBox end
+
+            // ouput icd选择
+            CheckBox {
+                id: ouputCheck
+                anchors {
+                    fill: parent
+                    margins: 1
+                }
+
+                visible: styleData.column === _OUTPUT_ICD_COLUMN
+
+                property var select: styleData.value
+
+                checked: select
+
+                onClicked: {
+                    if (root._device) {
+                        var nowICD = table.model.get(styleData.row).icdValue
+                        // 勾选
+                        if (checkedState === Qt.Checked) {
+                            root._device.output_icd.push(nowICD)
+                        }
+                        // 取消
+                        else {
+                            var index = (()=>{
+                                             for (var i in root._device.output_icd) {
+                                                 if (root._device.output_icd[i] === nowICD) {
+                                                     return i
+                                                 }
+                                             }
+                                             return -1
+                                         })()
+                            root._device.output_icd.splice(index, 1)
+                        }
+
+                        root.itemChanged("update_icd",
+                                         JSON.stringify({"type": "output", "icdList": root._device.output_icd}))
+                    }
+                }
+            }
+        } // itemDelegate end
 
         // 行背景
         rowDelegate: Item {
@@ -466,29 +437,15 @@ Column {
         table.model.clear()
         // 查询当前所有icd
         for (var i in payloads) {
-            var d = {
-                // 判断该行input icd 是否已经被选择
-                "isInput": (()=> {
-                                for (var j in value.input_icd) {
-                                    if (value.input_icd[j] === payloads[i].id) {
-                                        return true
-                                    }
-                                }
-                                return false
-                            })(),
-                // 判断该行ouput icd 是否已经被选择
-                "isOuput": (()=> {
-                                for (var j in value.output_icd) {
-                                    if (value.output_icd[j] === payloads[i].id) {
-                                        return true
-                                    }
-                                }
-                                return false
-                            })(),
+            var data = {
+                // 判断该行input icd 是否被选择
+                "isInput": value.input_icd.includes(payloads[i].id),
+                // 判断该行ouput icd 是否被选择
+                "isOuput": value.output_icd.includes(payloads[i].id),
                 "icdName": payloads[i].name,
                 "icdValue": String(payloads[i].id),
             }
-            table.model.append(d)
+            table.model.append(data)
         }
     }
 }

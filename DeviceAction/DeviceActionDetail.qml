@@ -17,7 +17,7 @@ Item {
 
     property var _action: {
         "device": devices[0],
-        "bind_output_icd": devices[0].output_icd[0]
+        "bind_output_icd": devices[0].input_icd[0]
     }
 
     property int defaultHeight: 60
@@ -83,7 +83,27 @@ Item {
 
             model: devices
 
+            property var curIndex: {
+                for (var i in devices) {
+                    if (_action.device.device_id === devices[i].device_id) {
+                        return i
+                    }
+                }
+                return -1
+            }
+
+            currentIndex: curIndex
+
+            onCurIndexChanged: {
+                //console.log("action device currIndex = ", curIndex)
+                currentIndex = curIndex
+            }
+
             onCurrentIndexChanged: {
+                if (currentIndex < 0) {
+                    return
+                }
+
                 if (root._action) {
                     root._action.device = devices[currentIndex]
                     root.itemChanged("device", JSON.stringify(devices[currentIndex]))
@@ -91,9 +111,9 @@ Item {
             }
         }
 
-        // ouputICD信息
+        // input ICD信息
         Label {
-            text: "绑定输出ICD"
+            text: "绑定输入ICD"
             height: 25
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
@@ -107,16 +127,19 @@ Item {
             textRole: "text"
 
             property var icdList: {
+                if (_action === undefined) {
+                    return []
+                }
+
                 if (_action.device === undefined) {
                     return []
                 }
-                return getOuputICDList(_action.device.device_id)
+                return getInputICDList()
             }
 
             property var curIndex: {
                 for (var i in icdList) {
-                    console.log("_action.bind_output_icd", _action.bind_output_icd, "icdList[i].value", icdList[i].value)
-                    if (_action.bind_output_icd === icdList[i].value) {
+                    if (_action.bind_input_icd === icdList[i].value) {
                         return i
                     }
                 }
@@ -128,6 +151,7 @@ Item {
             currentIndex: curIndex
 
             onCurIndexChanged: {
+                //console.log("action icd currIndex = ", curIndex)
                 currentIndex = curIndex
             }
 
@@ -137,8 +161,9 @@ Item {
                 }
 
                 if (root._action) {
-                    root._action.bind_output_icd = payloads[currentIndex].id
-                    root.itemChanged("bind_output_icd", payloads[currentIndex].id)
+                    //console.log("当前action bind_input_icd", icdList[currentIndex].id)
+                    root._action.bind_input_icd = icdList[currentIndex].id
+                    root.itemChanged("bind_input_icd", icdList[currentIndex].id)
                 }
             }
         }
@@ -164,8 +189,13 @@ Item {
     }
 
     function load(value) {
+        //console.log("ActionDetail ", JSON.stringify(value))
         _action = value
-        name.text = value.name
+        name.text = _action.name
+
+        if (value.device === undefined) {
+            return
+        }
 
         for (var i in devices) {
             if (value.device.device_id === devices[i].device_id) {
@@ -175,31 +205,23 @@ Item {
         }
     }
 
-    function getOuputICDList(device_id) {
+    function getInputICDList() {
         if (_action === undefined || _action.device === undefined) {
             return []
         }
 
-        var icd = []
-        for (var i in devices) {
-            if (devices[i].device_id === device_id) {
-                var device =  devices[i]
-                break
-            }
-        }
-
-        // 遍历所有output_icd, 获取他们的名称
-        for (var i in device.output_icd) {
+        var icdList = []
+        for (var i in _action.device.input_icd) {
             for (var j in payloads) {
-                if (String(device.output_icd[i]) === String(payloads[j].id)) {
+                if (String(_action.device.input_icd[i]) === String(payloads[j].id)) {
                     var info = {
                         text: payloads[j].name,
                         value: payloads[j].id
                     }
-                    icd.push(info)
+                    icdList.push(info)
                 }
             }
         }
-        return icd
+        return icdList
     }
 }

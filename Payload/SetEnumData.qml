@@ -23,8 +23,8 @@ Window {
 
     property var rootPage
 
-    property var __ENUM_NAME_COLUMN: 0
-    property var __ENUM_DATA_COLUMN: 1
+    property var _NAME_COLUMN: 0
+    property var _DATA_COLUMN: 1
 
     signal itemChanged
     signal enumSave
@@ -37,14 +37,12 @@ Window {
     title: qsTr("枚举值设置")
 
     Item {
-        //        id:root
         anchors {
             fill: parent
         }
 
         Rectangle {
             id: title
-
             anchors {
                 left: parent.left
                 right: parent.right
@@ -68,7 +66,16 @@ Window {
 
                 onClicked: {
                     if (table.rowCount > 0) {
-                        rootPage.getEnumdata(enumInfos)
+                        console.log("保存前", JSON.stringify(enumInfos))
+                        // 处理输出{"enumname":"FASDFADS","enumdata":"123"} 为 {"FASDFADS": "123"}
+                        var meaning = {}
+                        for (var i in enumInfos) {
+                            var key = enumInfos[i].enumname
+                            var value = enumInfos[i].enumdata
+                            meaning[key] = value
+                        }
+
+                        rootPage.getEnumdata(meaning)
                     }
                 }
             }
@@ -80,6 +87,7 @@ Window {
                     verticalCenter: parent.verticalCenter
                 }
 
+                // 增加
                 BatchAddButton {
                     id: batchAdd
                     enabled: true
@@ -106,32 +114,8 @@ Window {
 
             frameVisible: false
 
-            itemDelegate: Item {
-                TextField {
-                    id: field
-                    anchors {
-                        fill: parent
-                        margins: 1
-                    }
-
-                    visible: styleData.column === __ENUM_NAME_COLUMN || styleData.column === __ENUM_DATA_COLUMN
-
-                    text: styleData.value
-
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
-
-                    onTextChanged: {
-                        if (!visible) {
-                            return
-                        }
-                        updateValue(styleData.row, styleData.column, field.text)
-                    }
-                }
-            }
-
             TableViewColumn {
-                id: enumnameCol
+                id: nameColumn
                 visible: true
                 role: "enumname"
                 title: "名称"
@@ -139,7 +123,7 @@ Window {
             }
 
             TableViewColumn {
-                id: enumdataCol
+                id: dataColumn
                 visible: true
                 role: "enumdata"
                 title: "数值"
@@ -148,6 +132,32 @@ Window {
 
             model: ListModel {
                 id: myListModel
+            }
+
+            itemDelegate: Item {
+                TextField {
+                    id: field
+                    anchors {
+                        fill: parent
+                        margins: 1
+                    }
+
+                    visible: styleData.column === _NAME_COLUMN || styleData.column === _DATA_COLUMN
+
+                    property var select: styleData.value
+                    text: select
+
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+
+                    onTextChanged: {
+                        if (!visible) {
+                            return
+                        }
+                        //console.log("select", JSON.stringify(field.text))
+                        updateValue(styleData.row, styleData.column, field.text)
+                    }
+                }
             }
 
             rowDelegate: Item {
@@ -208,31 +218,18 @@ Window {
 
     // 将已经保存的枚举值重新输入子界面
     function setEunmInfos(enumInfos) {
+        var index = 0
         var info = {}
-        // 判断键名是否存在, 若不存在说明是外部导入数据, 需要处理
-        if (!enumInfos.hasOwnProperty("enumname") && !enumInfos.hasOwnProperty("enumdata")) {
-            var index = 0
-            for (var i in enumInfos) {
-                info = {
-                    "enumname": i,
-                    "enumdata": enumInfos[i]
-                }
-                //console.log("info ", info)
-                table.model.insert(index++, info)
-                root.enumInfos.push(info)
-            }
-            return
-        }
-
         for (var i in enumInfos) {
             info = {
-                "enumname": enumInfos[i].enumname,
-                "enumdata": enumInfos[i].enumdata
+                "enumname": i,
+                "enumdata": enumInfos[i]
             }
-            console.log("2info ", JSON.stringify(info))
-            table.model.insert(i, info)
+            console.log("info ", JSON.stringify(info))
+            table.model.insert(index++, info)
             root.enumInfos.push(info)
         }
+        return
     }
 
     function updateValue(index, column, value) {
@@ -242,16 +239,18 @@ Window {
 
         var enuminfo = root.enumInfos[index]
         switch (column) {
-        case __ENUM_NAME_COLUMN:
+        case _NAME_COLUMN:
             // enumname
             enuminfo.enumname = value
             table.model.setProperty(index, "enumname", value)
             break
-        case __ENUM_DATA_COLUMN:
+        case _DATA_COLUMN:
             // enumdata
             enuminfo.enumdata = value
             table.model.setProperty(index, "enumdata", value)
             break
         }
+
+        root.enumInfos[index] = enuminfo
     }
 }

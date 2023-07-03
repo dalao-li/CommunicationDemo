@@ -43,22 +43,17 @@ ListView {
 
     // 导入文件
     FileDialog {
-        id: fileDialog
+        id: deviceDialog
         title: "Please choose a file"
-        nameFilters: ["payloads files (*.payloads)"]
+        nameFilters: ["json files (*.json)", "All files (*)"]
         onAccepted: {
-            var fpath = String(fileDialog.fileUrls)
-            path = fpath.substring(8)
-            content = Excutor.query({ "payloads": path })
-            getTabItem(0).load()
-            getTabItem(1).stopListen()
-            getTabItem(2).load(content)
+            var path = String(deviceDialog.fileUrls).substring(8)
+            readJSONFile(path)
         }
         onRejected: {
             console.log("Canceled")
         }
     }
-
     header: Rectangle {
         height: 32
         width: root.width
@@ -103,6 +98,15 @@ ListView {
                 root.model.append({"name": info.name})
             }
         } // BatchAddButton end
+
+//        Button {
+//            width: 120
+//            height: 32
+//            text: "ICD导入"
+//            onClicked: {
+//                deviceDialog.open()
+//            } // onClicked end
+//        }
     } // header end
 
     delegate: Label {
@@ -157,27 +161,6 @@ ListView {
         onPressAndHold: mouse.accepted = false
     }
 
-    function saveJSONFile(path) {
-        // 处理meaning
-        for (var i in payloads) {
-            for (var j in  payloads[i].values) {
-                var resMean = {}
-                var meanList =  payloads[i].values[j].meaning
-                for (var k in meanList) {
-                    var name = meanList[k].enumname
-                    var data = meanList[k].enumdata
-                    resMean[name] = data
-                }
-                payloads[i].values[j].meaning = resMean
-            }
-
-        }
-
-        Excutor.query({"command": "write",
-                          content: Excutor.formatJSON(JSON.stringify(payloads)),
-                          path: path})
-    }
-
     function createID() {
         const MAX = 65535
         const MIN = 0
@@ -195,6 +178,34 @@ ListView {
             if (!flag) {
                 return num
             }
+        }
+    }
+
+    function saveJSONFile(path) {
+        Excutor.query({"command": "write",
+                          content: Excutor.formatJSON(JSON.stringify(payloads)),
+                          path: path})
+    }
+
+    // 导入设备信息
+    function readJSONFile(path) {
+        //console.log("path = ", path)
+        if (path === "") {
+            return
+        }
+
+        // 读取JSON
+        var data = Excutor.query({"payloads": path})
+        for (var i in data) {
+            var info = {
+                "bus": data.bus,
+                "bus_type": data.bus_type,
+                "id": data.id,
+                "name": data.name,
+                "values": data.values
+            }
+            root.payloads.push(info)
+            root.model.append({name: info.name})
         }
     }
 }

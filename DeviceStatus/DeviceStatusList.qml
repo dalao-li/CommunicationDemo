@@ -168,7 +168,6 @@ ListView {
 
         // 读取JSON
         var data = Excutor.query({"read": path})
-
         for (var i in data) {
             var info = {
                 "type_name": data[i].type_name,

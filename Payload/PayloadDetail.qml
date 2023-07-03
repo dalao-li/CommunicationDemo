@@ -144,13 +144,14 @@ Item {
 
         TextField {
             id: icdIDField
-            width: 100
+            width: 200
             height: 25
             text: ""
-            inputMask: ">HHHH"
+            //inputMask: ">HHHH"
 
             onTextChanged: {
                 if (root._payload) {
+                    //console.log("触发了", text)
                     root._payload.id = text
                     root.itemChanged("id", text)
                 }
@@ -173,12 +174,11 @@ Item {
     }
 
     function load(value) { 
+        //console.log("value", JSON.stringify(value))
         _payload = value
         nameField.text = value.name
-        //console.log("value.id ", value.id)
+        //console.log("==>value.id ", value.id)
         icdIDField.text = value.id
-
-        //splitValue(Number(value.id))
 
     }
 

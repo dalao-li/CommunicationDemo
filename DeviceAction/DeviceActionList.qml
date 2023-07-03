@@ -89,17 +89,19 @@ ListView {
 
             onClicked: {
                 var info = {
-                    "name": "动作" + String(root.actions.length),
-                    "id": String(createID()),
-                    "condition": [],
+                    //"id": String(createID()),
+
                     // 默认是选第一个设备
                     "device": devices[0],
-                    // 默认绑首个output_icd
-                    "bind_output_icd": devices[0].output_icd[0],
-
+                    "actions": {
+                        "name": "动作" + String(root.actions.length),
+                        // 默认绑首个input_icd
+                        "bind_input_icd": devices[0].bind_input_icd[0],
+                        "condition": [],
+                    }
                 }
                 root.actions.push(info)
-                root.model.append(info)
+                root.model.append({name: info.actions.name})
             }
         } // BatchAddButton end
 
@@ -163,40 +165,6 @@ ListView {
         onPressAndHold: mouse.accepted = false
     }
 
-    // 导入设备信息
-    function readJSONFile(path) {
-        if (path === "") {
-            return
-        }
-
-        // 读取JSON
-        var data = Excutor.query({"read": path})
-        for (var i in data) {
-            var device_id = data[i].id
-            var actions = data[i].actions
-
-            for (var j in actions) {
-                var info = {
-                    "name": actions[j].name,
-                    "id": actions[j].id,
-                    "condition": actions[j].condition,
-                    "device": (()=>{
-                                   var device_id = data[i].id
-                                   for (var k in devices) {
-                                       if (devices[k].device_id === device_id) {
-                                           return devices[k]
-                                       }
-                                   }
-                               })(),
-                    "bind_output_icd": actions[j].id,
-                }
-            }
-
-            root.actions.push(info)
-            root.model.append(info)
-        }
-    }
-
     // 生成随机ID
     function createID() {
         const MAX = 65535
@@ -217,7 +185,39 @@ ListView {
         }
     }
 
-    // TODO
+    // 导入设备动作信息
+    function readJSONFile(path) {
+        if (path === "") {
+            return
+        }
+
+        var data = Excutor.query({"read": path})
+        for (var i in data) {
+            var device_id = data[i].id
+            var actions = data[i].actions
+
+            var info = {
+                "name": actions[0].name,
+                "bind_input_icd": actions[0].id,
+                "condition": actions[0].condition,
+            }
+
+            var resData = {
+                "device": (()=>{
+                               for (var k in devices) {
+                                   if (devices[k].device_id === device_id) {
+                                       return devices[k]
+                                   }
+                               }
+                           })(),
+                "actions": info
+            }
+
+            root.actions.push(resData)
+            root.model.append({"name": resData.actions.name})
+        }
+    }
+
     // 导出
     function saveActionInfo(path) {
         var data = root.actions
@@ -226,49 +226,44 @@ ListView {
         // 处理JSON
         // TODO 按设备划分, 同设备下的action放在一个actions里
         for (var i in data) {
-            var res = {}
-            var action = []
-
             // device_id
             var deviceID = data[i].device.device_id
-            var ouputICD = data[i].bind_output_icd
-            var name = data[i].name
-            var condition = data[i].condition
+            var inputICD = data[i].actions.bind_input_icd
+            var name = data[i].actions.name
+            var condition = data[i].actions.condition
 
-            var resCondition = []
-            // segment中的每一行数据
+
             // 分类规则为将同input_icd的分到一个{}里
-            var temp = {}
+            var actionRes = []
             // "input_icd value" : [{"in_index": , "", "out_index": "...", "desc": "...", "difference": "..."], {...}}
+            var condRes = []
             for (var j in condition) {
-                var ouputICDIndex = condition[j].output_icd_index
-                var inputICD = condition[j].input_icd
-                var inputICDIndex = condition[j].input_icd_index
-                var desc = condition[j].desc
-                var difference = condition[j].difference
+                var outputICD = condition[j].id
 
-                // 如果这个input_icd已经存在, 就将数据存到它的值下
-                if (temp.hasOwnProperty(inputICD)) {
-                    temp[inputICD].push({"in_index": inputICDIndex, "out_index": ouputICDIndex, "desc": desc, "difference": difference})
+                var keys = condition[j].keys
+
+                var tempValue = []
+                for (var k in keys) {
+                    var outIndex = condition[j].out_index
+                    var inIndex = condition[j].in_index
+                    var desc = condition[j].desc
+                    var difference = condition[j].difference
+                    tempValue.push({
+                                       "desc": desc,
+                                       "difference": difference,
+                                       "in_index": inIndex,
+                                       "out_index": outIndex,
+                                   })
                 }
-                else {
-                    temp[inputICD] = []
-                }
+
+                condRes.push({"id": outputICD, "keys": tempValue})
             }
+            actionRes.push({"id":inputICD, "name": name, "condition": condRes})
 
-            // 处理temp格式
-            for (var k in temp) {
-                var id = k
-                var keys = temp[k]
-                resCondition.push({"id": k, "keys": keys})
-            }
-
-            action.push({
-                        "id": ouputICD, "name": name, "condition": resCondition
-
-                        })
-
-            dataList.push({"id": deviceID, "actions": action})
+            dataList.push({
+                          "id": deviceID,
+                          "actions": actionRes
+                          })
         }
 
 

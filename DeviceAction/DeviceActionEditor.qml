@@ -40,8 +40,8 @@ ColumnLayout {
                         return
                     }
                     var data = root.actions[listComponent.currentIndex]
-                    //console.log("=>", JSON.stringify(data))
-                    detailComponent.load(data)
+                    //console.log("ActionEditor", JSON.stringify(data))
+                    detailComponent.load({"device": data.device, "name": data.actions.name, "bind_input_icd": data.actions.bind_input_icd})
                     segmentComponent.load(data)
                 }
             } // listComponent end
@@ -80,8 +80,8 @@ ColumnLayout {
                     }
 
                     // 修改bind_ouput_icd
-                    if (id === "bind_ouput_icd") {
-                        d["bind_ouput_icd"] = value
+                    if (id === "bind_input_icd") {
+                        d["bind_input_icd"] = value
 
                         segmentComponent.clear()
                         segmentComponent.updateDevice(value)

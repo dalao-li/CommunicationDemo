@@ -194,44 +194,46 @@ ListView {
         // 读取JSON
         deviceJSONFile = Excutor.query({"read": path})
 
-        var data = deviceJSONFile["monitor_device_type"]
+        var monitorDeviceType = deviceJSONFile["monitor_device_type"]
         var deviceICDList = deviceJSONFile["DeviceICDList"]
-        for (var i in data) {
-            var icdList = deviceICDList[data[i].device_id]
+
+        for (var i in monitorDeviceType) {
+            var device_id = monitorDeviceType[i].device_id
+            var icdList = deviceICDList[monitorDeviceType[i].device_id]
             var inputList = []
-            var ouputList = []
+            var outputList = []
             for (var j in icdList) {
                 if (icdList[j].type === "input") {
                     inputList.push(icdList[j].icd_id)
                 }
                 if (icdList[j].type === "output") {
-                    ouputList.push(icdList[j].icd_id)
+                    outputList.push(icdList[j].icd_id)
                 }
             }
 
             var info = {
-                "type": data[i].type,
-                "device_id": data[i].device_id,
+                "type": monitorDeviceType[i].type,
+                "device_id": device_id,
                 "control_type": (()=> {
-                                     if (data[i].control_type === "controlled") {
+                                     if (monitorDeviceType[i].control_type === "controlled") {
                                          return 0
                                      }
                                      return 1
                                  })(),
                 "bus_type": (()=> {
-                                 if (data[i].bus_type === "udp") {
+                                 if (monitorDeviceType[i].bus_type === "udp") {
                                      return 0
                                  }
                                  return 1
                              })(),
-                "ip": data[i].ip,
-                "send_port": data[i].send_port,
-                "control_port": data[i].control_port,
-                "rfm2g_id": data[i].rfm2g_id,
-                "address": data[i].address,
+                "ip": monitorDeviceType[i].ip,
+                "send_port": monitorDeviceType[i].send_port,
+                "control_port": monitorDeviceType[i].control_port,
+                "rfm2g_id": monitorDeviceType[i].rfm2g_id,
+                "address": monitorDeviceType[i].address,
                 // 附加信息
                 "input_icd": inputList,
-                "output_icd": ouputList,
+                "output_icd": outputList,
             }
 
             root.devices.push(info)
