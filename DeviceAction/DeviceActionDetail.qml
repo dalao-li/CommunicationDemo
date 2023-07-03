@@ -17,7 +17,7 @@ Item {
 
     property var _action: {
         "device": devices[0],
-        "bind_output_icd": devices[0].input_icd[0]
+        "bind_input_icd": devices[0].input_icd[0]
     }
 
     property int defaultHeight: 60

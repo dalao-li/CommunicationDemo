@@ -7,7 +7,6 @@
  * @LastEditTime: 2023-05-09 19:05:47
  */
 
-
 import QtQuick 2.5
 import QtQuick.Layouts 1.1
 import QtQuick.Controls 1.4
@@ -61,27 +60,26 @@ ColumnLayout {
                 }
 
                 onItemChanged: {
-                    //console.log("信号接受DeviceStatusDetail")
                     if (listComponent.currentIndex < 0) {
                         return
                     }
 
-                    var d = {}
+                    var data = {}
                     if (id === "type_name") {
-                        d["type_name"] = value
+                        data["type_name"] = value
                     }
 
                     if (id === "desc") {
-                        d["desc"] = value
+                        data["desc"] = value
                     }
 
                     if (id === "device") {
-                        d["device"] = JSON.parse(value)
+                        data["device"] = JSON.parse(value)
                         // 修改设备名, 直接清空segmentComponent
                         segmentComponent.updateDevice(JSON.parse(value))
                         segmentComponent.clear()
                     }
-                    listComponent.model.set(listComponent.currentIndex, d)
+                    listComponent.model.set(listComponent.currentIndex, data)
                 }
             }
 

@@ -184,26 +184,25 @@ ListView {
             }
 
             root.status.push(info)
-            root.model.append(info)
+            root.model.append({type_name: info.type_name})
         }
     }
 
 
     // 导出
     function saveJSONFile(path) {
-        var jsonData = []
-        // 处理JSON
+        var result = []
         for (var i in root.status) {
-            var res = {}
-            res["id"] = root.status[i].device.device_id
-            res["type_name"] = root.status[i].type_name
-            res["desc"] = root.status[i].desc
-            res["monitor_status"] = root.status[i].monitor_status
-            jsonData.push(res)
+            result.push({
+                            "id": root.status[i].device.device_id,
+                            "type_name": root.status[i].type_name,
+                            "desc": root.status[i].desc,
+                            "monitor_status": root.status[i].monitor_status
+                        })
         }
 
         Excutor.query({"command": "write",
-                          content: Excutor.formatJSON(JSON.stringify(jsonData)),
+                          content: Excutor.formatJSON(JSON.stringify(result)),
                           path: path})
     }
 }

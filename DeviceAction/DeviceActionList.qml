@@ -178,7 +178,6 @@ ListView {
                     break
                 }
             }
-
             if (!flag) {
                 return num
             }
@@ -195,7 +194,6 @@ ListView {
         for (var i in data) {
             var device_id = data[i].id
             var actions = data[i].actions
-
             var info = {
                 "name": actions[0].name,
                 "bind_input_icd": actions[0].id,
@@ -226,43 +224,36 @@ ListView {
         // 处理JSON
         // TODO 按设备划分, 同设备下的action放在一个actions里
         for (var i in data) {
+            console.log("data", JSON.stringify(data[i]))
             // device_id
             var deviceID = data[i].device.device_id
-            var inputICD = data[i].actions.bind_input_icd
-            var name = data[i].actions.name
-            var condition = data[i].actions.condition
 
+            var actions = data[i].actions
+            var inputICD = actions.bind_input_icd
+            var name = actions.name
 
-            // 分类规则为将同input_icd的分到一个{}里
-            var actionRes = []
-            // "input_icd value" : [{"in_index": , "", "out_index": "...", "desc": "...", "difference": "..."], {...}}
             var condRes = []
+            var condition = actions.condition
             for (var j in condition) {
                 var outputICD = condition[j].id
-
+                var keyList = []
                 var keys = condition[j].keys
-
-                var tempValue = []
                 for (var k in keys) {
-                    var outIndex = condition[j].out_index
-                    var inIndex = condition[j].in_index
-                    var desc = condition[j].desc
-                    var difference = condition[j].difference
-                    tempValue.push({
-                                       "desc": desc,
-                                       "difference": difference,
-                                       "in_index": inIndex,
-                                       "out_index": outIndex,
-                                   })
+                    keyList.push({
+                                     "desc": keys[k].desc,
+                                     "difference": keys[k].difference,
+                                     "in_index": keys[k].in_index,
+                                     "out_index": keys[k].out_index,
+                                 })
                 }
 
-                condRes.push({"id": outputICD, "keys": tempValue})
+                condRes.push({"id": condition[j].id, "keys": keyList})
             }
-            actionRes.push({"id":inputICD, "name": name, "condition": condRes})
+
 
             dataList.push({
-                          "id": deviceID,
-                          "actions": actionRes
+                              "id": deviceID,
+                              "actions": {"name": name, "id": inputICD, "condition": condRes}
                           })
         }
 

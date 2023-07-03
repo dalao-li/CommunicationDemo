@@ -1,3 +1,12 @@
+/*
+ * @Description:
+ * @Version: 1.0
+ * @Author: liyuanhao
+ * @Date: 2023-05-09 19:05:47
+ * @LastEditors: liyuanhao
+ * @LastEditTime: 2023-05-09 19:05:47
+ */
+
 import QtQuick 2.5
 import Qt.labs.settings 1.0
 import QtQuick.Window 2.0
@@ -23,7 +32,7 @@ Window {
     property var _ICON_COLUMN: 2
     property var _COLOR_COLUMN: 3
 
-    property var colorArray: ["red", "yellow", "green", "blue", "gray"]
+    property var _COLOR_LIST: ["red", "yellow", "green", "blue", "gray"]
 
     signal itemChanged
     signal enumSave
@@ -97,6 +106,38 @@ Window {
 
             frameVisible: false
 
+            TableViewColumn {
+                id: valueColumn
+                visible: true
+                role: "value"
+                title: "取值"
+                width: 200
+            }
+
+            TableViewColumn {
+                id: showInfoColumn
+                visible: true
+                role: "showinfo"
+                title: "信息"
+                width: 200
+            }
+
+            TableViewColumn {
+                id: iconColumn
+                visible: true
+                role: "icon"
+                title: "图标"
+                width: 200
+            }
+
+            TableViewColumn {
+                id: colorColumn
+                visible: true
+                role: "color"
+                title: "颜色"
+                width: 200
+            }
+
             itemDelegate: Item {
                 TextField {
                     id: field
@@ -130,16 +171,15 @@ Window {
                     visible: styleData.column === _COLOR_COLUMN
 
                     property var curIndex: {
-                        for (var i in colorArray) {
-                            //console.log("i = ", i, "color ", colorArray[i])
-                            if (colorArray[i] === enumInfos[styleData.row].color) {
+                        for (var i in _COLOR_LIST) {
+                            if (enumInfos[styleData.row].color === _COLOR_LIST[i]) {
                                 return i
                             }
                         }
                         return -1
                     }
 
-                    model: colorArray
+                    model: _COLOR_LIST
 
                     onCurIndexChanged: {
                         currentIndex = curIndex
@@ -149,42 +189,9 @@ Window {
                         if (!visible) {
                             return
                         }
-                        //console.log("currIndex", colorBox.currentIndex)
                         root.updateValue(styleData.row, styleData.column, colorBox.currentIndex)
                     }
                 }
-            }
-
-            TableViewColumn {
-                id: valueColumn
-                visible: true
-                role: "value"
-                title: "取值"
-                width: 200
-            }
-
-            TableViewColumn {
-                id: showInfoColumn
-                visible: true
-                role: "showinfo"
-                title: "信息"
-                width: 200
-            }
-
-            TableViewColumn {
-                id: iconColumn
-                visible: true
-                role: "icon"
-                title: "图标"
-                width: 200
-            }
-
-            TableViewColumn {
-                id: colorColumn
-                visible: true
-                role: "color"
-                title: "颜色"
-                width: 200
             }
 
             model: ListModel {
@@ -237,7 +244,7 @@ Window {
 
     function addEnum(row) {
         var info = {
-            "value": "",
+            "value": Number(row + 1),
             "showinfo": "",
             "icon": "",
             "color": "red"
@@ -249,6 +256,7 @@ Window {
     // 将已经保存的枚举值重新输入子界面
     function setEunmInfos(enumInfos) {
         root.enumInfos = enumInfos
+        //console.log("setEunmInfos", JSON.stringify(enumInfos))
         for (var i = 0; i < enumInfos.length; ++i) {
             table.model.insert(i, enumInfos[i])
         }
@@ -260,7 +268,6 @@ Window {
         }
 
         var enuminfo = root.enumInfos[index]
-
         switch (column) {
         case _VALUE_COLUMN:
             enuminfo.value = value
@@ -275,9 +282,8 @@ Window {
             enuminfo.icon = value
             break
         case _COLOR_COLUMN:
-            enuminfo.color = colorArray[value]
-            console.log("color ", enuminfo.color)
-            table.model.setProperty(index, "color", colorArray[value])
+            enuminfo.color = _COLOR_LIST[value]
+            table.model.setProperty(index, "color", _COLOR_LIST[value])
             break
         }
         root.enumInfos[index] = enuminfo

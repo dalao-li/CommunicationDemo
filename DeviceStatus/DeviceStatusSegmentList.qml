@@ -29,7 +29,6 @@ Item {
 
     // icd列表
     property var icdList: {
-        //console.log("getICDList", JSON.stringify(getICDList()))
         return getICDList()
     }
 
@@ -252,6 +251,10 @@ Item {
                     }
                     // 更新当前bind_icd
                     root.setValue(styleData.row, styleData.column, icdList[currentIndex].value)
+
+                    // 同步修改index
+//                    fieldCombox.model = getFieldList(icdList[currentIndex].value)
+//                    fieldCombox.curIndex = 0
                 }
             }
 
@@ -322,6 +325,7 @@ Item {
                         win.rootPage = root
 
                         if (segments[styleData.row].status_list) {
+                            //console.log("onClicked", JSON.stringify(segments[styleData.row].status_list))
                             win.setEunmInfos(segments[styleData.row].status_list)
                         }
                     }
@@ -437,6 +441,7 @@ Item {
 
     // 获取枚举
     function getEnumdata(meaning) {
+        //console.log("getEnumdata", JSON.stringify(segments[table.currentRow].status_list))
         segments[table.currentRow].status_list = meaning
     }
 
@@ -456,8 +461,10 @@ Item {
             segment.bind_icd = value
             table.model.setProperty(index, "bind_icd", value)
             // 同步修改该行的field_list
+            segment.field_index = 0
+            table.model.setProperty(index, "field_index", 0)
             segment.field_list = getFieldList(value)
-            table.model.setProperty(index, "fidle_list", segment.field_list)
+            table.model.setProperty(index, "field_list", segment.field_list)
             break
         case _FIELD_INDEX_COLUMN:
             segment.field_index = value

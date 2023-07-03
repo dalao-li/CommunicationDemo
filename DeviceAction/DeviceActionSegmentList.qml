@@ -14,10 +14,10 @@ Item {
 
     property var _bindInputICD: devices[0].input_icd[0]
 
-    // output_icd
-    property var outputICDList: getOutputICDList()
+    property var outputICDInfo: getOuputICDInfo()
 
     // 列名枚举
+    //property var _INPUT_ICD_COLUMN: 0
     property var _INPUT_ICD_INDEX_COLUMN: 0
     property var _OUTPUT_ICD_COLUMN: 1
     property var _OUTPUT_ICD_INDEX_COLUMN: 2
@@ -72,6 +72,14 @@ Item {
             left: parent.left
             right: parent.right
         }
+
+//        TableViewColumn {
+//            id: inICDColumn
+//            visible: true
+//            role: "bind_input_icd"
+//            title: "输入ICD"
+//            width: 160
+//        }
 
         TableViewColumn {
             id: inIndexColumn
@@ -159,9 +167,9 @@ Item {
                         if (segment === [] || segment === undefined) {
                             return ""
                         }
-                        for (var i in payloads) {
-                            if (payloads[i].id === select) {
-                                return payloads[i].name
+                        for (var k in payloads) {
+                            if (payloads[k].id === select) {
+                                return payloads[k].name
                             }
                         }
                         return ""
@@ -171,13 +179,13 @@ Item {
                         if (segment === [] || segment === undefined) {
                             return ""
                         }
-                        for (var j in payloads) {
-                            if (payloads[j].id === segment.bind_output_icd) {
-                                var value = payloads[j].values[Number(select)]
-                                if (value === undefined) {
+                        for (var w in payloads) {
+                            if (payloads[w].id === segment.bind_output_icd) {
+                                var value1 = payloads[w].values[Number(select)]
+                                if (value1 === undefined) {
                                     return ""
                                 }
-                                return value.name
+                                return value1.name
                             }
                         }
                         return ""
@@ -226,27 +234,18 @@ Item {
                 visible: styleData.selected && (styleData.column === _INPUT_ICD_INDEX_COLUMN)
                 textRole: "text"
 
-                property var fieldList: getFieldList(_bindInputICD)
-
-                property var inIndexValue: {
-                    if (styleData.row === undefined) {
-                        return "0"
-                    }
-                    var index = table.model.get(styleData.row).in_index
-                    if (index === undefined) {
-                        return "0"
-                    }
-                    return String(index)
-                }
+                property var fieldList: getFieldInfo(_bindInputICD)
 
                 property var curIndex: {
-                    var inIndex = table.model.get(styleData.row).in_index
-                    if (inIndex === undefined) {
-                        return -1
-                    }
-                    for(var i in fieldList){
-                        if(String(inIndexValue) === String(fieldList[i].value)) {
-                            return i
+                    if (styleData.row && table.model.get(styleData.row)) {
+                        var inIndex = table.model.get(styleData.row).in_index
+                        if (inIndex === undefined) {
+                            return -1
+                        }
+                        for(var i in fieldList){
+                            if(String(inIndex) === String(fieldList[i].value)) {
+                                return i
+                            }
                         }
                     }
                     return -1
@@ -285,15 +284,15 @@ Item {
                     }
 
                     var outputICD = String(table.model.get(styleData.row).bind_output_icd)
-                    for (var i in outputICDList) {
-                        if (outputICD === outputICDList[i].value) {
+                    for (var i in outputICDInfo) {
+                        if (outputICD === outputICDInfo[i].value) {
                             return i
                         }
                     }
                     return -1
                 }
 
-                model: outputICDList
+                model: outputICDInfo
 
                 currentIndex: curIndex
 
@@ -305,7 +304,7 @@ Item {
                     if (!visible || styleData.row === undefined) {
                         return
                     }
-                    root.setValue(styleData.row, styleData.column, outputICDList[currentIndex].value)
+                    root.setValue(styleData.row, styleData.column, outputICDInfo[currentIndex].value)
                 }
             }
 
@@ -319,7 +318,13 @@ Item {
                 textRole: "text"
                 visible: (styleData.column === _OUTPUT_ICD_INDEX_COLUMN) && styleData.selected
 
-                property var fieldList: getFieldList(table.model.get(styleData.row).bind_output_icd)
+                property var fieldList: {
+                    if (styleData.row === undefined || table.model.get(styleData.row) === undefined) {
+                        return
+                    }
+
+                    return getFieldInfo(table.model.get(styleData.row).bind_output_icd)
+                }
 
                 property var curIndex: {
                     // 防止页面首次加载时错误
@@ -359,7 +364,7 @@ Item {
                     margins: 1
                 }
 
-                property var validColumn:  styleData.column === _DESC_COLUMN
+                property var validColumn: styleData.column === _DESC_COLUMN
 
                 visible: validColumn && styleData.selected
 
@@ -384,7 +389,7 @@ Item {
                     root.setValue(styleData.row, styleData.column, descField.text)
                 }
             } // TextField end
-        } // itemDelegate end
+        }
 
         model: ListModel {}
 
@@ -445,12 +450,11 @@ Item {
 
     // 加载列表数据
     function load(values) {
-        _device = values.device
-        _bindInputICD = values.actions.bind_input_icd
-
+        table.model.clear()
         batchAdd.enabled = true
 
-        table.model.clear()
+        _device = values.device
+        _bindInputICD = values.actions.bind_input_icd
 
         var condition = values.actions.condition[0]
         var ouputICDID = condition.id
@@ -461,13 +465,12 @@ Item {
                 "in_index": segments[i].in_index,
                 "out_index": segments[i].out_index,
                 "bind_output_icd": ouputICDID,
-
                 "difference": segments[i].difference,
                 "desc": segments[i].desc
             }
-            //console.log("info = ", JSON.stringify(info))
-            table.model.append(info)
 
+            console.log("segments", JSON.stringify(segments))
+            table.model.append(info)
         }
     }
 
@@ -539,12 +542,12 @@ Item {
     }
 
     // 根据ICD获取field
-    function getFieldList(bindICD) {
+    function getFieldInfo(bindICD) {
         if (bindICD === undefined) {
             console.log("DeviceActionSegmentList getFieleList, bindICD is undefined")
             return []
         }
-
+        // icd中values
         var values = (()=>{
                           for (var i in payloads) {
                               if (String(bindICD) === String(payloads[i].id)) {
@@ -554,19 +557,20 @@ Item {
                           return []
                       })()
 
-        var res = []
+        var result = []
         for (var i in values) {
             var info = {
                 text: values[i].name,
                 value: String(i)
             }
-            res.push(info)
+            result.push(info)
         }
-        return res
+        return result
     }
 
-    function getOutputICDList() {
-        var icd = []
+    // 获取OutputICD中名称与id
+    function getOuputICDInfo() {
+        var result = []
         for (var i in _device.output_icd) {
             for (var j in payloads) {
                 if (String(_device.output_icd[i]) === String(payloads[j].id)) {
@@ -574,10 +578,26 @@ Item {
                         text: payloads[j].name,
                         value: payloads[j].id
                     }
-                    icd.push(info)
+                    result.push(info)
                 }
             }
         }
-        return icd
+        return result
+    }
+
+    function getInputICDInfo() {
+        var icdList = []
+        for (var i in _device.input_icd) {
+            for (var j in payloads) {
+                if (String(_device.input_icd[i]) === String(payloads[j].id)) {
+                    var info = {
+                        text: payloads[j].name,
+                        value: payloads[j].id
+                    }
+                    icdList.push(info)
+                }
+            }
+        }
+        return icdList
     }
 }
