@@ -42,6 +42,13 @@ ColumnLayout {
                     detailComponent.load(data)
                     segmentComponent.load(data)
                 }
+
+                onCountChanged: {
+                    if (listComponent.count <= 0) {
+                        deviceDetail.clear()
+                        segmentComponent.clear()
+                    }
+                }
             } // DeviceStatusList end
         }
 
@@ -95,4 +102,5 @@ ColumnLayout {
             }
         }
     }
+
 }

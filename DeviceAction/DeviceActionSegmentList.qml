@@ -73,20 +73,12 @@ Item {
             right: parent.right
         }
 
-//        TableViewColumn {
-//            id: inICDColumn
-//            visible: true
-//            role: "bind_input_icd"
-//            title: "输入ICD"
-//            width: 160
-//        }
-
         TableViewColumn {
             id: inIndexColumn
             visible: true
             role: "in_index"
             title: "输入ICD中index"
-            width: 160
+            width: 200
         }
 
         TableViewColumn {
@@ -94,7 +86,7 @@ Item {
             visible: true
             role: "bind_output_icd"
             title: "输出ICD"
-            width: 160
+            width: 200
         }
 
         TableViewColumn {
@@ -102,7 +94,7 @@ Item {
             visible: true
             role: "out_index"
             title: "输出ICD中index"
-            width: 160
+            width: 200
         }
 
         TableViewColumn {
@@ -118,7 +110,7 @@ Item {
             visible: true
             role: "desc"
             title: "描述"
-            width: 100
+            width: 200
         }
 
         frameVisible: false
@@ -130,6 +122,7 @@ Item {
                 anchors.fill: parent
                 visible: !styleData.selected || [_INPUT_ICD_INDEX_COLUMN, _OUTPUT_ICD_INDEX_COLUMN, _OUTPUT_ICD_COLUMN, _DIFFERENCE_COLUMN, _DESC_COLUMN].includes(styleData.column)
 
+                // 设置居中
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
 
@@ -468,7 +461,6 @@ Item {
                 "difference": segments[i].difference,
                 "desc": segments[i].desc
             }
-            //console.log("segments", JSON.stringify(segments))
             table.model.append(info)
         }
     }
@@ -491,6 +483,7 @@ Item {
     }
 
     function clear() {
+        root.segments = []
         table.model.clear()
     }
 

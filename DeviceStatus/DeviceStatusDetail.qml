@@ -5,11 +5,12 @@ import QtQuick.Dialogs 1.2
 Item {
     id: root
 
-    property var _status
-    property var _device
     property int defaultHeight: 60
 
     height: defaultHeight
+
+    property var _status
+    property var _device
 
     signal itemChanged(string id, string value)
 
@@ -53,6 +54,7 @@ Item {
 
         spacing: 15
 
+        // 选择设备
         Label {
             text: "设备"
             height: 25
@@ -61,17 +63,42 @@ Item {
         }
 
         ComboBox {
-            id: idCompox
-            width: 130
+            id: deviceComboBox
+            width: 200
             height: 25
 
             textRole: "type"
 
-            model: devices
+            model: ListModel {
+                Component.onCompleted: {
+                    // 加载原始数据
+                    for (var i in devices) {
+                        deviceComboBox.model.append(devices[i])
+                    }
+                    // 用于更新数据
+                    mainWindow.updateDeviceSignal.connect(function(deviceList) {
+                        deviceComboBox.model.clear()
+                        deviceComboBox.model.append(deviceList)
+                    })
+                }
+            }
+
+            property var curIndex: {
+                for (var i in devices) {
+                    if (_status.device.device_id === devices[i].device_id) {
+                        return i
+                    }
+                }
+                return -1
+            }
+
+            onCurIndexChanged: {
+                currentIndex = curIndex
+            }
 
             onCurrentIndexChanged: {
                 if (root._status) {
-                    var newDevice = devices[idCompox.currentIndex]
+                    var newDevice = devices[deviceComboBox.currentIndex]
                     root._status.device = newDevice
                     root.itemChanged("device", JSON.stringify(newDevice))
                 }
@@ -87,7 +114,7 @@ Item {
 
         TextField {
             id: typeNameField
-            width: 100
+            width: 200
             height: 25
             onTextChanged: {
                 if (root._status) {
@@ -118,14 +145,13 @@ Item {
 
     function load(value) {
         _status = value
-        for (var i in devices) {
-            if (value.device.device_id === devices[i].device_id) {
-                idCompox.currentIndex = i
-                break
-            }
-        }
-
         typeNameField.text = value.type_name
         descField.text = value.desc
+    }
+
+    function clear() {
+        deviceComboBox.currentIndex = 0
+        typeNameField.text = ""
+        descField.text = ""
     }
 }

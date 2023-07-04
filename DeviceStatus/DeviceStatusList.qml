@@ -96,7 +96,7 @@ ListView {
 
                 }
                 root.status.push(info)
-                root.model.append(info)
+                root.model.append({type_name: info.type_name})
             }
         } // BatchAddButton end
 

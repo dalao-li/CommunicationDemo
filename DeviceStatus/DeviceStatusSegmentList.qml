@@ -86,7 +86,7 @@ Item {
             visible: true
             role: "bind_icd"
             title: "绑定输出ICD"
-            width: 80
+            width: 200
         }
 
         TableViewColumn {
@@ -94,7 +94,7 @@ Item {
             visible: true
             role: "field_index"
             title: "ICD域"
-            width: 120
+            width: 200
         }
 
         TableViewColumn {
@@ -102,7 +102,7 @@ Item {
             visible: true
             role: "type_name"
             title: "类别名"
-            width: 100
+            width: 200
         }
 
         TableViewColumn {
@@ -110,7 +110,7 @@ Item {
             visible: true
             role: "status_type"
             title: "status_type"
-            width: 160
+            width: 80
         }
 
         TableViewColumn {
@@ -118,7 +118,7 @@ Item {
             visible: true
             role: "desc"
             title: "描述"
-            width: 80
+            width: 200
         }
 
         TableViewColumn {
@@ -126,7 +126,7 @@ Item {
             visible: true
             role: "status_list"
             title: "状态列表"
-            width: 80
+            width: 100
         }
 
         model: ListModel {}
@@ -140,6 +140,7 @@ Item {
                 anchors.fill: parent
                 visible: !styleData.selected || [_BIND_ICD_COLUMN, _FIELD_INDEX_COLUMN, _TYPE_NAME_COLUMN, _DESC_COLUMN, _STATUS_TYPE_COLUMN].includes(styleData.column)
 
+                // 设置居中
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
 
@@ -320,13 +321,12 @@ Item {
                         return
                     }
                     if (component.status === Component.Ready) {
-                        var win = component.createObject()
-                        win.show()
-                        win.rootPage = root
+                        var windows = component.createObject()
+                        windows.show()
+                        windows.rootPage = root
 
                         if (segments[styleData.row].status_list) {
-                            //console.log("onClicked", JSON.stringify(segments[styleData.row].status_list))
-                            win.setEunmInfos(segments[styleData.row].status_list)
+                            windows.setEunmInfos(segments[styleData.row].status_list)
                         }
                     }
                 }
@@ -389,6 +389,7 @@ Item {
 
     // 加载列表
     function load(values) {
+        //console.log("values = ", JSON.stringify(values))
         segments = values.monitor_status
         _device = values.device
 

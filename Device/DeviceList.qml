@@ -88,21 +88,7 @@ ListView {
             }
 
             onClicked: {
-                var info = {
-                    "type": "设备_" + String(root.devices.length),
-                    "device_id": "device_" + String(createID()),
-                    "control_type": 0,
-                    "bus_type": 0,
-                    "ip": "",
-                    "send_port": "",
-                    "control_port": "",
-                    "rfm2g_id": "",
-                    "address": "",
-                    "input_icd": [],
-                    "output_icd": [],
-                }
-                root.devices.push(info)
-                root.model.append(info)
+                addData()
             }
         } // BatchAddButton end
 
@@ -112,7 +98,7 @@ ListView {
             text: "设备导入"
             onClicked: {
                 deviceDialog.open()
-            } // onClicked end
+            }
         }
     } // header end
 
@@ -143,6 +129,9 @@ ListView {
                 name: "minus"
                 onClicked: {
                     root.devices.splice(root.currentIndex, 1)
+
+                    mainWindow.updateDeviceSignal(devices)
+
                     root.model.remove(root.currentIndex, 1)
                 }
             }
@@ -163,6 +152,27 @@ ListView {
         onReleased: mouse.accepted = false
         onDoubleClicked: mouse.accepted = false
         onPressAndHold: mouse.accepted = false
+    }
+
+    function addData() {
+        var info = {
+            "type": "设备_" + String(root.devices.length),
+            "device_id": "device_" + String(createID()),
+            "control_type": 0,
+            "bus_type": 0,
+            "ip": "",
+            "send_port": "",
+            "control_port": "",
+            "rfm2g_id": "",
+            "address": "",
+            "input_icd": [],
+            "output_icd": [],
+        }
+        root.devices.push(info)
+
+        root.model.append({type: info.type})
+
+        mainWindow.updateDeviceSignal(devices)
     }
 
     // 生成随机ID
@@ -239,6 +249,7 @@ ListView {
             root.devices.push(info)
             root.model.append(info)
         }
+        mainWindow.updateDeviceSignal(devices)
     }
 
     // 存储文件
@@ -285,7 +296,7 @@ ListView {
                 bindICD.push({"icd_id": root.devices[j].input_icd[x], "type": "input"})
             }
             for (var y in root.devices[j].output_icd) {
-                bindICD.push({"icd_id": root.devices[j].output_icd[y], "type": "ouput"})
+                bindICD.push({"icd_id": root.devices[j].output_icd[y], "type": "output"})
             }
             deviceICDList[root.devices[j].device_id] = bindICD
         }

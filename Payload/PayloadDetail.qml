@@ -29,7 +29,6 @@ Item {
         }
 
         height: 32
-
         color: "#e5e5e5"
 
         Label {
@@ -96,8 +95,7 @@ Item {
             width: 25
             height: 25
             text: ""
-            inputMask: ">HH"
-
+            //inputMask: ">HH"
             onTextChanged: calculateICDID()
         }
 
@@ -112,7 +110,7 @@ Item {
             id: deviceID
             width: 25
             height: 25
-            inputMask: ">HH"
+            //inputMask: ">HH"
             text: ""
             onTextChanged: calculateICDID()
         }
@@ -129,7 +127,7 @@ Item {
             width: 40
             height: 25
             text: ""
-            inputMask: ">HHHH"
+            //inputMask: ">HHHH"
 
             onTextChanged: calculateICDID()
         }
@@ -148,10 +146,9 @@ Item {
             height: 25
             text: ""
             //inputMask: ">HHHH"
-
             onTextChanged: {
                 if (root._payload) {
-                    //console.log("触发了", text)
+                    splitICDID(Number(text))
                     root._payload.id = text
                     root.itemChanged("id", text)
                 }
@@ -160,7 +157,19 @@ Item {
 
     } // end flow
 
-    // 根据工厂ID, 设备ID, 数据ID计算ICDID
+    function load(value) {
+        _payload = value
+        nameField.text = value.name
+        icdIDField.text = value.id
+
+    }
+
+    function clear() {
+        nameField.text = ""
+        icdIDField.text = 0
+    }
+
+    // 根据工厂ID, 设备ID, 数据ID计算ICD ID
     function calculateICDID() {
         var factoryValue = Number(factoryID.text)
         var deviceValue = Number(deviceID.text)
@@ -170,16 +179,19 @@ Item {
         value |= (parseInt(factoryValue, 16) << 24)
         value |= (parseInt(deviceValue, 16) << 16)
         value |= (parseInt(dataValue, 16))
+
         icdIDField.text = String(value)
     }
 
-    function load(value) { 
-        //console.log("value", JSON.stringify(value))
-        _payload = value
-        nameField.text = value.name
-        //console.log("==>value.id ", value.id)
-        icdIDField.text = value.id
+    // 根据ICD ID拆分工厂ID, 设备ID, 数据ID
+    function splitICDID(value) {
+        const factoryValue = (value >> 24) & 0xFF
+        const deviceValue = (value >> 16) & 0x00FF
+        const dataValue = value & 0xFFFF
 
+        factoryID.text = factoryValue.toString(16)
+        deviceID.text = deviceValue.toString(16)
+        dataID.text = dataValue.toString(16)
     }
 
     function analyzePays(value) {
@@ -214,15 +226,5 @@ Item {
         array.push(String(value & 0x000000FF))
 
         return array.join(".")
-    }
-
-    function splitValue(value) {
-        const factoryValue = (value >> 24) & 0xFF
-        const deviceValue = (value >> 16) & 0x00FF
-        const dataValue = value & 0xFFFF
-
-        factoryID.text = factoryValue.toString(16)
-        deviceID.text = deviceValue.toString(16)
-        dataID.text = dataValue.toString(16)
     }
 }

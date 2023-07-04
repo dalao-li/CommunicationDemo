@@ -22,6 +22,8 @@ Item {
 
     property int defaultHeight: 60
 
+    property var _DEVICE_LSIT: getDevices()
+
     signal itemChanged(string id, string value)
 
     height: defaultHeight
@@ -73,15 +75,26 @@ Item {
             verticalAlignment: Text.AlignVCenter
         }
 
-        // device信息
+        // 设备信息
         ComboBox {
-            id: deviceIDCombox
+            id: deviceComboBox
             width: 130
             height: 25
 
             textRole: "type"
 
-            model: devices
+            model: ListModel {
+                Component.onCompleted: {
+                    // 加载原始数据
+                    for (var i in devices) {
+                        deviceComboBox.model.append(devices[i])
+                    }
+                    mainWindow.updateDeviceSignal.connect(function(deviceList) {
+                        deviceComboBox.model.clear()
+                        deviceComboBox.model.append(deviceList)
+                    })
+                }
+            }
 
             property var curIndex: {
                 for (var i in devices) {
@@ -95,7 +108,6 @@ Item {
             currentIndex: curIndex
 
             onCurIndexChanged: {
-                //console.log("action device currIndex = ", curIndex)
                 currentIndex = curIndex
             }
 
@@ -151,7 +163,6 @@ Item {
             currentIndex: curIndex
 
             onCurIndexChanged: {
-                //console.log("action icd currIndex = ", curIndex)
                 currentIndex = curIndex
             }
 
@@ -161,7 +172,7 @@ Item {
                 }
 
                 if (root._action) {
-                    //console.log("当前action bind_input_icd", icdList[currentIndex].id)
+                    console.log("当前action bind_input_icd", icdList[currentIndex].id)
                     root._action.bind_input_icd = icdList[currentIndex].id
                     root.itemChanged("bind_input_icd", icdList[currentIndex].id)
                 }
@@ -189,20 +200,8 @@ Item {
     }
 
     function load(value) {
-        //console.log("ActionDetail ", JSON.stringify(value))
         _action = value
         name.text = _action.name
-
-        if (value.device === undefined) {
-            return
-        }
-
-        for (var i in devices) {
-            if (value.device.device_id === devices[i].device_id) {
-                deviceIDCombox.currentIndex = i
-                break
-            }
-        }
     }
 
     function getInputICDList() {
@@ -223,5 +222,11 @@ Item {
             }
         }
         return icdList
+    }
+
+    function clear() {
+        deviceComboBox.currentIndex = 0
+        icdCombox.currentIndex = 0
+        name.text = ""
     }
 }

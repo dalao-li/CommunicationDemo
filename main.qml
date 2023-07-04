@@ -41,6 +41,7 @@ ApplicationWindow {
 
     property var actions: []
 
+    // 页面枚举
     property var _SEND_TAB_INDEX: 0
     property var _RECEIVE_TAB_INDEX: 1
     property var _PAYLOAD_TAB_INDEX: 2
@@ -50,6 +51,7 @@ ApplicationWindow {
 
     property var currentTabIndex: 0
 
+    signal updateDeviceSignal(var deviceList)
 
     menuBar: MenuBar {
         Menu {
@@ -261,5 +263,21 @@ ApplicationWindow {
         }
 
         return item
+    }
+
+    function getPayloads() {
+        return payloads
+    }
+
+    function getDevices() {
+        return devices
+    }
+
+    function getStatus() {
+        return status
+    }
+
+    function getAction() {
+        return actions
     }
 }

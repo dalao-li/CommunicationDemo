@@ -225,7 +225,7 @@ Window {
                 "enumname": i,
                 "enumdata": enumInfos[i]
             }
-            console.log("info ", JSON.stringify(info))
+            //console.log("info ", JSON.stringify(info))
             table.model.insert(index++, info)
             root.enumInfos.push(info)
         }

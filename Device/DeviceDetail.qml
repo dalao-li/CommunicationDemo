@@ -259,7 +259,7 @@ Column {
             visible: true
             role: "isInput"
             title: "输入选择"
-            width: 160
+            width: 200
         }
 
         TableViewColumn {
@@ -267,7 +267,7 @@ Column {
             visible: true
             role: "isOuput"
             title: "输出选择"
-            width: 80
+            width: 200
         }
 
         TableViewColumn {
@@ -275,7 +275,7 @@ Column {
             visible: true
             role: "icdName"
             title: "ICD名称"
-            width: 100
+            width: 200
         }
 
         TableViewColumn {
@@ -283,7 +283,7 @@ Column {
             visible: true
             role: "icdValue"
             title: "ICD id"
-            width: 80
+            width: 200
         }
 
         model: ListModel {}
@@ -359,6 +359,9 @@ Column {
                     margins: 1
                 }
 
+                implicitWidth: 20;
+                implicitHeight: 20;
+
                 visible: styleData.column === _OUTPUT_ICD_COLUMN
 
                 property var select: styleData.value
@@ -420,6 +423,10 @@ Column {
 
     // 加载函数
     function load(value) {
+        if (value === {} || value === undefined) {
+            return
+        }
+
         _device = value
 
         type.text = value.type
@@ -447,5 +454,12 @@ Column {
             }
             table.model.append(data)
         }
+    }
+
+    function clear() {
+        type.text = ""
+        deviceID.text = ""
+
+        table.model.clear()
     }
 }

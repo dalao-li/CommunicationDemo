@@ -96,8 +96,13 @@ ListView {
                     "actions": {
                         "name": "动作" + String(root.actions.length),
                         // 默认绑首个input_icd
-                        "bind_input_icd": devices[0].bind_input_icd[0],
-                        "condition": [],
+                        "bind_input_icd": devices[0].input_icd[0],
+                        "condition": [
+                            {
+                                "id": devices[0].output_icd[0],
+                                "keys": []
+                            }
+                        ],
                     }
                 }
                 root.actions.push(info)
@@ -220,19 +225,19 @@ ListView {
     function saveActionInfo(path) {
         var data = root.actions
         var dataList = []
-
         // 处理JSON
         // TODO 按设备划分, 同设备下的action放在一个actions里
         for (var i in data) {
-            console.log("data", JSON.stringify(data[i]))
-            // device_id
+            console.log("data = ", JSON.stringify(data))
             var deviceID = data[i].device.device_id
 
+            var actionList = []
             var actions = data[i].actions
+
             var inputICD = actions.bind_input_icd
             var name = actions.name
 
-            var condRes = []
+            var condList = []
             var condition = actions.condition
             for (var j in condition) {
                 var outputICD = condition[j].id
@@ -247,13 +252,13 @@ ListView {
                                  })
                 }
 
-                condRes.push({"id": condition[j].id, "keys": keyList})
+                condList.push({"id": condition[j].id, "keys": keyList})
             }
-
+            actionList.push({"name": name, "id": inputICD, "condition": condList})
 
             dataList.push({
                               "id": deviceID,
-                              "actions": {"name": name, "id": inputICD, "condition": condRes}
+                              "actions": actionList
                           })
         }
 

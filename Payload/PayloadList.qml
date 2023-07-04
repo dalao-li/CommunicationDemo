@@ -87,26 +87,9 @@ ListView {
             }
 
             onClicked: {
-                var info = {
-                    "name": "载荷" + String(root.payloads.length),
-                    "id": String(createID()),
-                    "bus": 0,
-                    "bus_type": "udp",
-                    "values": []
-                }
-                root.payloads.push(info)
-                root.model.append({"name": info.name})
+                addData()
             }
         } // BatchAddButton end
-
-//        Button {
-//            width: 120
-//            height: 32
-//            text: "ICD导入"
-//            onClicked: {
-//                deviceDialog.open()
-//            } // onClicked end
-//        }
     } // header end
 
     delegate: Label {
@@ -162,8 +145,8 @@ ListView {
     }
 
     function createID() {
-        const MAX = 65535
-        const MIN = 0
+        const MAX = 99999999
+        const MIN = 40000000
 
         while(true) {
             var num = Math.floor(Math.random() * (MIN - MAX)) + MAX
@@ -182,19 +165,19 @@ ListView {
     }
 
     function saveJSONFile(path) {
-        Excutor.query({"command": "write",
+        Excutor.query({
+                          "command": "write",
                           content: Excutor.formatJSON(JSON.stringify(payloads)),
-                          path: path})
+                          path: path
+                      })
     }
 
     // 导入设备信息
     function readJSONFile(path) {
-        //console.log("path = ", path)
         if (path === "") {
             return
         }
 
-        // 读取JSON
         var data = Excutor.query({"payloads": path})
         for (var i in data) {
             var info = {
@@ -207,5 +190,17 @@ ListView {
             root.payloads.push(info)
             root.model.append({name: info.name})
         }
+    }
+
+    function addData() {
+        var info = {
+            "name": "载荷" + String(root.payloads.length),
+            "id": String(createID()),
+            "bus": 0,
+            "bus_type": "udp",
+            "values": []
+        }
+        root.payloads.push(info)
+        root.model.append({"name": info.name})
     }
 }

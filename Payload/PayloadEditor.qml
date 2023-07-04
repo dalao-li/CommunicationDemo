@@ -45,6 +45,13 @@ ColumnLayout {
                     detailComponent.load(data)
                     segmentComponent.load(data.values)
                 }
+
+                onCountChanged: {
+                    if (listComponent.count <= 0) {
+                        detailComponent.clear()
+                        segmentComponent.clear()
+                    }
+                }
             } // PayloadList end
         }
 
@@ -64,19 +71,18 @@ ColumnLayout {
                 }
 
                 onItemChanged: {
-                    var data = {}
+                    var newValue = {}
                     if (listComponent.currentIndex < 0) {
                         return
                     }
-
                     if (id === "name") {
-                        data = {"name": value}
+                        newValue = {"name": value}
                     }
 
                     if (id === "id") {
-                        data = {"id": value}
+                        newValue = {"id": value}
                     }
-                    listComponent.model.set(listComponent.currentIndex, data)
+                    listComponent.model.set(listComponent.currentIndex, newValue)
                 }
             }
 

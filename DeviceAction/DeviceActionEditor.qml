@@ -40,9 +40,14 @@ ColumnLayout {
                         return
                     }
                     var data = root.actions[listComponent.currentIndex]
-                    //console.log("ActionEditor", JSON.stringify(data))
                     detailComponent.load({"device": data.device, "name": data.actions.name, "bind_input_icd": data.actions.bind_input_icd})
                     segmentComponent.load(data)
+                }
+                onCountChanged: {
+                    if (listComponent.count <= 0) {
+                        detailComponent.clear()
+                        segmentComponent.clear()
+                    }
                 }
             } // listComponent end
         }

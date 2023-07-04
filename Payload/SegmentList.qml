@@ -48,21 +48,20 @@ Item {
     property var _ASCII_TYPE: 7
     property var _UNICODE: 8
 
+    property var _TYPE_LIST: ["无符号整数", "单精度浮点", "双精度浮点", "字符串", "枚举", "有符号整数", "字符", "ASCII", "UNICODE"]
+
     signal itemChanged(string id, string value)
 
     // 表头
     Rectangle {
         id: title
-
         color: "#8E8E8E"
-
+        height: 32
         anchors {
             left: parent.left
             right: parent.right
             top: parent.top
         }
-
-        height: 32
 
         Label {
             anchors.centerIn: parent
@@ -102,7 +101,7 @@ Item {
 
         TableViewColumn {
             id: nameCol
-            visible: table.columsVisible[0]
+            visible: true
             role: "name"
             title: "名称"
             width: 160
@@ -110,23 +109,23 @@ Item {
 
         TableViewColumn {
             id: offsetCol
-            visible: table.columsVisible[1]
+            visible: true
             role: "offset"
             title: "偏移"
-            width: 80
+            width: 50
         }
 
         TableViewColumn {
             id: sizeCol
-            visible: table.columsVisible[2]
+            visible: true
             role: "size"
             title: "大小"
-            width: 80
+            width: 50
         }
 
         TableViewColumn {
             id: typeCol
-            visible: table.columsVisible[3]
+            visible: true
             role: "type"
             title: "类型"
             width: 100
@@ -134,7 +133,7 @@ Item {
 
         TableViewColumn {
             id: maskCol
-            visible: table.columsVisible[4]
+            visible: true
             role: "mask"
             title: "掩码"
             width: 100
@@ -142,7 +141,7 @@ Item {
 
         TableViewColumn {
             id: orderCol
-            visible: table.columsVisible[5]
+            visible: true
             role: "order"
             title: "大/小端"
             width: 80
@@ -150,7 +149,7 @@ Item {
 
         TableViewColumn {
             id: dimCol
-            visible: table.columsVisible[6]
+            visible: true
             role: "dim"
             title: "量纲"
             width: 80
@@ -158,7 +157,7 @@ Item {
 
         TableViewColumn {
             id: ampCol
-            visible: table.columsVisible[7]
+            visible: true
             role: "amp"
             title: "幅值"
             width: 80
@@ -166,7 +165,7 @@ Item {
 
         TableViewColumn {
             id: bitstartCol
-            visible: table.columsVisible[8] && 0
+            visible: false
             role: "bitstart"
             title: "bitstart"
             width: 80
@@ -174,7 +173,7 @@ Item {
 
         TableViewColumn {
             id: bitlengthCol
-            visible: table.columsVisible[9] && 0
+            visible: false
             role: "bitlength"
             title: "bitlength"
             width: 80
@@ -182,21 +181,21 @@ Item {
 
         TableViewColumn {
             id: descCol
-            visible: table.columsVisible[10]
+            visible: true
             role: "desc"
             title: "描述"
-            width: 250
+            width: 200
         }
 
         TableViewColumn {
             id: enumdataCol
-            visible: table.columsVisible[11]
+            visible: true
             role: "meaning"
             title: "枚举值"
-            width: 80
+            width: 300
         }
 
-        // 如何绘制每一个单元格
+        // Item委托
         itemDelegate: Item {
             Label {
                 id: indexLabel
@@ -253,7 +252,7 @@ Item {
 
                 model: {
                     if (styleData.column === _TYPE_COLUMN) {
-                        return ["无符号整数", "单精度浮点", "双精度浮点", "字符串", "枚举", "有符号整数", "字符", "ASCII", "UNICODE"]
+                        return _TYPE_LIST
                     }
 
                     if (styleData.column === _ORDER_COLUMN) {
@@ -283,7 +282,6 @@ Item {
 
                 visible: styleData.selected && validColumn
 
-                // enabled: styleData.selected && ![_UINT_TYPE, _DOUBLE_TYPE, _CHAR_TYPE].includes(segments[styleData.row].type)
                 enabled: true
 
                 value: validColumn ? Number(styleData.value) : 0
@@ -295,7 +293,6 @@ Item {
                     if (!visible) {
                         return
                     }
-
                     root.updateValue(styleData.row, styleData.column, value)
 
                     if (styleData.column === _SIZE_COLUMN) {
@@ -347,7 +344,6 @@ Item {
                         windows.rootPage = root
 
                         if (segments[styleData.row].meaning) {
-                            console.log("segments[styleData.row].meaning", JSON.stringify(segments[styleData.row].meaning))
                             windows.setEunmInfos(segments[styleData.row].meaning)
                         }
                     }
@@ -356,18 +352,15 @@ Item {
 
             Label {
                 id: label
+                //width: 300
                 anchors.fill: parent
+
                 visible: !styleData.selected || [_BITSTART_COLUMN, _BIT_LENGTH_COLUMN].includes(styleData.column)
 
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
 
-                property var select: {
-                    if (styleData.value === undefined) {
-                        return ""
-                    }
-                    return styleData.value
-                }
+                property var select: styleData.value
 
                 text: {
                     if (!visible || select === undefined) {
@@ -379,12 +372,18 @@ Item {
                     }
 
                     if (styleData.column === _TYPE_COLUMN) {
-                        var dts = ["无符号整数", "单精度浮点", "双精度浮点", "字符串", "枚举", "有符号整数", "字符", "ASCII", "UNICODE"]
-                        return dts[Number(select)]
+                        if (select === "" || Number(select) < 0) {
+                            return
+                        }
+                        return _TYPE_LIST[Number(select)]
                     }
 
                     if (styleData.column === _ORDER_COLUMN) {
                         return Number(select) === 0 ? "小端" : "大端"
+                    }
+
+                    if (styleData.column === _MEANING_COLUMN) {
+                        return String(JSON.stringify(select)).substring(0, 20)
                     }
 
                     return String(JSON.stringify(select))
@@ -392,15 +391,6 @@ Item {
             }
         } // itemDelegate end
 
-        property var columsVisible: {
-            var apppath = Excutor.query({ "apppath": "" })
-            var config = Excutor.query({ "read": apppath + "/config/persistence.soft" })
-            return config.payload_editor.segments
-        }
-
-        model: ListModel {}
-
-        // 行背景
         rowDelegate: Item {
             height: 25
 
@@ -455,6 +445,9 @@ Item {
                 }
             }
         } // end of rowDelegate
+
+        model: ListModel {}
+
     } // end of TableView
 
 
