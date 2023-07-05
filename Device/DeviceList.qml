@@ -18,7 +18,7 @@ ListView {
     id: root
 
     property var devices: []
-    property var deviceJSONFile
+    property var jsonFile
 
     focus: true
     implicitWidth: 200
@@ -63,12 +63,15 @@ ListView {
         // 保存按钮
         AwesomeIcon {
             id: save
-            anchors.verticalCenter: parent.verticalCenter
+            anchors {
+                verticalCenter: parent.verticalCenter
+                right: batchAdd.left
+                rightMargin: 5
+            }
+
             size: 20
             name: "save"
             color: "black"
-            anchors.right: batchAdd.left
-            anchors.rightMargin: 5
 
             MouseArea {
                 anchors.fill: parent
@@ -129,10 +132,9 @@ ListView {
                 name: "minus"
                 onClicked: {
                     root.devices.splice(root.currentIndex, 1)
-
-                    mainWindow.updateDeviceSignal(devices)
-
                     root.model.remove(root.currentIndex, 1)
+
+                    mainWindow.signalUpdateDeviceInfo(devices)
                 }
             }
         }
@@ -169,10 +171,9 @@ ListView {
             "output_icd": [],
         }
         root.devices.push(info)
-
         root.model.append({type: info.type})
 
-        mainWindow.updateDeviceSignal(devices)
+        mainWindow.signalUpdateDeviceInfo(devices)
     }
 
     // 生成随机ID
@@ -201,15 +202,14 @@ ListView {
             return
         }
 
-        // 读取JSON
-        deviceJSONFile = Excutor.query({"read": path})
+        jsonFile = Excutor.query({"read": path})
 
-        var monitorDeviceType = deviceJSONFile["monitor_device_type"]
-        var deviceICDList = deviceJSONFile["DeviceICDList"]
+        var monitorDeviceType = jsonFile["monitor_device_type"]
+        var deviceICDList = jsonFile["DeviceICDList"]
 
         for (var i in monitorDeviceType) {
             var device_id = monitorDeviceType[i].device_id
-            var icdList = deviceICDList[monitorDeviceType[i].device_id]
+            var icdList = deviceICDList[device_id]
             var inputList = []
             var outputList = []
             for (var j in icdList) {
@@ -245,11 +245,10 @@ ListView {
                 "input_icd": inputList,
                 "output_icd": outputList,
             }
-
             root.devices.push(info)
-            root.model.append(info)
+            root.model.append({type: info.type})
         }
-        mainWindow.updateDeviceSignal(devices)
+        mainWindow.signalUpdateDeviceInfo(devices)
     }
 
     // 存储文件
@@ -281,11 +280,11 @@ ListView {
         }
 
         // 如果前期未导入JSON
-        if (deviceJSONFile === undefined) {
-            deviceJSONFile = {}
+        if (jsonFile === undefined) {
+            jsonFile = {}
         }
 
-        deviceJSONFile["monitor_device_type"] = monitorDeviceType
+        jsonFile["monitor_device_type"] = monitorDeviceType
 
         var deviceICDList = {}
         // 增加设置ICD信息
@@ -301,10 +300,10 @@ ListView {
             deviceICDList[root.devices[j].device_id] = bindICD
         }
 
-        deviceJSONFile["DeviceICDList"] = deviceICDList
+        jsonFile["DeviceICDList"] = deviceICDList
 
         Excutor.query({"command": "write",
-                          content: Excutor.formatJSON(JSON.stringify(deviceJSONFile)),
+                          content: Excutor.formatJSON(JSON.stringify(jsonFile)),
                           path: path})
     }
 }

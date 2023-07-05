@@ -197,6 +197,37 @@ Item {
 
         // Item委托
         itemDelegate: Item {
+            Loader {
+                anchors.fill: parent
+                sourceComponent: {
+                    if (styleData.selected) {
+                        if([_NAME_COLUMN, _MASK_COLUMN, _DESC_COLUMN].includes(styleData.column)) {
+                            return textComponent
+                        }
+
+                        if(styleData.column === _TYPE_COLUMN || styleData.column === _ORDER_COLUMN) {
+                            return typeBoxComponent
+                        }
+
+                        if(styleData.column === _OFFSET_COLUMN || styleData.column === _SIZE_COLUMN) {
+                            return spinBoxComponent_1
+                        }
+
+                        if (styleData.column === _DIM_COLUMN || styleData.column === _AMP_COLUMN) {
+                            return spinBoxComponent_2
+                        }
+
+                        if (styleData.column === _MEANING_COLUMN && segments[styleData.row].type === _ENUM_TYPE) {
+                            return buttonComponent
+                        }
+                    }
+
+                    else {
+                        return labelCompoent
+                    }
+                }
+            }
+
             Label {
                 id: indexLabel
                 anchors {
@@ -210,183 +241,203 @@ Item {
                 verticalAlignment: Text.AlignVCenter
             }
 
-            TextField {
-                id: field
-                anchors {
-                    fill: parent
-                    margins: 1
-                }
-
-                property var validColumn: [_NAME_COLUMN, _MASK_COLUMN, _DESC_COLUMN].includes(styleData.column)
-
-                visible: validColumn && styleData.selected
-
-                text: {
-                    if (validColumn) {
-                        return styleData.value
-                    }
-                    return ""
-                }
-
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-
-                onTextChanged: {
-                    if (!visible) {
-                        return
-                    }
-                    root.updateValue(styleData.row, styleData.column, field.text)
-                }
-            } // TextField end
-
-            ComboBox {
-                id: typeBox
-                anchors {
-                    fill: parent
-                    margins: 1
-                }
-
-                property var validColumn: styleData.column === _TYPE_COLUMN || styleData.column === _ORDER_COLUMN
-
-                visible: validColumn && styleData.selected
-
-                model: {
-                    if (styleData.column === _TYPE_COLUMN) {
-                        return _TYPE_LIST
+            Component {
+                id: textComponent
+                TextField {
+                    id: field
+                    anchors {
+                        fill: parent
+                        margins: 1
                     }
 
-                    if (styleData.column === _ORDER_COLUMN) {
-                        return ["小端", "大端"]
-                    }
-                    return []
-                }
+                    property var validColumn: [_NAME_COLUMN, _MASK_COLUMN, _DESC_COLUMN].includes(styleData.column)
 
-                currentIndex: validColumn ? Number(styleData.value) : 0
+                    visible: validColumn && styleData.selected
 
-                onCurrentIndexChanged: {
-                    if (!visible) {
-                        return
-                    }
-                    root.updateValue(styleData.row, styleData.column, typeBox.currentIndex)
-                }
-            }
-
-            // 大小
-            SpinBox {
-                anchors {
-                    fill: parent
-                    margins: 1
-                }
-
-                property var validColumn: styleData.column === _OFFSET_COLUMN || styleData.column === _SIZE_COLUMN
-
-                visible: styleData.selected && validColumn
-
-                enabled: true
-
-                value: validColumn ? Number(styleData.value) : 0
-
-                maximumValue: 128
-                minimumValue: styleData.column === 1 ? 0 : 1
-
-                onValueChanged: {
-                    if (!visible) {
-                        return
-                    }
-                    root.updateValue(styleData.row, styleData.column, value)
-
-                    if (styleData.column === _SIZE_COLUMN) {
-                        root.updateValue(styleData.row, 4, getMask(value))
-                        root.updateValue(styleData.row, 9, value * 8)
-                    }
-                    root.updateOffset(styleData.row)
-                }
-            }
-
-            SpinBox {
-                anchors {
-                    fill: parent
-                    margins: 1
-                }
-
-                property var validColumn: styleData.column === _DIM_COLUMN || styleData.column === _AMP_COLUMN
-
-                visible: styleData.selected && validColumn
-
-                value: validColumn ? Number(styleData.value) : 0
-
-                maximumValue: 999999
-                minimumValue: 0
-
-                onValueChanged: {
-                    if (!visible) {
-                        return
-                    }
-                    root.updateValue(styleData.row, styleData.column, value)
-                }
-            }
-
-            Button {
-                id: enumBtn
-                text: qsTr("枚举")
-                anchors {
-                    fill: parent
-                    margins: 1
-                }
-
-                visible: styleData.selected && styleData.column === _MEANING_COLUMN && segments[styleData.row].type === _ENUM_TYPE
-
-                onClicked: {
-                    var component = Qt.createComponent("SetEnumData.qml")
-                    if (component.status === Component.Ready) {
-                        var windows = component.createObject()
-                        windows.show()
-                        windows.rootPage = root
-
-                        if (segments[styleData.row].meaning) {
-                            windows.setEunmInfos(segments[styleData.row].meaning)
+                    text: {
+                        if (validColumn) {
+                            return styleData.value
                         }
-                    }
-                }
-            }
-
-            Label {
-                id: label
-                //width: 300
-                anchors.fill: parent
-
-                visible: !styleData.selected || [_BITSTART_COLUMN, _BIT_LENGTH_COLUMN].includes(styleData.column)
-
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-
-                property var select: styleData.value
-
-                text: {
-                    if (!visible || select === undefined) {
                         return ""
                     }
 
-                    if (styleData.column === _NAME_COLUMN || styleData.column === _DESC_COLUMN) {
-                        return select
-                    }
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
 
-                    if (styleData.column === _TYPE_COLUMN) {
-                        if (select === "" || Number(select) < 0) {
+                    onTextChanged: {
+                        if (!visible) {
                             return
                         }
-                        return _TYPE_LIST[Number(select)]
+                        root.updateValue(styleData.row, styleData.column, field.text)
+                    }
+                } // TextField end
+            }
+
+            Component {
+                id: typeBoxComponent
+                ComboBox {
+                    id: typeBox
+                    anchors {
+                        fill: parent
+                        margins: 1
                     }
 
-                    if (styleData.column === _ORDER_COLUMN) {
-                        return Number(select) === 0 ? "小端" : "大端"
+                    property var validColumn: styleData.column === _TYPE_COLUMN || styleData.column === _ORDER_COLUMN
+
+                    visible: validColumn && styleData.selected
+
+                    model: {
+                        if (styleData.column === _TYPE_COLUMN) {
+                            return _TYPE_LIST
+                        }
+
+                        if (styleData.column === _ORDER_COLUMN) {
+                            return ["小端", "大端"]
+                        }
+                        return []
                     }
 
-                    if (styleData.column === _MEANING_COLUMN) {
-                        return String(JSON.stringify(select)).substring(0, 20)
+                    currentIndex: validColumn ? Number(styleData.value) : 0
+
+                    onCurrentIndexChanged: {
+                        if (!visible) {
+                            return
+                        }
+                        root.updateValue(styleData.row, styleData.column, typeBox.currentIndex)
+                    }
+                }
+            }
+
+            Component {
+                id: spinBoxComponent_1
+                // 大小
+                SpinBox {
+                    anchors {
+                        fill: parent
+                        margins: 1
                     }
 
-                    return String(JSON.stringify(select))
+                    property var validColumn: styleData.column === _OFFSET_COLUMN || styleData.column === _SIZE_COLUMN
+
+                    visible: styleData.selected && validColumn
+
+                    enabled: true
+
+                    value: validColumn ? Number(styleData.value) : 0
+
+                    maximumValue: 128
+                    minimumValue: styleData.column === 1 ? 0 : 1
+
+                    onValueChanged: {
+                        if (!visible) {
+                            return
+                        }
+                        root.updateValue(styleData.row, styleData.column, value)
+
+                        if (styleData.column === _SIZE_COLUMN) {
+                            root.updateValue(styleData.row, 4, getMask(value))
+                            root.updateValue(styleData.row, 9, value * 8)
+                        }
+                        root.updateOffset(styleData.row)
+                    }
+                }
+            }
+
+            Component {
+                id: spinBoxComponent_2
+                SpinBox {
+                    anchors {
+                        fill: parent
+                        margins: 1
+                    }
+
+                    property var validColumn: styleData.column === _DIM_COLUMN || styleData.column === _AMP_COLUMN
+
+                    visible: styleData.selected && validColumn
+
+                    value: validColumn ? Number(styleData.value) : 0
+
+                    maximumValue: 999999
+                    minimumValue: 0
+
+                    onValueChanged: {
+                        if (!visible) {
+                            return
+                        }
+                        root.updateValue(styleData.row, styleData.column, value)
+                    }
+                }
+            }
+
+            Component {
+                id: buttonComponent
+                Button {
+                    id: enumBtn
+                    text: qsTr("枚举")
+                    anchors {
+                        fill: parent
+                        margins: 1
+                    }
+
+                    visible: styleData.selected && styleData.column === _MEANING_COLUMN && segments[styleData.row].type === _ENUM_TYPE
+
+                    onClicked: {
+                        var component = Qt.createComponent("SetEnumData.qml")
+                        if (component.status === Component.Ready) {
+                            var windows = component.createObject()
+                            windows.show()
+                            windows.rootPage = root
+
+                            if (segments[styleData.row].meaning) {
+                                windows.setEunmInfos(segments[styleData.row].meaning)
+                            }
+                        }
+                    }
+                }
+            }
+
+            Component {
+                id: labelCompoent
+                Label {
+                    id: label
+                    //width: 300
+                    anchors.fill: parent
+
+                    visible: !styleData.selected
+
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+
+                    property var select: styleData.value
+
+                    text: {
+                        if (!visible || select === undefined) {
+                            return ""
+                        }
+
+                        if (styleData.column === _NAME_COLUMN || styleData.column === _DESC_COLUMN) {
+                            return styleData.value
+                        }
+
+                        if (styleData.column === _TYPE_COLUMN) {
+                            if (select === "" || Number(select) < 0) {
+                                return ""
+                            }
+                            if (Number(select) <= _TYPE_LIST.length) {
+                                return _TYPE_LIST[Number(select)]
+                            }
+                        }
+
+                        if (styleData.column === _ORDER_COLUMN) {
+                            return Number(select) === 0 ? "小端" : "大端"
+                        }
+
+                        if (styleData.column === _MEANING_COLUMN) {
+                            return String(JSON.stringify(select)).substring(0, 20)
+                        }
+
+                        return select
+                    }
                 }
             }
         } // itemDelegate end

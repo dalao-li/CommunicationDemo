@@ -135,198 +135,236 @@ Item {
 
         // 如何绘制每一个单元格
         itemDelegate: Item {
-            Label {
-                id: label
+            Loader {
                 anchors.fill: parent
-                visible: !styleData.selected || [_BIND_ICD_COLUMN, _FIELD_INDEX_COLUMN, _TYPE_NAME_COLUMN, _DESC_COLUMN, _STATUS_TYPE_COLUMN].includes(styleData.column)
+                sourceComponent: {
+                    if (styleData.selected) {
+                        if ([_TYPE_NAME_COLUMN, _DESC_COLUMN].includes(styleData.column)) {
+                            return textComponent
+                        }
 
-                // 设置居中
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
+                        if (styleData.column === _BIND_ICD_COLUMN) {
+                            return icdComboboxCompoent
+                        }
 
-                text: {
-                    if (!visible || styleData.row === undefined || segments[styleData.row] === undefined || segments[styleData.row] === []) {
-                        return ""
+                        if (styleData.column === _FIELD_INDEX_COLUMN) {
+                            return indexComboboxComponent
+                        }
+
+                        if (styleData.column === _STATUS_LIST_COLUMN) {
+                            return buttonComponent
+                        }
                     }
 
-                    switch (styleData.column) {
-                    case _STATUS_TYPE_COLUMN:
-                    case _TYPE_NAME_COLUMN:
-                    case _DESC_COLUMN:
-                        return String(styleData.value)
-                    case _BIND_ICD_COLUMN:
-                        for (var i in payloads) {
-                            if (payloads[i].id === styleData.value) {
-                                return payloads[i].name
-                            }
-                        }
-                        break
-                    case _FIELD_INDEX_COLUMN:
-                        for (var j in payloads) {
-                            if (payloads[j].id === String(segments[styleData.row].bind_icd)) {
-                                var value = payloads[j].values[styleData.value]
-                                if (value === undefined) {
-                                    return ""
-                                }
-                                return value.name
-                            }
-                        }
-                        break
-
-                    default:
-                        return ""
+                    else {
+                        return labelComponent
                     }
-                    return ""
                 }
             }
 
-            TextField {
-                id: field
-                anchors {
-                    fill: parent
-                    margins: 1
-                }
+            Component {
+                id: labelComponent
+                Label {
+                    id: label
+                    anchors.fill: parent
+                    visible: !styleData.selected
 
-                property var validColumn: [_TYPE_NAME_COLUMN, _DESC_COLUMN].includes(styleData.column)
+                    // 设置居中
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
 
-                visible: validColumn && styleData.selected
+                    text: {
+                        if (!visible || styleData.row === undefined || segments[styleData.row] === undefined || segments[styleData.row] === []) {
+                            return ""
+                        }
 
-                enabled: {
-                    return true
-                }
+                        switch (styleData.column) {
+                        case _STATUS_TYPE_COLUMN:
+                        case _TYPE_NAME_COLUMN:
+                        case _DESC_COLUMN:
+                            return String(styleData.value)
+                        case _BIND_ICD_COLUMN:
+                            for (var i in payloads) {
+                                if (payloads[i].id === styleData.value) {
+                                    return payloads[i].name
+                                }
+                            }
+                            break
+                        case _FIELD_INDEX_COLUMN:
+                            for (var j in payloads) {
+                                if (payloads[j].id === String(segments[styleData.row].bind_icd)) {
+                                    var value = payloads[j].values[styleData.value]
+                                    if (value === undefined) {
+                                        return ""
+                                    }
+                                    return value.name
+                                }
+                            }
+                            break
 
-                text: {
-                    if (validColumn) {
-                        return styleData.value
+                        default:
+                            return ""
+                        }
+                        return ""
                     }
-                    return qsTr("")
                 }
+            }
 
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-
-                onTextChanged: {
-                    if (!visible || styleData.row === undefined) {
-                        return
+            Component {
+                id: textComponent
+                TextField {
+                    id: field
+                    anchors {
+                        fill: parent
+                        margins: 1
                     }
-                    root.setValue(styleData.row, styleData.column, field.text)
-                }
-            } // TextField end
 
-            // 绑定的ICD
-            ComboBox {
-                id: typeBox
-                anchors {
-                    fill: parent
-                    margins: 1
-                }
+                    property var validColumn: [_TYPE_NAME_COLUMN, _DESC_COLUMN].includes(styleData.column)
 
-                textRole: "text"
+                    visible: validColumn && styleData.selected
 
-                visible: styleData.selected && styleData.column === _BIND_ICD_COLUMN
+                    enabled: {
+                        return true
+                    }
 
-                property var curIndex: {
-                    if (styleData.row === undefined || segments[styleData.row] === undefined || segments[styleData.row].bind_icd === undefined) {
+                    text: {
+                        if (validColumn) {
+                            return styleData.value
+                        }
+                        return qsTr("")
+                    }
+
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+
+                    onTextChanged: {
+                        if (!visible || styleData.row === undefined) {
+                            return
+                        }
+                        root.setValue(styleData.row, styleData.column, field.text)
+                    }
+                } // TextField end
+            }
+
+            Component {
+                id: icdComboboxCompoent
+                // 绑定的ICD
+                ComboBox {
+                    id: typeBox
+                    anchors {
+                        fill: parent
+                        margins: 1
+                    }
+
+                    textRole: "text"
+
+                    visible: styleData.selected && styleData.column === _BIND_ICD_COLUMN
+
+                    property var curIndex: {
+                        if (styleData.row === undefined || segments[styleData.row] === undefined || segments[styleData.row].bind_icd === undefined) {
+                            return -1
+                        }
+
+                        for (var i in icdList) {
+                            if (String(segments[styleData.row].bind_icd) === icdList[i].value) {
+                                return i
+                            }
+                        }
                         return -1
                     }
 
-                    for (var i in icdList) {
-                        if (String(segments[styleData.row].bind_icd) === icdList[i].value) {
-                            return i
+                    model: icdList
+
+                    currentIndex: curIndex
+
+                    onCurIndexChanged: {
+                        currentIndex = curIndex
+                    }
+
+                    onCurrentIndexChanged: {
+                        if (!visible || styleData.row === undefined || currentIndex < 0) {
+                            return
                         }
+                        // 更新当前bind_icd
+                        root.setValue(styleData.row, styleData.column, icdList[currentIndex].value)
                     }
-                    return -1
-                }
-
-                model: icdList
-
-                currentIndex: curIndex
-
-                onCurIndexChanged: {
-                    currentIndex = curIndex
-                }
-
-                onCurrentIndexChanged: {
-                    if (!visible || styleData.row === undefined || currentIndex < 0) {
-                        return
-                    }
-                    // 更新当前bind_icd
-                    root.setValue(styleData.row, styleData.column, icdList[currentIndex].value)
-
-                    // 同步修改index
-//                    fieldCombox.model = getFieldList(icdList[currentIndex].value)
-//                    fieldCombox.curIndex = 0
                 }
             }
 
-            // ICD下的工程index
-            ComboBox {
-                id: fieldCombox
-                anchors {
-                    fill: parent
-                    margins: 1
-                }
-
-                textRole: "text"
-
-                visible: styleData.selected && styleData.column === _FIELD_INDEX_COLUMN
-
-                // field 列表
-                property var fieldList: {
-                    if (styleData.row === undefined || segments[styleData.row] === undefined || segments[styleData.row].bind_icd === undefined) {
-                        return []
+            Component {
+                id: indexComboboxComponent
+                // ICD下的工程index
+                ComboBox {
+                    id: fieldCombox
+                    anchors {
+                        fill: parent
+                        margins: 1
                     }
-                    return getFieldList(segments[styleData.row].bind_icd)
-                }
 
-                property var curIndex: {
-                    for(var i in fieldList){
-                        if(String(segments[styleData.row].field_index) === String(fieldList[i].value)) {
-                            return i
+                    textRole: "text"
+
+                    visible: styleData.selected && styleData.column === _FIELD_INDEX_COLUMN
+
+                    // field 列表
+                    property var fieldList: {
+                        if (styleData.row === undefined || segments[styleData.row] === undefined || segments[styleData.row].bind_icd === undefined) {
+                            return []
                         }
+                        return getFieldList(segments[styleData.row].bind_icd)
                     }
-                    return -1
-                }
 
-                model: fieldList
-
-                currentIndex: curIndex
-
-                onCurIndexChanged: {
-                    currentIndex = curIndex
-                }
-
-                onCurrentIndexChanged: {
-                    if (!visible || styleData.row === undefined) {
-                        return
+                    property var curIndex: {
+                        for(var i in fieldList){
+                            if(String(segments[styleData.row].field_index) === String(fieldList[i].value)) {
+                                return i
+                            }
+                        }
+                        return -1
                     }
-                    root.setValue(styleData.row, styleData.column, currentIndex)
+
+                    model: fieldList
+
+                    currentIndex: curIndex
+
+                    onCurIndexChanged: {
+                        currentIndex = curIndex
+                    }
+
+                    onCurrentIndexChanged: {
+                        if (!visible || styleData.row === undefined) {
+                            return
+                        }
+                        root.setValue(styleData.row, styleData.column, currentIndex)
+                    }
                 }
             }
 
-            Button {
-                id: enumBtn
-                text: qsTr("添加状态")
-                anchors {
-                    fill: parent
-                    margins: 1
-                }
-
-                visible: styleData.column === _STATUS_LIST_COLUMN && styleData.selected
-
-                onClicked: {
-                    var component = Qt.createComponent("DeviceStatusEnumData.qml")
-                    if (component.status === Component.Error) {
-                        console.debug("Error:"+ component.errorString())
-                        return
+            Component {
+                id: buttonComponent
+                Button {
+                    id: enumBtn
+                    text: qsTr("添加状态")
+                    anchors {
+                        fill: parent
+                        margins: 1
                     }
-                    if (component.status === Component.Ready) {
-                        var windows = component.createObject()
-                        windows.show()
-                        windows.rootPage = root
 
-                        if (segments[styleData.row].status_list) {
-                            windows.setEunmInfos(segments[styleData.row].status_list)
+                    visible: styleData.column === _STATUS_LIST_COLUMN && styleData.selected
+
+                    onClicked: {
+                        var component = Qt.createComponent("DeviceStatusEnumData.qml")
+                        if (component.status === Component.Error) {
+                            console.debug("Error:"+ component.errorString())
+                            return
+                        }
+                        if (component.status === Component.Ready) {
+                            var windows = component.createObject()
+                            windows.show()
+                            windows.rootPage = root
+
+                            if (segments[styleData.row].status_list) {
+                                windows.setEunmInfos(segments[styleData.row].status_list)
+                            }
                         }
                     }
                 }
@@ -442,7 +480,6 @@ Item {
 
     // 获取枚举
     function getEnumdata(meaning) {
-        //console.log("getEnumdata", JSON.stringify(segments[table.currentRow].status_list))
         segments[table.currentRow].status_list = meaning
     }
 

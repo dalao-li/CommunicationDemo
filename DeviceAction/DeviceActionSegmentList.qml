@@ -117,271 +117,320 @@ Item {
 
         // 如何绘制每一个单元格
         itemDelegate: Item {
-            Label {
-                id: label
+            Loader {
                 anchors.fill: parent
-                visible: !styleData.selected || [_INPUT_ICD_INDEX_COLUMN, _OUTPUT_ICD_INDEX_COLUMN, _OUTPUT_ICD_COLUMN, _DIFFERENCE_COLUMN, _DESC_COLUMN].includes(styleData.column)
-
-                // 设置居中
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-
-                property var select: styleData.value
-
-                property var segment: {
-                    if (styleData.row === undefined) {
-                        return []
-                    }
-                    return segments[styleData.row]
-                }
-
-                text: {
-                    if (!visible) {
-                        return ""
-                    }
-
-                    if (styleData.column === _INPUT_ICD_INDEX_COLUMN) {
-                        if (segment === [] || segment === undefined) {
-                            return ""
+                sourceComponent: {
+                    if (styleData.selected) {
+                        if (styleData.column === _DIFFERENCE_COLUMN) {
+                            return textComponent
                         }
-                        for (var i in payloads) {
-                            if (payloads[i].id === String(_bindInputICD)) {
-                                var values = payloads[i].values[Number(select)]
-                                if (values === undefined) {
-                                    return ""
-                                }
-                                return values.name
-                            }
+
+                        if (styleData.column === _INPUT_ICD_INDEX_COLUMN) {
+                            return inIndexComboxComponent
                         }
-                        return ""
+
+                        if (styleData.column === _OUTPUT_ICD_COLUMN) {
+                            return outputICDComboxComponent
+                        }
+
+                        if (styleData.column === _OUTPUT_ICD_INDEX_COLUMN) {
+                            return outIndexComboxComponent
+                        }
+
+                        if (styleData.column === _DESC_COLUMN) {
+                            return descTextComponent
+                        }
                     }
 
-                    if (styleData.column === _OUTPUT_ICD_COLUMN) {
-                        if (segment === [] || segment === undefined) {
-                            return ""
-                        }
-                        for (var k in payloads) {
-                            if (payloads[k].id === select) {
-                                return payloads[k].name
-                            }
-                        }
-                        return ""
+                    else {
+                        return labelComponent
                     }
-
-                    if (styleData.column === _OUTPUT_ICD_INDEX_COLUMN) {
-                        if (segment === [] || segment === undefined) {
-                            return ""
-                        }
-                        for (var w in payloads) {
-                            if (payloads[w].id === segment.bind_output_icd) {
-                                var value1 = payloads[w].values[Number(select)]
-                                if (value1 === undefined) {
-                                    return ""
-                                }
-                                return value1.name
-                            }
-                        }
-                        return ""
-                    }
-                    return select
                 }
             }
 
-            TextField {
-                id: field
-                anchors {
-                    fill: parent
-                    margins: 1
-                }
+            Component {
+                id: labelComponent
+                Label {
+                    id: label
+                    anchors.fill: parent
+                    visible: !styleData.selected
 
-                property var validColumn: styleData.column === _DIFFERENCE_COLUMN
+                    // 设置居中
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
 
-                visible: validColumn && styleData.selected
+                    property var select: styleData.value
 
-                text: {
-                    if (validColumn) {
-                        return styleData.value
+                    property var segment: {
+                        if (styleData.row === undefined) {
+                            return []
+                        }
+                        return segments[styleData.row]
                     }
-                    return qsTr("")
-                }
 
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
+                    text: {
+                        if (!visible) {
+                            return ""
+                        }
 
-                onTextChanged: {
-                    if (!visible) {
-                        return
+                        if (styleData.column === _INPUT_ICD_INDEX_COLUMN) {
+                            if (segment === [] || segment === undefined) {
+                                return ""
+                            }
+                            for (var i in payloads) {
+                                if (payloads[i].id === String(_bindInputICD)) {
+                                    var values = payloads[i].values[Number(select)]
+                                    if (values === undefined) {
+                                        return ""
+                                    }
+                                    return values.name
+                                }
+                            }
+                            return ""
+                        }
+
+                        if (styleData.column === _OUTPUT_ICD_COLUMN) {
+                            if (segment === [] || segment === undefined) {
+                                return ""
+                            }
+                            for (var k in payloads) {
+                                if (payloads[k].id === select) {
+                                    return payloads[k].name
+                                }
+                            }
+                            return ""
+                        }
+
+                        if (styleData.column === _OUTPUT_ICD_INDEX_COLUMN) {
+                            if (segment === [] || segment === undefined) {
+                                return ""
+                            }
+                            for (var w in payloads) {
+                                if (payloads[w].id === segment.bind_output_icd) {
+                                    var value1 = payloads[w].values[Number(select)]
+                                    if (value1 === undefined) {
+                                        return ""
+                                    }
+                                    return value1.name
+                                }
+                            }
+                            return ""
+                        }
+                        return select
                     }
-                    root.setValue(styleData.row, styleData.column, field.text)
                 }
-            } // TextField end
+            }
 
-            // input_icd 中 index
-            ComboBox {
-                id: inIndexBox
-                anchors {
-                    fill: parent
-                    margins: 1
+            Component {
+                id: textComponent
+                TextField {
+                    id: field
+                    anchors {
+                        fill: parent
+                        margins: 1
+                    }
+
+                    property var validColumn: styleData.column === _DIFFERENCE_COLUMN
+
+                    visible: validColumn && styleData.selected
+
+                    text: {
+                        if (validColumn) {
+                            return styleData.value
+                        }
+                        return qsTr("")
+                    }
+
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+
+                    onTextChanged: {
+                        if (!visible) {
+                            return
+                        }
+                        root.setValue(styleData.row, styleData.column, field.text)
+                    }
+                } // TextField end
+            }
+
+            Component {
+                id: inIndexComboxComponent
+                // input_icd 中 index
+                ComboBox {
+                    id: inIndexBox
+                    anchors {
+                        fill: parent
+                        margins: 1
+                    }
+
+                    visible: styleData.selected && (styleData.column === _INPUT_ICD_INDEX_COLUMN)
+                    textRole: "text"
+
+                    property var fieldList: getFieldInfo(_bindInputICD)
+
+                    property var curIndex: {
+                        if (styleData.row && table.model.get(styleData.row)) {
+                            var inIndex = table.model.get(styleData.row).in_index
+                            if (inIndex === undefined) {
+                                return -1
+                            }
+                            for(var i in fieldList){
+                                if(String(inIndex) === String(fieldList[i].value)) {
+                                    return i
+                                }
+                            }
+                        }
+                        return -1
+                    }
+
+                    model: fieldList
+
+                    currentIndex: curIndex
+
+                    onCurIndexChanged: {
+                        currentIndex = curIndex
+                    }
+
+                    onCurrentIndexChanged: {
+                        if (!visible || styleData.row === undefined) {
+                            return
+                        }
+                        root.setValue(styleData.row, styleData.column, String(currentIndex))
+                    }
                 }
+            }
 
-                visible: styleData.selected && (styleData.column === _INPUT_ICD_INDEX_COLUMN)
-                textRole: "text"
+            Component {
+                id: outputICDComboxComponent
+                // output_icd
+                ComboBox {
+                    id: outputICDBox
+                    anchors {
+                        fill: parent
+                        margins: 1
+                    }
 
-                property var fieldList: getFieldInfo(_bindInputICD)
+                    textRole: "text"
+                    visible: styleData.selected && (styleData.column === _OUTPUT_ICD_COLUMN)
 
-                property var curIndex: {
-                    if (styleData.row && table.model.get(styleData.row)) {
-                        var inIndex = table.model.get(styleData.row).in_index
-                        if (inIndex === undefined) {
+                    property var curIndex: {
+                        if (styleData.row === undefined || table.model.get(styleData.row) === undefined) {
                             return -1
                         }
-                        for(var i in fieldList){
-                            if(String(inIndex) === String(fieldList[i].value)) {
+
+                        var outputICD = String(table.model.get(styleData.row).bind_output_icd)
+                        for (var i in outputICDInfo) {
+                            if (outputICD === outputICDInfo[i].value) {
                                 return i
                             }
                         }
-                    }
-                    return -1
-                }
-
-                model: fieldList
-
-                currentIndex: curIndex
-
-                onCurIndexChanged: {
-                    currentIndex = curIndex
-                }
-
-                onCurrentIndexChanged: {
-                    if (!visible || styleData.row === undefined) {
-                        return
-                    }
-                    root.setValue(styleData.row, styleData.column, String(currentIndex))
-                }
-            }
-
-            // output_icd
-            ComboBox {
-                id: inputICDBox
-                anchors {
-                    fill: parent
-                    margins: 1
-                }
-
-                textRole: "text"
-                visible: styleData.selected && (styleData.column === _OUTPUT_ICD_COLUMN)
-
-                property var curIndex: {
-                    if (styleData.row === undefined || table.model.get(styleData.row) === undefined) {
                         return -1
                     }
 
-                    var outputICD = String(table.model.get(styleData.row).bind_output_icd)
-                    for (var i in outputICDInfo) {
-                        if (outputICD === outputICDInfo[i].value) {
-                            return i
+                    model: outputICDInfo
+
+                    currentIndex: curIndex
+
+                    onCurIndexChanged: {
+                        currentIndex = curIndex
+                    }
+
+                    onCurrentIndexChanged: {
+                        if (!visible || styleData.row === undefined) {
+                            return
                         }
+                        root.setValue(styleData.row, styleData.column, outputICDInfo[currentIndex].value)
                     }
-                    return -1
-                }
-
-                model: outputICDInfo
-
-                currentIndex: curIndex
-
-                onCurIndexChanged: {
-                    currentIndex = curIndex
-                }
-
-                onCurrentIndexChanged: {
-                    if (!visible || styleData.row === undefined) {
-                        return
-                    }
-                    root.setValue(styleData.row, styleData.column, outputICDInfo[currentIndex].value)
                 }
             }
 
-            // output_icd 中 index
-            ComboBox {
-                id: typeBox
-                anchors {
-                    fill: parent
-                    margins: 1
-                }
-                textRole: "text"
-                visible: (styleData.column === _OUTPUT_ICD_INDEX_COLUMN) && styleData.selected
+            Component {
+                id: outIndexComboxComponent
+                // output_icd 中 index
+                ComboBox {
+                    id: typeBox
+                    anchors {
+                        fill: parent
+                        margins: 1
+                    }
+                    textRole: "text"
+                    visible: (styleData.column === _OUTPUT_ICD_INDEX_COLUMN) && styleData.selected
 
-                property var fieldList: {
-                    if (styleData.row === undefined || table.model.get(styleData.row) === undefined) {
-                        return
+                    property var fieldList: {
+                        if (styleData.row === undefined || table.model.get(styleData.row) === undefined) {
+                            return
+                        }
+
+                        return getFieldInfo(table.model.get(styleData.row).bind_output_icd)
                     }
 
-                    return getFieldInfo(table.model.get(styleData.row).bind_output_icd)
-                }
+                    property var curIndex: {
+                        // 防止页面首次加载时错误
+                        if (styleData.row === undefined || segments[styleData.row] === undefined || segments[styleData.row].out_index === undefined) {
+                            return -1
+                        }
 
-                property var curIndex: {
-                    // 防止页面首次加载时错误
-                    if (styleData.row === undefined || segments[styleData.row] === undefined || segments[styleData.row].out_index === undefined) {
+                        var outIndex = String(table.model.get(styleData.row).out_index)
+                        for(var i in fieldList){
+                            if(outIndex === fieldList[i].value) {
+                                return i
+                            }
+                        }
                         return -1
                     }
 
-                    var outIndex = String(table.model.get(styleData.row).out_index)
-                    for(var i in fieldList){
-                        if(outIndex === fieldList[i].value) {
-                            return i
+                    model: fieldList
+
+                    currentIndex: curIndex
+
+                    onCurIndexChanged: {
+                        currentIndex = curIndex
+                    }
+
+                    onCurrentIndexChanged: {
+                        if (!visible || styleData.row === undefined || currentIndex < 0) {
+                            return
                         }
+                        root.setValue(styleData.row, styleData.column, String(currentIndex))
                     }
-                    return -1
-                }
-
-                model: fieldList
-
-                currentIndex: curIndex
-
-                onCurIndexChanged: {
-                    currentIndex = curIndex
-                }
-
-                onCurrentIndexChanged: {
-                    if (!visible || styleData.row === undefined || currentIndex < 0) {
-                        return
-                    }
-                    root.setValue(styleData.row, styleData.column, String(currentIndex))
                 }
             }
 
-            TextField {
-                id: descField
-                anchors {
-                    fill: parent
-                    margins: 1
-                }
-
-                property var validColumn: styleData.column === _DESC_COLUMN
-
-                visible: validColumn && styleData.selected
-
-                enabled: {
-                    return true
-                }
-
-                text: {
-                    if (validColumn) {
-                        return styleData.value
+            Component {
+                id: descTextComponent
+                TextField {
+                    id: descField
+                    anchors {
+                        fill: parent
+                        margins: 1
                     }
-                    return qsTr("")
-                }
 
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
+                    property var validColumn: styleData.column === _DESC_COLUMN
 
-                onTextChanged: {
-                    if (!visible || styleData.row === undefined) {
-                        return
+                    visible: validColumn && styleData.selected
+
+                    enabled: {
+                        return true
                     }
-                    root.setValue(styleData.row, styleData.column, descField.text)
-                }
-            } // TextField end
+
+                    text: {
+                        if (validColumn) {
+                            return styleData.value
+                        }
+                        return qsTr("")
+                    }
+
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+
+                    onTextChanged: {
+                        if (!visible || styleData.row === undefined) {
+                            return
+                        }
+                        root.setValue(styleData.row, styleData.column, descField.text)
+                    }
+                } // TextField end
+            }
         }
 
         model: ListModel {}
@@ -495,7 +544,6 @@ Item {
         _device = newDevice
     }
 
-    // 获取枚举
     function getEnumdata(meaning) {
         segments[table.currentRow].keys = meaning
     }

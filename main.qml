@@ -51,7 +51,8 @@ ApplicationWindow {
 
     property var currentTabIndex: 0
 
-    signal updateDeviceSignal(var deviceList)
+    // 更新设备数据信号
+    signal signalUpdateDeviceInfo(var deviceList)
 
     menuBar: MenuBar {
         Menu {
@@ -263,21 +264,5 @@ ApplicationWindow {
         }
 
         return item
-    }
-
-    function getPayloads() {
-        return payloads
-    }
-
-    function getDevices() {
-        return devices
-    }
-
-    function getStatus() {
-        return status
-    }
-
-    function getAction() {
-        return actions
     }
 }

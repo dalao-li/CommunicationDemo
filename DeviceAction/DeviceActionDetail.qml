@@ -22,8 +22,6 @@ Item {
 
     property int defaultHeight: 60
 
-    property var _DEVICE_LSIT: getDevices()
-
     signal itemChanged(string id, string value)
 
     height: defaultHeight
@@ -89,7 +87,7 @@ Item {
                     for (var i in devices) {
                         deviceComboBox.model.append(devices[i])
                     }
-                    mainWindow.updateDeviceSignal.connect(function(deviceList) {
+                    mainWindow.signalUpdateDeviceInfo.connect(function(deviceList) {
                         deviceComboBox.model.clear()
                         deviceComboBox.model.append(deviceList)
                     })

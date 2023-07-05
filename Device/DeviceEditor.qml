@@ -1,10 +1,10 @@
 /*
- * @Description:
+ * @Description: Deivce主页面
  * @Version: 1.0
  * @Author: liyuanhao
  * @Date: 2023-05-9 19:05:47
  * @LastEditors: liyuanhao
- * @LastEditTime: 2023-05-9 19:05:47
+ * @LastEditTime: 2023-07-05 19:05:47
  */
 
 
@@ -13,10 +13,16 @@ import QtQuick.Layouts 1.1
 import QtQuick.Controls 1.4
 import DesktopControls 0.1
 
+
+
 ColumnLayout {
     id: root
 
     property var devices: []
+
+    property var icdSelectList: []
+
+    signal signalUpdateICDSelectInfo(var deviceSelectList)
 
     SplitView {
         Layout.fillHeight: true
@@ -27,65 +33,69 @@ ColumnLayout {
             Layout.fillHeight: true
             color: "#f0f0f0"
 
+            // 左侧选项卡
             DeviceList {
-                id: deviceList
+                id: listComponent
                 anchors.fill: parent
                 Layout.fillHeight: true
 
                 devices: root.devices
 
                 onCurrentIndexChanged: {
-                    deviceDetail.load(root.devices[deviceList.currentIndex])
+                    detailComponent.load(root.devices[listComponent.currentIndex])
                 }
 
                 onCountChanged: {
-                    if (deviceList.count <= 0) {
-                        deviceDetail.clear()
+                    if (listComponent.count <= 0) {
+                        detailComponent.clear()
                     }
                 }
             }
         }
 
         Rectangle {
+            // 右侧页面
             DeviceDetail {
-                id: deviceDetail
+                id: detailComponent
 
                 onItemChanged: {
-                    if (deviceList.currentIndex < 0) {
+                    var curIndex = listComponent.currentIndex
+                    if (curIndex < 0) {
                         return
                     }
 
-                    var curIndex = deviceList.currentIndex
+                    if (id === "type") {
+                        listComponent.model.set(curIndex, {"type": value})
+                        mainWindow.signalUpdateDeviceInfo(devices)
+                        return
+                    }
 
                     if (id === "control_type") {
-                        deviceList.model.set(curIndex, {"control_type": Number(value)})
+                        listComponent.model.set(curIndex, {"control_type": Number(value)})
                         return
                     }
 
                     if (id === "bus_type") {
-                        deviceList.model.set(curIndex, {"bus_type": Number(value)})
+                        listComponent.model.set(curIndex, {"bus_type": Number(value)})
                         return
                     }
 
-                    if (id === "update_icd") {
-                        var info = JSON.parse(value)
-                        if (info["type"] === "input") {
-                            root.devices[curIndex].input_icd = info["icdList"]
-                            deviceList.model.set(curIndex, {"input_icd": info["icdList"]})
+                    if (id === "input_icd" || id === "output_icd") {
+                        var data = JSON.parse(value)
+                        if (id === "input_icd") {
+                            root.devices[curIndex].input_icd = data["icd"]
+                            listComponent.model.set(curIndex, {"input_icd": data["icd"]})
                         }
-                        if (info["type"] === "output") {
-                            root.devices[curIndex].output_icd = info["icdList"]
-                            deviceList.model.set(curIndex, {"output_icd": info["icdList"]})
+                        if (id === "output_icd") {
+                            root.devices[curIndex].output_icd = data["icd"]
+                            listComponent.model.set(curIndex, {"output_icd": data["icd"]})
                         }
                         return
                     }
-                    deviceList.model.set(curIndex, {id: value})
+
+                    listComponent.model.set(curIndex, {id: value})
                 }
             }
         }
     }
-
-//    function updateModel() {
-//        deviceList.model.append(devices)
-//    }
 }

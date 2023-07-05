@@ -24,6 +24,7 @@ Column {
     property int defaultHeight: 60
     property var _device
 
+    // 列名枚举
     property var _INPUT_ICD_COLUMN: 0
     property var _OUTPUT_ICD_COLUMN: 1
     property var _ICD_NAME_COLUMN: 2
@@ -68,9 +69,6 @@ Column {
                 if (root._device) {
                     root._device.type = text
                     root.itemChanged("type", text)
-
-                    root._device.type = text
-                    root.itemChanged("type", text)
                 }
             }
         }
@@ -85,10 +83,11 @@ Column {
             width: 300
             height: 25
             onTextChanged: {
-                if (root._device) {
-                    root._device.device_id = text
-                    root.itemChanged("device_id", text)
+                if (!root._device) {
+                    return
                 }
+                root._device.device_id = text
+                root.itemChanged("device_id", text)
             }
         }
 
@@ -105,10 +104,11 @@ Column {
             model: ["是", "否"]
 
             onCurrentIndexChanged: {
-                if (root._device) {
-                    root._device.control_type = currentIndex
-                    root.itemChanged("control_type", currentIndex)
+                if (!root._device) {
+                    return
                 }
+                root._device.control_type = currentIndex
+                root.itemChanged("control_type", currentIndex)
             }
         }
 
@@ -126,34 +126,19 @@ Column {
             onCurrentTextChanged: {
                 // ip sendport
                 if (currentIndex === 0) {
-                    ipLabel.visible = true
-                    sendPortLabel.visible = true
-                    ipField.visible = true
-                    sendPortField.visible = true
-
-                    rfm2gLabel.visible = false
-                    addressLabel.visible = false
-                    rfm2gField.visible = false
-                    addressField.visible = false
+                    setBusType(true)
                 }
 
                 // rfm2g address
                 if (currentIndex === 1) {
-                    ipLabel.visible = false
-                    sendPortLabel.visible = false
-                    ipField.visible = false
-                    sendPortField.visible = false
-
-                    rfm2gLabel.visible = true
-                    addressLabel.visible = true
-                    rfm2gField.visible = true
-                    addressField.visible = true
+                    setBusType(false)
                 }
 
-                if (root._device) {
-                    root._device.bus_type = currentIndex
-                    root.itemChanged("bus_type", currentIndex)
+                if (!root._device) {
+                    return
                 }
+                root._device.bus_type = currentIndex
+                root.itemChanged("bus_type", currentIndex)
             }
         }
 
@@ -168,10 +153,11 @@ Column {
             width: 300
             height: 25
             onTextChanged: {
-                if (root._device) {
-                    root._device.ip = text
-                    root.itemChanged("ip", text)
+                if (!root._device) {
+                    return
                 }
+                root._device.ip = text
+                root.itemChanged("ip", text)
             }
         }
 
@@ -186,10 +172,11 @@ Column {
             width: 300
             height: 25
             onTextChanged: {
-                if (root._device) {
-                    root._device.send_port = text
-                    root.itemChanged("send_port", text)
+                if (!root._device) {
+                    return
                 }
+                root._device.send_port = text
+                root.itemChanged("send_port", text)
             }
         }
 
@@ -206,10 +193,11 @@ Column {
             width: 300
             height: 25
             onTextChanged: {
-                if (root._device) {
-                    root._device.rfm2g_id = text
-                    root.itemChanged("rfm2g_id", text)
+                if (!root._device) {
+                    return
                 }
+                root._device.rfm2g_id = text
+                root.itemChanged("rfm2g_id", text)
             }
         }
 
@@ -226,10 +214,11 @@ Column {
             width: 300
             height: 25
             onTextChanged: {
-                if (root._device) {
-                    root._device.address = text
-                    root.itemChanged("address", text)
+                if (!root._device) {
+                    return
                 }
+                root._device.address = text
+                root.itemChanged("address", text)
             }
         }
     } // Grid end
@@ -247,6 +236,7 @@ Column {
         }
     } // Rectangle end
 
+    // 选择表格
     TableView {
         id: table
         width: parent.width
@@ -263,9 +253,9 @@ Column {
         }
 
         TableViewColumn {
-            id: isOuput
+            id: isOutput
             visible: true
-            role: "isOuput"
+            role: "isOutput"
             title: "输出选择"
             width: 200
         }
@@ -282,7 +272,7 @@ Column {
             id: icdValue
             visible: true
             role: "icdValue"
-            title: "ICD id"
+            title: "ICD ID"
             width: 200
         }
 
@@ -290,86 +280,109 @@ Column {
 
         // 如何绘制每一个单元格
         itemDelegate: Item {
-            Label {
-                id: field
-                anchors {
-                    fill: parent
-                    margins: 1
-                }
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-
-                visible: [_ICD_NAME_COLUMN, _ICD_ID_COLUMN].includes(styleData.column)
-
-                text: {
-                    if (visible) {
-                        return styleData.value
+            Loader {
+                anchors.fill: parent
+                sourceComponent: {
+                    if([_ICD_NAME_COLUMN, _ICD_ID_COLUMN].includes(styleData.column)) {
+                        return labelComponent
                     }
-                    return ""
+
+                    if(styleData.column === _INPUT_ICD_COLUMN) {
+                        return inputCheckComponent
+                    }
+
+                    if(styleData.column === _OUTPUT_ICD_COLUMN) {
+                        return outputCheckComponent
+                    }
                 }
-            } // TextField end
+            }
 
-            // input icd 选择
-            CheckBox {
-                id: inputCheck
-                anchors {
-                    fill: parent
-                    margins: 1
+            Component {
+                id: labelComponent
+                Label {
+                    id: field
+                    anchors {
+                        fill: parent
+                        margins: 1
+                    }
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+
+                    visible: [_ICD_NAME_COLUMN, _ICD_ID_COLUMN].includes(styleData.column)
+
+                    text: {
+                        if (visible) {
+                            return styleData.value
+                        }
+                        return ""
+                    }
                 }
+            }
 
-                property var select: styleData.value
+            Component {
+                id: inputCheckComponent
+                // input icd 选择
+                CheckBox {
+                    id: inputCheck
+                    anchors {
+                        fill: parent
+                        margins: 1
+                    }
 
-                checked: select
+                    visible: styleData.column === _INPUT_ICD_COLUMN
 
-                visible: styleData.column === _INPUT_ICD_COLUMN
+                    property var select: styleData.value
 
-                onClicked: {
-                    if (root._device) {
-                        var updateValue = {}
+                    onSelectChanged: {
+                        checked = select
+                    }
+
+                    onClicked: {
+                        if (!root._device) {
+                            return
+                        }
                         var nowICD = table.model.get(styleData.row).icdValue
                         // 勾选
                         if (checkedState === Qt.Checked) {
                             root._device.input_icd.push(nowICD)
                         }
-
                         // 取消
                         else {
-                            var index = (()=>{
-                                             for (var i in root._device.input_icd) {
-                                                 if (root._device.input_icd[i] === nowICD) {
-                                                     return i
-                                                 }
-                                             }
-                                             return -1
-                                         })()
-                            root._device.input_icd.splice(index, 1)
+                            for (var i in root._device.input_icd) {
+                                if (root._device.input_icd[i] === nowICD) {
+                                    root._device.input_icd.splice(i, 1)
+                                    break
+                                }
+                            }
                         }
-
-                        root.itemChanged("update_icd",
-                                         JSON.stringify({"type": "input", "icdList": root._device.input_icd}))
+                        root.itemChanged("input_icd", JSON.stringify({"icd": root._device.input_icd}))
                     }
-                }
-            } // CheckBox end
+                } // CheckBox end
+            }
+            Component {
+                id: outputCheckComponent
+                // ouput icd选择
+                CheckBox {
+                    id: ouputCheck
+                    anchors {
+                        fill: parent
+                        margins: 1
+                    }
 
-            // ouput icd选择
-            CheckBox {
-                id: ouputCheck
-                anchors {
-                    fill: parent
-                    margins: 1
-                }
+                    implicitWidth: 20;
+                    implicitHeight: 20;
 
-                implicitWidth: 20;
-                implicitHeight: 20;
+                    visible: styleData.column === _OUTPUT_ICD_COLUMN
 
-                visible: styleData.column === _OUTPUT_ICD_COLUMN
+                    property var select: styleData.value
 
-                property var select: styleData.value
-
-                checked: select
-
-                onClicked: {
-                    if (root._device) {
+                    onSelectChanged: {
+                        checked = select
+                    }
+                    onClicked: {
+                        if (!root._device) {
+                            return
+                        }
                         var nowICD = table.model.get(styleData.row).icdValue
                         // 勾选
                         if (checkedState === Qt.Checked) {
@@ -377,19 +390,14 @@ Column {
                         }
                         // 取消
                         else {
-                            var index = (()=>{
-                                             for (var i in root._device.output_icd) {
-                                                 if (root._device.output_icd[i] === nowICD) {
-                                                     return i
-                                                 }
-                                             }
-                                             return -1
-                                         })()
-                            root._device.output_icd.splice(index, 1)
+                            for (var i in root._device.output_icd) {
+                                if (root._device.output_icd[i] === nowICD) {
+                                    root._device.output_icd.splice(i, 1)
+                                    break
+                                }
+                            }
                         }
-
-                        root.itemChanged("update_icd",
-                                         JSON.stringify({"type": "output", "icdList": root._device.output_icd}))
+                        root.itemChanged("output", JSON.stringify({"icd": root._device.output_icd}))
                     }
                 }
             }
@@ -429,30 +437,32 @@ Column {
 
         _device = value
 
-        type.text = value.type
-        deviceID.text = value.device_id
+        type.text = _device.type
+        deviceID.text = _device.device_id
 
-        controlCombox.currentIndex = value.control_type
-        busTypeCombox.currentIndex = value.bus_type
+        controlCombox.currentIndex = _device.control_type
+        busTypeCombox.currentIndex = _device.bus_type
 
-        ipField.text = value.ip
-        sendPortField.text = value.send_port
+        ipField.text = _device.ip
+        sendPortField.text = _device.send_port
 
-        rfm2gField.text = value.rfm2g_id
-        addressField.text = value.address
+        rfm2gField.text = _device.rfm2g_id
+        addressField.text = _device.address
 
         table.model.clear()
-        // 查询当前所有icd
+
+
+        // 选择表格
         for (var i in payloads) {
-            var data = {
-                // 判断该行input icd 是否被选择
-                "isInput": value.input_icd.includes(payloads[i].id),
-                // 判断该行ouput icd 是否被选择
-                "isOuput": value.output_icd.includes(payloads[i].id),
-                "icdName": payloads[i].name,
-                "icdValue": String(payloads[i].id),
-            }
-            table.model.append(data)
+            table.model.append({
+                                   // 判断该input icd 是否被选择
+                                   "isInput": _device.input_icd.includes(payloads[i].id),
+                                   // 判断该ouput icd 是否被选择
+                                   "isOutput": _device.output_icd.includes(payloads[i].id),
+                                   "icdName": payloads[i].name,
+                                   "icdValue": String(payloads[i].id),
+                               })
+            //console.log("table", JSON.stringify(table.model.get(i)))
         }
     }
 
@@ -461,5 +471,18 @@ Column {
         deviceID.text = ""
 
         table.model.clear()
+    }
+
+    // 设置UDP与反射内存卡
+    function setBusType(flag) {
+        ipLabel.visible = flag
+        sendPortLabel.visible = flag
+        ipField.visible = flag
+        sendPortField.visible = flag
+
+        rfm2gLabel.visible = !flag
+        addressLabel.visible = !flag
+        rfm2gField.visible = !flag
+        addressField.visible = !flag
     }
 }

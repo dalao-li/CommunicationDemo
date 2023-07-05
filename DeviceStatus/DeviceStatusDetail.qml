@@ -76,7 +76,7 @@ Item {
                         deviceComboBox.model.append(devices[i])
                     }
                     // 用于更新数据
-                    mainWindow.updateDeviceSignal.connect(function(deviceList) {
+                    mainWindow.signalUpdateDeviceInfo.connect(function(deviceList) {
                         deviceComboBox.model.clear()
                         deviceComboBox.model.append(deviceList)
                     })
@@ -84,12 +84,14 @@ Item {
             }
 
             property var curIndex: {
-                for (var i in devices) {
-                    if (_status.device.device_id === devices[i].device_id) {
-                        return i
+                if (_status) {
+                    for (var i in devices) {
+                        if (_status.device.device_id === devices[i].device_id) {
+                            return i
+                        }
                     }
+                    return -1
                 }
-                return -1
             }
 
             onCurIndexChanged: {
@@ -145,6 +147,7 @@ Item {
 
     function load(value) {
         _status = value
+
         typeNameField.text = value.type_name
         descField.text = value.desc
     }
