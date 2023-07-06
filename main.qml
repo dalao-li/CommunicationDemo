@@ -70,29 +70,29 @@ ApplicationWindow {
                 }
             }
 
-//            MenuItem {
-//                text: "导入设备信息"
-//                onTriggered: {
-//                    currentTabIndex = _DEVICE_TAB_INDEX
-//                    importFileDialog.open()
-//                }
-//            }
+            //            MenuItem {
+            //                text: "导入设备信息"
+            //                onTriggered: {
+            //                    currentTabIndex = _DEVICE_TAB_INDEX
+            //                    importFileDialog.open()
+            //                }
+            //            }
 
-//            MenuItem {
-//                text: "导入设备状态"
-//                onTriggered: {
-//                    currentTabIndex = _DEVICE_STATUS_TAB_INDEX
-//                    importFileDialog.open()
-//                }
-//            }
+            //            MenuItem {
+            //                text: "导入设备状态"
+            //                onTriggered: {
+            //                    currentTabIndex = _DEVICE_STATUS_TAB_INDEX
+            //                    importFileDialog.open()
+            //                }
+            //            }
 
-//            MenuItem {
-//                text: "导入设备动作"
-//                onTriggered: {
-//                    currentTabIndex = _DEVICE_ACTION_TAB_INDEX
-//                    importFileDialog.open()
-//                }
-//            }
+            //            MenuItem {
+            //                text: "导入设备动作"
+            //                onTriggered: {
+            //                    currentTabIndex = _DEVICE_ACTION_TAB_INDEX
+            //                    importFileDialog.open()
+            //                }
+            //            }
 
             //            MenuItem {
             //                text: "Open"
@@ -197,6 +197,12 @@ ApplicationWindow {
         tabView.currentIndex = 1
         tabView.currentIndex = 2
         tabView.currentIndex = 0
+
+        var path = "D:\\QML\\icd1111.json"
+        content = Excutor.query({ "payloads": path })
+        //getTabItem(0).load()
+        //getTabItem(1).stopListen()
+        getTabItem(2).load(content)
     }
 
     FileDialog {
@@ -264,5 +270,45 @@ ApplicationWindow {
         }
 
         return item
+    }
+
+    function getPayLoads(icdID) {
+        if (icdID === "") {
+            return payloads[0]
+        }
+        for (var i in payloads) {
+            if (payloads[i].id === icdID) {
+                return payloads[i]
+            }
+        }
+        return undefined
+    }
+
+    function getDevices(deviceID) {
+        if (deviceID === "") {
+            return devices[0]
+        }
+        for (var i in devices) {
+            if (devices[i].device_id === deviceID) {
+                return devices[i]
+            }
+        }
+        return undefined
+    }
+
+    function getAllDevices() {
+        return devices
+    }
+
+    function getActions(deviceID) {
+        if (deviceID === "") {
+            return actions[0]
+        }
+        for (var i in actions) {
+            if (actions[i].id === deviceID) {
+                return actions[i]
+            }
+        }
+        return undefined
     }
 }

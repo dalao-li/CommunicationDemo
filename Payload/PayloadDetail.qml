@@ -159,6 +159,7 @@ Item {
 
     function load(value) {
         _payload = value
+
         nameField.text = value.name
         icdIDField.text = value.id
 

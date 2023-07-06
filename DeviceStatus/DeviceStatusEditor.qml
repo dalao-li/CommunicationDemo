@@ -45,7 +45,8 @@ ColumnLayout {
 
                 onCountChanged: {
                     if (listComponent.count <= 0) {
-                        deviceDetail.clear()
+                        console.log("listComponent.count", listComponent.count)
+                        detailComponent.clear()
                         segmentComponent.clear()
                     }
                 }

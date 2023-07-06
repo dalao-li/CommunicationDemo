@@ -10,14 +10,24 @@ Item {
 
     property var segments: []
 
+    property var keysList: []
+
     property var _device: devices[0]
 
     property var _bindInputICD: devices[0].input_icd[0]
 
     property var outputICDInfo: getOuputICDInfo()
 
+    property var _IN_INDEX_COMBOBOX_MODEL: []
+    property var _IN_INDEX_COMBOBOX_INDEX: []
+
+    property var _OUTPUT_ICD_COMBOBOX_MODEL: []
+    property var _OUTPUT_ICD_COMBOBOX_INDEX: []
+
+    property var _OUT_INDEX_COMBOBOX_MODEL: []
+    property var _OUT_INDEX_COMBOBOX_INDEX: []
+
     // 列名枚举
-    //property var _INPUT_ICD_COLUMN: 0
     property var _INPUT_ICD_INDEX_COLUMN: 0
     property var _OUTPUT_ICD_COLUMN: 1
     property var _OUTPUT_ICD_INDEX_COLUMN: 2
@@ -117,6 +127,7 @@ Item {
 
         // 如何绘制每一个单元格
         itemDelegate: Item {
+            // 加载
             Loader {
                 anchors.fill: parent
                 sourceComponent: {
@@ -161,22 +172,12 @@ Item {
 
                     property var select: styleData.value
 
-                    property var segment: {
-                        if (styleData.row === undefined) {
-                            return []
-                        }
-                        return segments[styleData.row]
-                    }
-
                     text: {
-                        if (!visible) {
+                        if (!visible || styleData.row < 0) {
                             return ""
                         }
 
                         if (styleData.column === _INPUT_ICD_INDEX_COLUMN) {
-                            if (segment === [] || segment === undefined) {
-                                return ""
-                            }
                             for (var i in payloads) {
                                 if (payloads[i].id === String(_bindInputICD)) {
                                     var values = payloads[i].values[Number(select)]
@@ -190,9 +191,6 @@ Item {
                         }
 
                         if (styleData.column === _OUTPUT_ICD_COLUMN) {
-                            if (segment === [] || segment === undefined) {
-                                return ""
-                            }
                             for (var k in payloads) {
                                 if (payloads[k].id === select) {
                                     return payloads[k].name
@@ -202,11 +200,8 @@ Item {
                         }
 
                         if (styleData.column === _OUTPUT_ICD_INDEX_COLUMN) {
-                            if (segment === [] || segment === undefined) {
-                                return ""
-                            }
                             for (var w in payloads) {
-                                if (payloads[w].id === segment.bind_output_icd) {
+                                if (payloads[w].id === segments[styleData.row].bind_output_icd) {
                                     var value1 = payloads[w].values[Number(select)]
                                     if (value1 === undefined) {
                                         return ""
@@ -266,33 +261,23 @@ Item {
                     visible: styleData.selected && (styleData.column === _INPUT_ICD_INDEX_COLUMN)
                     textRole: "text"
 
-                    property var fieldList: getFieldInfo(_bindInputICD)
-
                     property var curIndex: {
-                        if (styleData.row && table.model.get(styleData.row)) {
-                            var inIndex = table.model.get(styleData.row).in_index
-                            if (inIndex === undefined) {
-                                return -1
-                            }
-                            for(var i in fieldList){
-                                if(String(inIndex) === String(fieldList[i].value)) {
-                                    return i
-                                }
-                            }
+                        // 这里是新增数据的情况, 超过传入长度时默认是0
+                        if (styleData.row > _IN_INDEX_COMBOBOX_INDEX.length) {
+                            return 0
                         }
-                        return -1
+                        // 获取该行在model里的下标
+                        return Number(_IN_INDEX_COMBOBOX_INDEX[styleData.row])
                     }
 
-                    model: fieldList
-
-                    currentIndex: curIndex
+                    model: _IN_INDEX_COMBOBOX_MODEL
 
                     onCurIndexChanged: {
                         currentIndex = curIndex
                     }
 
                     onCurrentIndexChanged: {
-                        if (!visible || styleData.row === undefined) {
+                        if (!visible || styleData.row < 0) {
                             return
                         }
                         root.setValue(styleData.row, styleData.column, String(currentIndex))
@@ -314,22 +299,16 @@ Item {
                     visible: styleData.selected && (styleData.column === _OUTPUT_ICD_COLUMN)
 
                     property var curIndex: {
-                        if (styleData.row === undefined || table.model.get(styleData.row) === undefined) {
-                            return -1
+                        // 这里是新增数据的情况, 超过传入长度时默认是0
+                        if (styleData.row > _OUTPUT_ICD_COMBOBOX_INDEX.length) {
+                            return 0
                         }
 
-                        var outputICD = String(table.model.get(styleData.row).bind_output_icd)
-                        for (var i in outputICDInfo) {
-                            if (outputICD === outputICDInfo[i].value) {
-                                return i
-                            }
-                        }
-                        return -1
+                        return Number(_OUTPUT_ICD_COMBOBOX_MODEL[styleData.row])
                     }
 
-                    model: outputICDInfo
+                    model: _OUTPUT_ICD_COMBOBOX_MODEL
 
-                    currentIndex: curIndex
 
                     onCurIndexChanged: {
                         currentIndex = curIndex
@@ -339,7 +318,7 @@ Item {
                         if (!visible || styleData.row === undefined) {
                             return
                         }
-                        root.setValue(styleData.row, styleData.column, outputICDInfo[currentIndex].value)
+                        root.setValue(styleData.row, styleData.column, _OUTPUT_ICD_COMBOBOX_MODEL[currentIndex].value)
                     }
                 }
             }
@@ -357,31 +336,24 @@ Item {
                     visible: (styleData.column === _OUTPUT_ICD_INDEX_COLUMN) && styleData.selected
 
                     property var fieldList: {
-                        if (styleData.row === undefined || table.model.get(styleData.row) === undefined) {
-                            return
-                        }
-
-                        return getFieldInfo(table.model.get(styleData.row).bind_output_icd)
+                        var outputICD = _OUTPUT_ICD_COMBOBOX_MODEL[styleData.row].value
+                        return getFieldInfo(outputICD)
                     }
+
 
                     property var curIndex: {
-                        // 防止页面首次加载时错误
-                        if (styleData.row === undefined || segments[styleData.row] === undefined || segments[styleData.row].out_index === undefined) {
-                            return -1
+                        if (styleData.row > _OUT_INDEX_COMBOBOX_INDEX.length) {
+                            return 0
                         }
-
-                        var outIndex = String(table.model.get(styleData.row).out_index)
-                        for(var i in fieldList){
-                            if(outIndex === fieldList[i].value) {
-                                return i
-                            }
-                        }
-                        return -1
+                        return Number(_OUT_INDEX_COMBOBOX_INDEX[styleData.row])
                     }
 
-                    model: fieldList
-
-                    currentIndex: curIndex
+                    model: {
+                        if (styleData.row > _OUT_INDEX_COMBOBOX_MODEL.length) {
+                            return _OUT_INDEX_COMBOBOX_MODEL[0]
+                        }
+                        return _OUT_INDEX_COMBOBOX_MODEL[styleData.row]
+                    }
 
                     onCurIndexChanged: {
                         currentIndex = curIndex
@@ -491,34 +463,37 @@ Item {
 
 
     // 加载列表数据
-    function load(values) {
+    function load(values, inIndexComboBoxModel, inIndexComboBoxIndex, outputICDComboBoxModel, outputICDComboBoxIndex, outIndexComboBoxModel, outIndexComboBoxIndex) {
+        // 输出ICD中index
+        _IN_INDEX_COMBOBOX_MODEL = inIndexComboBoxModel
+        _IN_INDEX_COMBOBOX_INDEX = inIndexComboBoxIndex
+
+        // 输出ICD
+        _OUTPUT_ICD_COMBOBOX_MODEL = outputICDComboBoxModel
+        _OUTPUT_ICD_COMBOBOX_INDEX = outputICDComboBoxIndex
+
+
+        // 输出ICD中index
+        _OUT_INDEX_COMBOBOX_MODEL = outIndexComboBoxModel
+        _OUT_INDEX_COMBOBOX_INDEX = outIndexComboBoxIndex
+
+
         table.model.clear()
         batchAdd.enabled = true
 
         _device = values.device
         _bindInputICD = values.actions.bind_input_icd
 
-        var condition = values.actions.condition[0]
-        var ouputICDID = condition.id
-        segments = condition.keys
+        segments = values.actions.keyList
         for (var i in segments) {
-            segments[i].bind_output_icd = ouputICDID
-            var info = {
-                "in_index": segments[i].in_index,
-                "out_index": segments[i].out_index,
-                "bind_output_icd": ouputICDID,
-                "difference": segments[i].difference,
-                "desc": segments[i].desc
-            }
-            table.model.append(info)
+            table.model.append(segments[i])
         }
     }
 
     // 增加新行
     function addSegment(row) {
-        // console.log("add", JSON.stringify(_device))
         var info = {
-            "index": String(row + 1),
+            //"index": String(row + 1),
             "in_index": "0",
             "out_index": "0",
             // 默认绑定设备的output_icd的第一个
@@ -527,8 +502,8 @@ Item {
             "desc": ""
         }
 
-        root.segments.splice(row + 1, 0, info)
-        table.model.insert(row + 1, info)
+        root.segments.push(info)
+        table.model.append(info)
     }
 
     function clear() {
@@ -550,7 +525,6 @@ Item {
 
     // 修改某行某列的值
     function setValue(index, column, value) {
-        // console.log("修改信号", index, column, value)
         if (index < 0 || column < 0) {
             return
         }
@@ -570,8 +544,8 @@ Item {
             table.model.setProperty(index, "bind_output_icd", value)
             break
         case _DIFFERENCE_COLUMN:
-            segment.difference = Number(value)
-            table.model.setProperty(index, "difference", Number(value))
+            segment.difference = value
+            table.model.setProperty(index, "difference", value)
             break
         case _DESC_COLUMN:
             segment.desc = value

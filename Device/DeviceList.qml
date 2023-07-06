@@ -25,6 +25,11 @@ ListView {
 
     model: ListModel {}
 
+    Component.onCompleted: {
+        var path = "D:\\QML\\device_monitor_setting.json"
+        readJSONFile(path)
+    }
+
     // 导入文件
     FileDialog {
         id: deviceDialog

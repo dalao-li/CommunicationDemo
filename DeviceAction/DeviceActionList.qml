@@ -88,25 +88,7 @@ ListView {
             }
 
             onClicked: {
-                var info = {
-                    //"id": String(createID()),
-
-                    // 默认是选第一个设备
-                    "device": devices[0],
-                    "actions": {
-                        "name": "动作" + String(root.actions.length),
-                        // 默认绑首个input_icd
-                        "bind_input_icd": devices[0].input_icd[0],
-                        "condition": [
-                            {
-                                "id": devices[0].output_icd[0],
-                                "keys": []
-                            }
-                        ],
-                    }
-                }
-                root.actions.push(info)
-                root.model.append({name: info.actions.name})
+                addData()
             }
         } // BatchAddButton end
 
@@ -170,6 +152,21 @@ ListView {
         onPressAndHold: mouse.accepted = false
     }
 
+    function addData() {
+        var info = {
+            // 默认是选第一个设备
+            "device": devices[0],
+            "actions": {
+                "name": "动作" + String(root.actions.length),
+                // 默认绑首个input_icd
+                "bind_input_icd": devices[0].input_icd[0],
+                "keyList": [],
+            }
+        }
+        root.actions.push(info)
+        root.model.append({name: info.actions.name})
+    }
+
     // 生成随机ID
     function createID() {
         const MAX = 65535
@@ -199,68 +196,100 @@ ListView {
         for (var i in data) {
             var device_id = data[i].id
             var actions = data[i].actions
-            var info = {
-                "name": actions[0].name,
-                "bind_input_icd": actions[0].id,
-                "condition": actions[0].condition,
+
+            for (var j in actions) {
+                var condition = actions[j].condition
+                var keyList = []
+
+                for (var k in condition) {
+                    var keys = condition[k].keys
+                    var outputICD = condition[k].id
+                    for (var m in keys) {
+                        keyList.push({
+                                         "bind_output_icd": outputICD,
+                                         "in_index": keys[m].in_index,
+                                         "out_index": keys[m].out_index,
+                                         "difference": keys[m].difference,
+                                         "desc": keys[m].desc
+
+                                     })
+                    }
+                }
+
+                var info = {
+                    "name": actions[j].name,
+                    "bind_input_icd": actions[j].id,
+                    "keyList": keyList,
+                }
+
+                var resData = {
+                    "device": mainWindow.getDevices(device_id),
+                    "actions": info
+                }
+
+                root.actions.push(resData)
+                root.model.append({"name": resData.actions.name})
             }
 
-            var resData = {
-                "device": (()=>{
-                               for (var k in devices) {
-                                   if (devices[k].device_id === device_id) {
-                                       return devices[k]
-                                   }
-                               }
-                           })(),
-                "actions": info
-            }
 
-            root.actions.push(resData)
-            root.model.append({"name": resData.actions.name})
         }
     }
 
     // 导出
     function saveActionInfo(path) {
         var data = root.actions
+        console.log("root.actions = ", JSON.stringify(root.actions))
         var dataList = []
-        // 处理JSON
         // TODO 按设备划分, 同设备下的action放在一个actions里
         for (var i in data) {
-            console.log("data = ", JSON.stringify(data))
             var deviceID = data[i].device.device_id
 
             var actionList = []
             var actions = data[i].actions
-
             var inputICD = actions.bind_input_icd
             var name = actions.name
+            var keyList = actions.keyList
 
-            var condList = []
-            var condition = actions.condition
-            for (var j in condition) {
-                var outputICD = condition[j].id
-                var keyList = []
-                var keys = condition[j].keys
-                for (var k in keys) {
-                    keyList.push({
-                                     "desc": keys[k].desc,
-                                     "difference": keys[k].difference,
-                                     "in_index": keys[k].in_index,
-                                     "out_index": keys[k].out_index,
-                                 })
+            var condition = []
+            var v = {}
+            for (var j in keyList) {
+                var id = keyList[j].bind_output_icd
+                console.log("id = ", id)
+                if (v.hasOwnProperty(id)) {
+                    v[id].push({
+                                        "in_index": keyList[j].in_index,
+                                        "out_index": keyList[j].out_index,
+                                        "difference": keyList[j].difference,
+                                        "desc": keyList[j].desc
+                                    })
                 }
-
-                condList.push({"id": condition[j].id, "keys": keyList})
+                else {
+                    v[id] = []
+                }
             }
-            actionList.push({"name": name, "id": inputICD, "condition": condList})
+            console.log("v", JSON.stringify(v))
 
-            dataList.push({
-                              "id": deviceID,
-                              "actions": actionList
-                          })
+            for (var k in v) {
+                condition.push({
+                                   "id": k,
+                                   "keys": v[k]
+                               })
+            }
+
+
+            actionList.push({
+                                "id": inputICD,
+                                "name": name,
+                                "condition": condition
+                            })
         }
+
+        dataList.push({
+                          "id": deviceID,
+                          "actions": actionList
+                      })
+
+
 
 
         Excutor.query({"command": "write",

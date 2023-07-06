@@ -15,10 +15,18 @@ import QtQuick.Dialogs 1.2
 Item {
     id: root
 
-    property var _action: {
+    property var _action/*: {
         "device": devices[0],
-        "bind_input_icd": devices[0].input_icd[0]
-    }
+        "actions": {
+            "bind_input_icd": devices[0].input_icd[0]
+        }
+    }*/
+
+    property var _DEVICE_COMBOBOX_MODEL: []
+    property var _DEVICE_COMBOBOX_CURRENTINDEX: -1
+
+    property var _INPUTICD_COMBOBOX_MODEL: []
+    property var _INPUTICD_COMBOBOX_CURRENTINDEX: -1
 
     property int defaultHeight: 60
 
@@ -76,48 +84,33 @@ Item {
         // 设备信息
         ComboBox {
             id: deviceComboBox
-            width: 130
+            width: 200
             height: 25
 
-            textRole: "type"
+            textRole: "text"
 
-            model: ListModel {
-                Component.onCompleted: {
-                    // 加载原始数据
-                    for (var i in devices) {
-                        deviceComboBox.model.append(devices[i])
-                    }
-                    mainWindow.signalUpdateDeviceInfo.connect(function(deviceList) {
-                        deviceComboBox.model.clear()
-                        deviceComboBox.model.append(deviceList)
-                    })
-                }
-            }
+            model: _DEVICE_COMBOBOX_MODEL
 
-            property var curIndex: {
-                for (var i in devices) {
-                    if (_action.device.device_id === devices[i].device_id) {
-                        return i
-                    }
-                }
-                return -1
-            }
-
-            currentIndex: curIndex
+            property var curIndex: _DEVICE_COMBOBOX_CURRENTINDEX
 
             onCurIndexChanged: {
                 currentIndex = curIndex
             }
 
             onCurrentIndexChanged: {
-                if (currentIndex < 0) {
+                if (!root._action) {
                     return
                 }
 
-                if (root._action) {
-                    root._action.device = devices[currentIndex]
-                    root.itemChanged("device", JSON.stringify(devices[currentIndex]))
-                }
+                var deviceID = _DEVICE_COMBOBOX_MODEL[currentIndex].value
+                root._action.device = getDevices(deviceID)
+                root.itemChanged("device", JSON.stringify(root._action.device))
+
+                // 更新input combobox
+                _INPUTICD_COMBOBOX_MODEL = getInputICDInfo()
+                _INPUTICD_COMBOBOX_CURRENTINDEX = 0
+                icdCombox.currentIndex = 0
+                root.itemChanged("bind_input_icd", _INPUTICD_COMBOBOX_MODEL[0].value)
             }
         }
 
@@ -131,49 +124,26 @@ Item {
 
         ComboBox {
             id: icdCombox
-            width: 130
+            width: 200
             height: 25
 
             textRole: "text"
 
-            property var icdList: {
-                if (_action === undefined) {
-                    return []
-                }
+            model: _INPUTICD_COMBOBOX_MODEL
 
-                if (_action.device === undefined) {
-                    return []
-                }
-                return getInputICDList()
-            }
-
-            property var curIndex: {
-                for (var i in icdList) {
-                    if (_action.bind_input_icd === icdList[i].value) {
-                        return i
-                    }
-                }
-                return -1
-            }
-
-            model: icdList
-
-            currentIndex: curIndex
+            property var curIndex: _INPUTICD_COMBOBOX_CURRENTINDEX
 
             onCurIndexChanged: {
                 currentIndex = curIndex
             }
 
             onCurrentIndexChanged: {
-                if (currentIndex < 0) {
+                if (!root._action || currentIndex < 0) {
                     return
                 }
 
-                if (root._action) {
-                    console.log("当前action bind_input_icd", icdList[currentIndex].id)
-                    root._action.bind_input_icd = icdList[currentIndex].id
-                    root.itemChanged("bind_input_icd", icdList[currentIndex].id)
-                }
+                root._action.actions.bind_input_icd = _INPUTICD_COMBOBOX_MODEL[currentIndex].value
+                root.itemChanged("bind_input_icd", _INPUTICD_COMBOBOX_MODEL[currentIndex].value)
             }
         }
 
@@ -189,42 +159,54 @@ Item {
             width: 200
             height: 25
             onTextChanged: {
-                if (root._action) {
-                    root._action.name = text
-                    root.itemChanged("name", text)
+                if (!root._action) {
+                    return
                 }
+                root._action.actions.name = text
+                root.itemChanged("name", text)
             }
         }
     }
 
-    function load(value) {
+    function load(value, deviceInfoList, deviceIndex, inputICDInfoList, intputICDIndex) {
         _action = value
-        name.text = _action.name
+
+        // 配置ComBoBox
+        _DEVICE_COMBOBOX_MODEL = deviceInfoList
+        _DEVICE_COMBOBOX_CURRENTINDEX = deviceIndex
+
+        _INPUTICD_COMBOBOX_MODEL = inputICDInfoList
+        _INPUTICD_COMBOBOX_CURRENTINDEX = intputICDIndex
+
+        name.text = _action.actions.name
     }
 
-    function getInputICDList() {
+    function getInputICDInfo() {
         if (_action === undefined || _action.device === undefined) {
             return []
         }
 
-        var icdList = []
-        for (var i in _action.device.input_icd) {
+        var info = []
+        for (var i in root._action.device.input_icd) {
             for (var j in payloads) {
-                if (String(_action.device.input_icd[i]) === String(payloads[j].id)) {
-                    var info = {
-                        text: payloads[j].name,
-                        value: payloads[j].id
-                    }
-                    icdList.push(info)
+                if (String(root._action.device.input_icd[i]) === String(payloads[j].id)) {
+                    info.push({
+                                  text: payloads[j].name,
+                                  value: payloads[j].id
+                              })
                 }
             }
         }
-        return icdList
+        return info
     }
 
     function clear() {
+        _DEVICE_COMBOBOX_MODEL = []
+        _INPUTICD_COMBOBOX_MODEL = []
+
         deviceComboBox.currentIndex = 0
         icdCombox.currentIndex = 0
+
         name.text = ""
     }
 }

@@ -139,57 +139,80 @@ Window {
             }
 
             itemDelegate: Item {
-                TextField {
-                    id: field
-                    anchors {
-                        fill: parent
-                        margins: 1
-                    }
-
-                    visible: [_VALUE_COLUMN, _SHOWINFO_COLUMN, _ICON_COLUMN].includes(styleData.column)
-
-                    text: styleData.value
-
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
-
-                    onTextChanged: {
-                        if (!visible) {
-                            return
+                Loader {
+                    anchors.fill: parent
+                    sourceComponent: {
+                        if ([_VALUE_COLUMN, _SHOWINFO_COLUMN, _ICON_COLUMN].includes(styleData.column)) {
+                            return textComponent
                         }
-                        updateValue(styleData.row, styleData.column, field.text)
+
+                        if (styleData.column === _COLOR_COLUMN) {
+                            return comboxComponent
+                        }
                     }
                 }
 
-                ComboBox {
-                    id: colorBox
-                    anchors {
-                        fill: parent
-                        margins: 1
-                    }
+                Component {
+                    id: textComponent
+                    TextField {
+                        id: field
+                        anchors {
+                            fill: parent
+                            margins: 1
+                        }
 
-                    visible: styleData.column === _COLOR_COLUMN
+                        visible: [_VALUE_COLUMN, _SHOWINFO_COLUMN, _ICON_COLUMN].includes(styleData.column)
 
-                    property var curIndex: {
-                        for (var i in _COLOR_LIST) {
-                            if (enumInfos[styleData.row].color === _COLOR_LIST[i]) {
-                                return i
+                        text: styleData.value
+
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+
+                        onTextChanged: {
+                            if (!visible) {
+                                return
                             }
+                            updateValue(styleData.row, styleData.column, field.text)
                         }
-                        return -1
                     }
+                }
 
-                    model: _COLOR_LIST
-
-                    onCurIndexChanged: {
-                        currentIndex = curIndex
-                    }
-
-                    onCurrentIndexChanged: {
-                        if (!visible) {
-                            return
+                Component {
+                    id: comboxComponent
+                    ComboBox {
+                        id: colorBox
+                        anchors {
+                            fill: parent
+                            margins: 1
                         }
-                        root.updateValue(styleData.row, styleData.column, colorBox.currentIndex)
+
+                        visible: styleData.column === _COLOR_COLUMN
+
+                        property var curIndex: {
+                            if (enumInfos[styleData.row] === undefined || enumInfos[styleData.row].color === undefined) {
+                                return -1
+                            }
+
+                            for (var i in _COLOR_LIST) {
+                                if (enumInfos[styleData.row].color === _COLOR_LIST[i]) {
+                                    return i
+                                }
+                            }
+                            return -1
+                        }
+
+                        model: _COLOR_LIST
+
+                        onCurIndexChanged: {
+                            currentIndex = curIndex
+                        }
+
+                        onCurrentIndexChanged: {
+                            if (!visible) {
+                                return
+                            }
+                            root.updateValue(styleData.row, styleData.column, colorBox.currentIndex)
+                        }
                     }
                 }
             }
@@ -256,9 +279,8 @@ Window {
     // 将已经保存的枚举值重新输入子界面
     function setEunmInfos(enumInfos) {
         root.enumInfos = enumInfos
-        //console.log("setEunmInfos", JSON.stringify(enumInfos))
-        for (var i = 0; i < enumInfos.length; ++i) {
-            table.model.insert(i, enumInfos[i])
+        for (var i in enumInfos) {
+            table.model.append(enumInfos[i])
         }
     }
 

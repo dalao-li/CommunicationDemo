@@ -197,7 +197,15 @@ ListView {
                             "id": root.status[i].device.device_id,
                             "type_name": root.status[i].type_name,
                             "desc": root.status[i].desc,
-                            "monitor_status": root.status[i].monitor_status
+                            "monitor_status": (()=>{
+                                                   // 删除多余键值对
+                                                   var monitorStatus = root.status[i].monitor_status
+                                                   for (var j in monitorStatus) {
+                                                       delete monitorStatus[j].icd_list
+                                                       delete monitorStatus[j].field_list
+                                                   }
+                                                   return monitorStatus
+                                               })()
                         })
         }
 

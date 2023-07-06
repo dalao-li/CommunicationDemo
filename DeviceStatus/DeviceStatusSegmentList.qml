@@ -460,14 +460,15 @@ Item {
             "bind_icd": _device.output_icd[0],
             // field index默认为工程0
             "field_index": 0,
-            "type": row + 1,
+            // 置空
+            "type": "",
             "type_name": "状态" + String(row + 1),
             "status_type": 0,
             "desc": "",
             "status_list": [],
-            // output_icd id列表
+            // 额外增加 output_icd id列表
             "icd_list": getICDList(),
-            // ICD下field的index
+            // 额外增加 ICD下field的index
             "field_list": getFieldList(_device.output_icd[0])
         }
         root.segments.splice(row + 1, 0, info)
@@ -529,6 +530,7 @@ Item {
     }
 
     function clear() {
+        //console.log("DeviceStatusSegmentList clear")
         table.model.clear()
         root.segments = []
     }
