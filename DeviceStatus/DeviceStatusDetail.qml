@@ -5,6 +5,9 @@ import QtQuick.Dialogs 1.2
 Item {
     id: root
 
+    // ComboBox组件取值
+    property var _DEVICE_INFO: []
+
     property int defaultHeight: 60
 
     height: defaultHeight
@@ -67,43 +70,36 @@ Item {
             width: 200
             height: 25
 
-            textRole: "type"
+            textRole: "text"
 
-            model: ListModel {
-                Component.onCompleted: {
-                    // 加载原始数据
-                    for (var i in devices) {
-                        deviceComboBox.model.append(devices[i])
-                    }
-                    // 用于更新数据
-                    mainWindow.signalUpdateDeviceInfo.connect(function(deviceList) {
-                        deviceComboBox.model.clear()
-                        deviceComboBox.model.append(deviceList)
-                    })
-                }
-            }
+            model: _DEVICE_INFO
 
             property var curIndex: {
-                if (_status) {
-                    for (var i in devices) {
-                        if (_status.device.device_id === devices[i].device_id) {
-                            return i
-                        }
-                    }
+                if (!_status) {
                     return -1
                 }
+
+                for (var i in _DEVICE_INFO) {
+                    if (_status.device.device_id === _DEVICE_INFO[i].value) {
+                        return i
+                    }
+                }
+
+                return -1
             }
 
             onCurIndexChanged: {
                 currentIndex = curIndex
             }
 
-            onCurrentIndexChanged: {
-                if (root._status) {
-                    var newDevice = devices[deviceComboBox.currentIndex]
-                    root._status.device = newDevice
-                    root.itemChanged("device", JSON.stringify(newDevice))
+            onActivated: {
+                if (!root._status) {
+                    return
                 }
+
+                var newID = _DEVICE_INFO[currentIndex].value
+                root._status.device = mainWindow.getDevices(newID)
+                root.itemChanged("device", JSON.stringify(root._status.device))
             }
         }
 
@@ -119,10 +115,11 @@ Item {
             width: 200
             height: 25
             onTextChanged: {
-                if (root._status) {
-                    root._status.type_name = text
-                    root.itemChanged("type_name", text)
+                if (!root._status) {
+                    return
                 }
+                root._status.type_name = text
+                root.itemChanged("type_name", text)
             }
         }
 
@@ -137,16 +134,26 @@ Item {
             width: 300
             height: 25
             onTextChanged: {
-                if (root._status) {
-                    root._status.desc = text
-                    root.itemChanged("desc", text)
+                if (!root._status) {
+                    return
                 }
+                root._status.desc = text
+                root.itemChanged("desc", text)
             }
         }
     }
 
+    Component.onCompleted: {
+        mainWindow.signalUpdateDeviceInfo.connect(function(deviceList) {
+            _DEVICE_INFO = getDeiveInfo(deviceList)
+        })
+    }
+
     function load(value) {
         _status = value
+        _DEVICE_INFO = getDeiveInfo(mainWindow.getAllDevices())
+
+        console.log("_DEVICE_INFO = ", JSON.stringify(_DEVICE_INFO))
 
         typeNameField.text = value.type_name
         descField.text = value.desc
@@ -157,4 +164,16 @@ Item {
         typeNameField.text = ""
         descField.text = ""
     }
+
+    function getDeiveInfo(deviceList) {
+        var info = []
+        for (var i in deviceList) {
+            info.push({
+                          text: deviceList[i].type,
+                          value: deviceList[i].device_id
+                      })
+        }
+        return info
+    }
+
 }

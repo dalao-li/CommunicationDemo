@@ -16,6 +16,7 @@ import "../Button"
 
 Item {
     id: root
+
     property var segments: []
     property var _device: devices[0]
 
@@ -28,9 +29,7 @@ Item {
     property var _STATUS_LIST_COLUMN: 5
 
     // icd列表
-    property var icdList: {
-        return getICDList()
-    }
+    signal ouputICDChanged()
 
     signal itemChanged(string id, string value)
 
@@ -81,53 +80,12 @@ Item {
             right: parent.right
         }
 
-        TableViewColumn {
-            id: bindICD
-            visible: true
-            role: "bind_icd"
-            title: "绑定输出ICD"
-            width: 200
-        }
-
-        TableViewColumn {
-            id: fieldIndex
-            visible: true
-            role: "field_index"
-            title: "ICD域"
-            width: 200
-        }
-
-        TableViewColumn {
-            id: typeName
-            visible: true
-            role: "type_name"
-            title: "类别名"
-            width: 200
-        }
-
-        TableViewColumn {
-            id: statusType
-            visible: true
-            role: "status_type"
-            title: "status_type"
-            width: 80
-        }
-
-        TableViewColumn {
-            id: desc
-            visible: true
-            role: "desc"
-            title: "描述"
-            width: 200
-        }
-
-        TableViewColumn {
-            id: statusList
-            visible: true
-            role: "status_list"
-            title: "状态列表"
-            width: 100
-        }
+        TableViewColumn { id: bindICD; visible: true; role: "bind_icd"; title: "绑定输出ICD"; width: 200 }
+        TableViewColumn { id: fieldIndex; visible: true; role: "field_index"; title: "ICD域"; width: 200}
+        TableViewColumn { id: typeName; visible: true; role: "type_name"; title: "类别名"; width: 200}
+        TableViewColumn { id: statusType; visible: true; role: "status_type"; title: "status_type"; width: 80}
+        TableViewColumn { id: desc; visible: true; role: "desc"; title: "描述"; width: 200}
+        TableViewColumn { id: statusList; visible: true; role: "status_list"; title: "状态列表"; width: 100}
 
         model: ListModel {}
 
@@ -137,29 +95,19 @@ Item {
         itemDelegate: Item {
             Loader {
                 anchors.fill: parent
-                sourceComponent: {
-                    if (styleData.selected) {
-                        if ([_TYPE_NAME_COLUMN, _DESC_COLUMN].includes(styleData.column)) {
-                            return textComponent
-                        }
+                sourceComponent: loadComponent(styleData.column)
+            }
 
-                        if (styleData.column === _BIND_ICD_COLUMN) {
-                            return icdComboboxCompoent
-                        }
+            property var _OUTPUT_ICD_INFO: {
+                return getOuputICDInfo(_device.output_icd)
+            }
 
-                        if (styleData.column === _FIELD_INDEX_COLUMN) {
-                            return indexComboboxComponent
-                        }
-
-                        if (styleData.column === _STATUS_LIST_COLUMN) {
-                            return buttonComponent
-                        }
-                    }
-
-                    else {
-                        return labelComponent
-                    }
+            property var _OUTPU_ICD_INDEX_INFO: {
+                if (styleData.row < 0) {
+                    return
                 }
+                var icd = table.model.get(styleData.row).bind_icd
+                return getFieldInfo(icd)
             }
 
             Component {
@@ -174,37 +122,32 @@ Item {
                     verticalAlignment: Text.AlignVCenter
 
                     text: {
-                        if (!visible || styleData.row === undefined || segments[styleData.row] === undefined || segments[styleData.row] === []) {
+                        if (!visible || styleData.row < 0 || segments[styleData.row] === undefined || segments[styleData.row] === []) {
                             return ""
                         }
 
-                        switch (styleData.column) {
-                        case _STATUS_TYPE_COLUMN:
-                        case _TYPE_NAME_COLUMN:
-                        case _DESC_COLUMN:
+                        if (styleData.column === _BIND_ICD_COLUMN) {
+                            var icd = table.model.get(styleData.row).bind_icd
+                            for (var i in _OUTPUT_ICD_INFO) {
+                                if (icd === _OUTPUT_ICD_INFO[i].value) {
+                                    return _OUTPUT_ICD_INFO[i].text
+                                }
+                            }
+                            return ""
+                        }
+
+                        if (styleData.column === _FIELD_INDEX_COLUMN) {
+                            var index = table.model.get(styleData.row).field_index
+                            if (index < 0 || index > _OUTPU_ICD_INDEX_INFO.length) {
+                                return ""
+                            }
+                            return _OUTPU_ICD_INDEX_INFO[index].text
+                        }
+
+                        if (styleData.column === _TYPE_NAME_COLUMN || styleData.column === _DESC_COLUMN) {
                             return String(styleData.value)
-                        case _BIND_ICD_COLUMN:
-                            for (var i in payloads) {
-                                if (payloads[i].id === styleData.value) {
-                                    return payloads[i].name
-                                }
-                            }
-                            break
-                        case _FIELD_INDEX_COLUMN:
-                            for (var j in payloads) {
-                                if (payloads[j].id === String(segments[styleData.row].bind_icd)) {
-                                    var value = payloads[j].values[styleData.value]
-                                    if (value === undefined) {
-                                        return ""
-                                    }
-                                    return value.name
-                                }
-                            }
-                            break
-
-                        default:
-                            return ""
                         }
+
                         return ""
                     }
                 }
@@ -261,32 +204,32 @@ Item {
                     visible: styleData.selected && styleData.column === _BIND_ICD_COLUMN
 
                     property var curIndex: {
-                        if (styleData.row === undefined || segments[styleData.row] === undefined || segments[styleData.row].bind_icd === undefined) {
+                        if (styleData.row < 0 || segments[styleData.row] === undefined) {
                             return -1
                         }
 
-                        for (var i in icdList) {
-                            if (String(segments[styleData.row].bind_icd) === icdList[i].value) {
+                        for (var i in _OUTPUT_ICD_INFO) {
+                            if (segments[styleData.row].bind_icd === _OUTPUT_ICD_INFO[i].value) {
                                 return i
                             }
                         }
+
                         return -1
                     }
 
-                    model: icdList
-
-                    currentIndex: curIndex
+                    model: _OUTPUT_ICD_INFO
 
                     onCurIndexChanged: {
                         currentIndex = curIndex
                     }
 
-                    onCurrentIndexChanged: {
-                        if (!visible || styleData.row === undefined || currentIndex < 0) {
+                    onActivated: {
+                        if (!visible || styleData.row < 0 || currentIndex < 0) {
                             return
                         }
                         // 更新当前bind_icd
-                        root.setValue(styleData.row, styleData.column, icdList[currentIndex].value)
+                        root.setValue(styleData.row, styleData.column, _OUTPUT_ICD_INFO[currentIndex].value)
+                        ouputICDChanged()
                     }
                 }
             }
@@ -314,27 +257,31 @@ Item {
                     }
 
                     property var curIndex: {
-                        for(var i in fieldList){
-                            if(String(segments[styleData.row].field_index) === String(fieldList[i].value)) {
-                                return i
-                            }
+                        if (styleData.row < 0 || segments[styleData.row] === undefined) {
+                            return -1
                         }
-                        return -1
+                        return Number(segments[styleData.row].field_index)
                     }
 
-                    model: fieldList
-
-                    currentIndex: curIndex
+                    model: _OUTPU_ICD_INDEX_INFO
 
                     onCurIndexChanged: {
                         currentIndex = curIndex
                     }
 
-                    onCurrentIndexChanged: {
-                        if (!visible || styleData.row === undefined) {
+                    onActivated: {
+                        if (!visible || styleData.row < 0) {
                             return
                         }
                         root.setValue(styleData.row, styleData.column, currentIndex)
+                    }
+
+                    Connections {
+                        target: root
+                        onOuputICDChanged: {
+                            root.setValue(styleData.row, styleData.column, -1)
+                            fieldCombox.currentIndex = -1
+                        }
                     }
                 }
             }
@@ -367,6 +314,28 @@ Item {
                             }
                         }
                     }
+                }
+            }
+
+            function loadComponent(column) {
+                if (!styleData.selected) {
+                    return labelComponent
+                }
+
+                if ([_TYPE_NAME_COLUMN, _DESC_COLUMN].includes(column)) {
+                    return textComponent
+                }
+
+                if (column === _BIND_ICD_COLUMN) {
+                    return icdComboboxCompoent
+                }
+
+                if (column === _FIELD_INDEX_COLUMN) {
+                    return indexComboboxComponent
+                }
+
+                if (column === _STATUS_LIST_COLUMN) {
+                    return buttonComponent
                 }
             }
         } // itemDelegate end
@@ -476,6 +445,7 @@ Item {
     }
 
     function updateDevice(newDevice) {
+        //_status.device = newDevice
         _device = newDevice
     }
 
@@ -577,5 +547,35 @@ Item {
             res.push(info)
         }
         return res
+    }
+
+    // 根据ICD获取field
+    function getFieldInfo(bindICD) {
+        if (bindICD === undefined) {
+            console.log("DeviceActionSegmentList, getFieleList, bindICD is undefined")
+            return []
+        }
+        var payload = mainWindow.getPayLoads(bindICD)
+        var info = []
+        for (var i in payload.values) {
+            info.push({
+                          text: payload.values[i].name,
+                          value: String(i)
+                      })
+        }
+        return info
+    }
+
+    // 获取OutputICD中名称与id
+    function getOuputICDInfo(outputICDList) {
+        var info = []
+        for (var i in outputICDList) {
+            var payload = mainWindow.getPayLoads(outputICDList[i])
+            info.push({
+                          text: payload.name,
+                          value: payload.id
+                      })
+        }
+        return info
     }
 }

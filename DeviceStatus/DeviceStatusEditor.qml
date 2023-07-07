@@ -39,13 +39,14 @@ ColumnLayout {
                         return
                     }
                     var data = root.status[listComponent.currentIndex]
+                    //console.log("data = ", JSON.stringify(data))
                     detailComponent.load(data)
                     segmentComponent.load(data)
                 }
 
                 onCountChanged: {
                     if (listComponent.count <= 0) {
-                        console.log("listComponent.count", listComponent.count)
+                        //console.log("listComponent.count", listComponent.count)
                         detailComponent.clear()
                         segmentComponent.clear()
                     }
@@ -68,26 +69,30 @@ ColumnLayout {
                 }
 
                 onItemChanged: {
-                    if (listComponent.currentIndex < 0) {
+                    var currentIndex = listComponent.currentIndex
+                    if (currentIndex < 0) {
                         return
                     }
 
                     var data = {}
                     if (id === "type_name") {
-                        data["type_name"] = value
+                        listComponent.model.set(currentIndex, {"type_name": value})
+                        return
                     }
 
                     if (id === "desc") {
-                        data["desc"] = value
+                        listComponent.model.set(currentIndex, {"desc": value})
+                        return
                     }
 
                     if (id === "device") {
-                        data["device"] = JSON.parse(value)
-                        // 修改设备名, 直接清空segmentComponent
-                        segmentComponent.updateDevice(JSON.parse(value))
-                        segmentComponent.clear()
+                        var device = JSON.parse(value)
+                        root.status[currentIndex].device = device
+                        segmentComponent.updateDevice(device)
+                        return
+                        //segmentComponent.clear()
                     }
-                    listComponent.model.set(listComponent.currentIndex, data)
+                    listComponent.model.set(currentIndex, {id: value})
                 }
             }
 

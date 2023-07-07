@@ -10,24 +10,11 @@ Item {
 
     property var segments: []
 
-    property var keysList: []
-
     property var _device: devices[0]
 
     property var _bindInputICD: devices[0].input_icd[0]
 
-    property var outputICDInfo: getOuputICDInfo()
-
-    property var _IN_INDEX_COMBOBOX_MODEL: []
-    property var _IN_INDEX_COMBOBOX_INDEX: []
-
-    property var _OUTPUT_ICD_COMBOBOX_MODEL: []
-    property var _OUTPUT_ICD_COMBOBOX_INDEX: []
-
-    property var _OUT_INDEX_COMBOBOX_MODEL: []
-    property var _OUT_INDEX_COMBOBOX_INDEX: []
-
-    // 列名枚举
+    // TableView列名枚举
     property var _INPUT_ICD_INDEX_COLUMN: 0
     property var _OUTPUT_ICD_COLUMN: 1
     property var _OUTPUT_ICD_INDEX_COLUMN: 2
@@ -35,6 +22,8 @@ Item {
     property var _DESC_COLUMN: 4
 
     signal itemChanged(string id, string value)
+
+    signal ouputICDChanged()
 
     // 表头
     Rectangle {
@@ -73,7 +62,7 @@ Item {
         }
     } // Rectangle end
 
-    // 除表头之外的表格内容
+    // 表格内容
     TableView {
         id: table
         anchors {
@@ -83,80 +72,38 @@ Item {
             right: parent.right
         }
 
-        TableViewColumn {
-            id: inIndexColumn
-            visible: true
-            role: "in_index"
-            title: "输入ICD中index"
-            width: 200
-        }
-
-        TableViewColumn {
-            id: bindOutputICDColumn
-            visible: true
-            role: "bind_output_icd"
-            title: "输出ICD"
-            width: 200
-        }
-
-        TableViewColumn {
-            id: outIndexColumn
-            visible: true
-            role: "out_index"
-            title: "输出ICD中index"
-            width: 200
-        }
-
-        TableViewColumn {
-            id: diffColumn
-            visible: true
-            role: "difference"
-            title: "difference"
-            width: 100
-        }
-
-        TableViewColumn {
-            id: descColumn
-            visible: true
-            role: "desc"
-            title: "描述"
-            width: 200
-        }
+        TableViewColumn { id: inIndexColumn; visible: true; role: "in_index"; title: "输入ICD中index"; width: 200 }
+        TableViewColumn { id: bindOutputICDColumn; visible: true; role: "bind_output_icd"; title: "输出ICD"; width: 200 }
+        TableViewColumn { id: outIndexColumn; visible: true; role: "out_index"; title: "输出ICD中index"; width: 200 }
+        TableViewColumn { id: diffColumn; visible: true; role: "difference"; title: "difference"; width: 100}
+        TableViewColumn { id: descColumn; visible: true; role: "desc"; title: "描述"; width: 200 }
 
         frameVisible: false
 
-        // 如何绘制每一个单元格
         itemDelegate: Item {
-            // 加载
             Loader {
                 anchors.fill: parent
-                sourceComponent: {
-                    if (styleData.selected) {
-                        if (styleData.column === _DIFFERENCE_COLUMN) {
-                            return textComponent
-                        }
+                sourceComponent: loadCompoent(styleData.column)
+            }
 
-                        if (styleData.column === _INPUT_ICD_INDEX_COLUMN) {
-                            return inIndexComboxComponent
-                        }
+            property var currentRow: styleData.row
+            property var currentColumn: styleData.column
+            property var currentValue: styleData.value
 
-                        if (styleData.column === _OUTPUT_ICD_COLUMN) {
-                            return outputICDComboxComponent
-                        }
+            property var _IN_INDEX_INFO: {
+                return getFieldInfo(_bindInputICD)
+            }
 
-                        if (styleData.column === _OUTPUT_ICD_INDEX_COLUMN) {
-                            return outIndexComboxComponent
-                        }
+            property var _OUTPUT_ICD_INFO: {
+                return getOuputICDInfo(_device.output_icd)
+            }
 
-                        if (styleData.column === _DESC_COLUMN) {
-                            return descTextComponent
-                        }
-                    }
-
-                    else {
-                        return labelComponent
-                    }
+            property var _OUTPU_ICD_INDEX_INFO: {
+                if (styleData.row < 0) {
+                    return
                 }
+                var icd = table.model.get(styleData.row).bind_output_icd
+                return getFieldInfo(icd)
             }
 
             Component {
@@ -164,54 +111,44 @@ Item {
                 Label {
                     id: label
                     anchors.fill: parent
-                    visible: !styleData.selected
-
                     // 设置居中
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
 
-                    property var select: styleData.value
+                    visible: !styleData.selected
 
                     text: {
                         if (!visible || styleData.row < 0) {
                             return ""
                         }
 
+                        // input icd index列
                         if (styleData.column === _INPUT_ICD_INDEX_COLUMN) {
-                            for (var i in payloads) {
-                                if (payloads[i].id === String(_bindInputICD)) {
-                                    var values = payloads[i].values[Number(select)]
-                                    if (values === undefined) {
-                                        return ""
-                                    }
-                                    return values.name
-                                }
+                            var icdIndex = Number(styleData.value)
+                            if (icdIndex < 0 || icdIndex > _IN_INDEX_INFO.length) {
+                                return ""
                             }
-                            return ""
+                            return _IN_INDEX_INFO[icdIndex].text
                         }
 
+                        // ouput_icd
                         if (styleData.column === _OUTPUT_ICD_COLUMN) {
-                            for (var k in payloads) {
-                                if (payloads[k].id === select) {
-                                    return payloads[k].name
+                            for (var i in _OUTPUT_ICD_INFO) {
+                                if (_OUTPUT_ICD_INFO[i].value === styleData.value) {
+                                    return _OUTPUT_ICD_INFO[i].text
                                 }
                             }
                             return ""
                         }
 
                         if (styleData.column === _OUTPUT_ICD_INDEX_COLUMN) {
-                            for (var w in payloads) {
-                                if (payloads[w].id === segments[styleData.row].bind_output_icd) {
-                                    var value1 = payloads[w].values[Number(select)]
-                                    if (value1 === undefined) {
-                                        return ""
-                                    }
-                                    return value1.name
-                                }
+                            var outIndex = Number(styleData.value)
+                            if (outIndex < 0 || outIndex > _OUTPU_ICD_INDEX_INFO.length) {
+                                return ""
                             }
-                            return ""
+                            return _OUTPU_ICD_INDEX_INFO[Number(styleData.value)].text
                         }
-                        return select
+                        return styleData.value
                     }
                 }
             }
@@ -220,30 +157,19 @@ Item {
                 id: textComponent
                 TextField {
                     id: field
-                    anchors {
-                        fill: parent
-                        margins: 1
-                    }
-
-                    property var validColumn: styleData.column === _DIFFERENCE_COLUMN
-
-                    visible: validColumn && styleData.selected
-
-                    text: {
-                        if (validColumn) {
-                            return styleData.value
-                        }
-                        return qsTr("")
-                    }
-
+                    anchors { fill: parent; margins: 1 }
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
 
+                    visible: styleData.column === _DIFFERENCE_COLUMN && styleData.selected
+
+                    text: { return styleData.value }
+
                     onTextChanged: {
-                        if (!visible) {
+                        if (!visible || styleData.row < 0) {
                             return
                         }
-                        root.setValue(styleData.row, styleData.column, field.text)
+                        root.updateValue(styleData.row, styleData.column, field.text)
                     }
                 } // TextField end
             }
@@ -253,34 +179,29 @@ Item {
                 // input_icd 中 index
                 ComboBox {
                     id: inIndexBox
-                    anchors {
-                        fill: parent
-                        margins: 1
-                    }
+                    anchors { fill: parent; margins: 1 }
 
                     visible: styleData.selected && (styleData.column === _INPUT_ICD_INDEX_COLUMN)
                     textRole: "text"
 
                     property var curIndex: {
-                        // 这里是新增数据的情况, 超过传入长度时默认是0
-                        if (styleData.row > _IN_INDEX_COMBOBOX_INDEX.length) {
-                            return 0
+                        if (styleData.row < 0 || segments[styleData.row] === undefined) {
+                            return -1
                         }
-                        // 获取该行在model里的下标
-                        return Number(_IN_INDEX_COMBOBOX_INDEX[styleData.row])
+                        return Number(segments[styleData.row].in_index)
                     }
 
-                    model: _IN_INDEX_COMBOBOX_MODEL
+                    model: _IN_INDEX_INFO
 
                     onCurIndexChanged: {
                         currentIndex = curIndex
                     }
 
-                    onCurrentIndexChanged: {
+                    onActivated: {
                         if (!visible || styleData.row < 0) {
                             return
                         }
-                        root.setValue(styleData.row, styleData.column, String(currentIndex))
+                        root.updateValue(styleData.row, styleData.column, String(currentIndex))
                     }
                 }
             }
@@ -289,7 +210,7 @@ Item {
                 id: outputICDComboxComponent
                 // output_icd
                 ComboBox {
-                    id: outputICDBox
+                    id: outputICDCombox
                     anchors {
                         fill: parent
                         margins: 1
@@ -299,26 +220,31 @@ Item {
                     visible: styleData.selected && (styleData.column === _OUTPUT_ICD_COLUMN)
 
                     property var curIndex: {
-                        // 这里是新增数据的情况, 超过传入长度时默认是0
-                        if (styleData.row > _OUTPUT_ICD_COMBOBOX_INDEX.length) {
-                            return 0
+                        if (styleData.row < 0 || segments[styleData.row] === undefined) {
+                            return -1
                         }
 
-                        return Number(_OUTPUT_ICD_COMBOBOX_MODEL[styleData.row])
+                        var icd = segments[styleData.row].bind_output_icd
+                        for (var i in _OUTPUT_ICD_INFO) {
+                            if (icd === _OUTPUT_ICD_INFO[i].value) {
+                                return i
+                            }
+                        }
+                        return -1
                     }
 
-                    model: _OUTPUT_ICD_COMBOBOX_MODEL
-
+                    model: _OUTPUT_ICD_INFO
 
                     onCurIndexChanged: {
                         currentIndex = curIndex
                     }
 
-                    onCurrentIndexChanged: {
-                        if (!visible || styleData.row === undefined) {
+                    onActivated: {
+                        if (!visible || styleData.row < 0) {
                             return
                         }
-                        root.setValue(styleData.row, styleData.column, _OUTPUT_ICD_COMBOBOX_MODEL[currentIndex].value)
+                        root.updateValue(styleData.row, styleData.column, _OUTPUT_ICD_INFO[currentIndex].value)
+                        ouputICDChanged()
                     }
                 }
             }
@@ -327,7 +253,7 @@ Item {
                 id: outIndexComboxComponent
                 // output_icd 中 index
                 ComboBox {
-                    id: typeBox
+                    id: outIndexCombox
                     anchors {
                         fill: parent
                         margins: 1
@@ -335,35 +261,32 @@ Item {
                     textRole: "text"
                     visible: (styleData.column === _OUTPUT_ICD_INDEX_COLUMN) && styleData.selected
 
-                    property var fieldList: {
-                        var outputICD = _OUTPUT_ICD_COMBOBOX_MODEL[styleData.row].value
-                        return getFieldInfo(outputICD)
-                    }
-
-
                     property var curIndex: {
-                        if (styleData.row > _OUT_INDEX_COMBOBOX_INDEX.length) {
-                            return 0
+                        if (styleData.row < 0 || segments[styleData.row] === undefined) {
+                            return -1
                         }
-                        return Number(_OUT_INDEX_COMBOBOX_INDEX[styleData.row])
+                        return Number(segments[styleData.row].out_index)
                     }
 
-                    model: {
-                        if (styleData.row > _OUT_INDEX_COMBOBOX_MODEL.length) {
-                            return _OUT_INDEX_COMBOBOX_MODEL[0]
-                        }
-                        return _OUT_INDEX_COMBOBOX_MODEL[styleData.row]
-                    }
+                    model: _OUTPU_ICD_INDEX_INFO
 
                     onCurIndexChanged: {
                         currentIndex = curIndex
                     }
 
-                    onCurrentIndexChanged: {
-                        if (!visible || styleData.row === undefined || currentIndex < 0) {
+                    onActivated: {
+                        if (!visible || currentIndex < 0) {
                             return
                         }
-                        root.setValue(styleData.row, styleData.column, String(currentIndex))
+                        root.updateValue(styleData.row, styleData.column, String(currentIndex))
+                    }
+
+                    Connections {
+                        target: root
+                        onOuputICDChanged: {
+                            root.updateValue(styleData.row, styleData.column, String(-1))
+                            outIndexCombox.currentIndex = -1
+                        }
                     }
                 }
             }
@@ -377,31 +300,48 @@ Item {
                         margins: 1
                     }
 
-                    property var validColumn: styleData.column === _DESC_COLUMN
+                    visible: styleData.column === _DESC_COLUMN && styleData.selected
 
-                    visible: validColumn && styleData.selected
+                    enabled: { return true }
 
-                    enabled: {
-                        return true
-                    }
-
-                    text: {
-                        if (validColumn) {
-                            return styleData.value
-                        }
-                        return qsTr("")
-                    }
+                    text: { return styleData.value }
 
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
 
                     onTextChanged: {
-                        if (!visible || styleData.row === undefined) {
+                        if (!visible || styleData.row < 0) {
                             return
                         }
-                        root.setValue(styleData.row, styleData.column, descField.text)
+                        root.updateValue(styleData.row, styleData.column, descField.text)
                     }
                 } // TextField end
+            }
+
+            function loadCompoent(column) {
+                if (!styleData.selected) {
+                    return labelComponent
+                }
+
+                if (column === _DIFFERENCE_COLUMN) {
+                    return textComponent
+                }
+
+                if (column === _INPUT_ICD_INDEX_COLUMN) {
+                    return inIndexComboxComponent
+                }
+
+                if (column === _OUTPUT_ICD_COLUMN) {
+                    return outputICDComboxComponent
+                }
+
+                if (column === _OUTPUT_ICD_INDEX_COLUMN) {
+                    return outIndexComboxComponent
+                }
+
+                if (styleData.column === _DESC_COLUMN) {
+                    return descTextComponent
+                }
             }
         }
 
@@ -463,20 +403,7 @@ Item {
 
 
     // 加载列表数据
-    function load(values, inIndexComboBoxModel, inIndexComboBoxIndex, outputICDComboBoxModel, outputICDComboBoxIndex, outIndexComboBoxModel, outIndexComboBoxIndex) {
-        // 输出ICD中index
-        _IN_INDEX_COMBOBOX_MODEL = inIndexComboBoxModel
-        _IN_INDEX_COMBOBOX_INDEX = inIndexComboBoxIndex
-
-        // 输出ICD
-        _OUTPUT_ICD_COMBOBOX_MODEL = outputICDComboBoxModel
-        _OUTPUT_ICD_COMBOBOX_INDEX = outputICDComboBoxIndex
-
-
-        // 输出ICD中index
-        _OUT_INDEX_COMBOBOX_MODEL = outIndexComboBoxModel
-        _OUT_INDEX_COMBOBOX_INDEX = outIndexComboBoxIndex
-
+    function load(values) {
 
         table.model.clear()
         batchAdd.enabled = true
@@ -524,7 +451,7 @@ Item {
     }
 
     // 修改某行某列的值
-    function setValue(index, column, value) {
+    function updateValue(index, column, value) {
         if (index < 0 || column < 0) {
             return
         }
@@ -558,60 +485,30 @@ Item {
     // 根据ICD获取field
     function getFieldInfo(bindICD) {
         if (bindICD === undefined) {
-            console.log("DeviceActionSegmentList getFieleList, bindICD is undefined")
+            console.log("DeviceActionSegmentList, getFieleList, bindICD is undefined")
             return []
         }
-        // icd中values
-        var values = (()=>{
-                          for (var i in payloads) {
-                              if (String(bindICD) === String(payloads[i].id)) {
-                                  return payloads[i].values
-                              }
-                          }
-                          return []
-                      })()
-
-        var result = []
-        for (var i in values) {
-            var info = {
-                text: values[i].name,
-                value: String(i)
-            }
-            result.push(info)
+        var payload = mainWindow.getPayLoads(bindICD)
+        var info = []
+        for (var i in payload.values) {
+            info.push({
+                          text: payload.values[i].name,
+                          value: String(i)
+                      })
         }
-        return result
+        return info
     }
 
     // 获取OutputICD中名称与id
-    function getOuputICDInfo() {
-        var result = []
-        for (var i in _device.output_icd) {
-            for (var j in payloads) {
-                if (String(_device.output_icd[i]) === String(payloads[j].id)) {
-                    var info = {
-                        text: payloads[j].name,
-                        value: payloads[j].id
-                    }
-                    result.push(info)
-                }
-            }
+    function getOuputICDInfo(outputICDList) {
+        var info = []
+        for (var i in outputICDList) {
+            var payload = mainWindow.getPayLoads(outputICDList[i])
+            info.push({
+                          text: payload.name,
+                          value: payload.id
+                      })
         }
-        return result
-    }
-
-    function getInputICDInfo() {
-        var icdList = []
-        for (var i in _device.input_icd) {
-            for (var j in payloads) {
-                if (String(_device.input_icd[i]) === String(payloads[j].id)) {
-                    var info = {
-                        text: payloads[j].name,
-                        value: payloads[j].id
-                    }
-                    icdList.push(info)
-                }
-            }
-        }
-        return icdList
+        return info
     }
 }

@@ -284,6 +284,10 @@ ApplicationWindow {
         return undefined
     }
 
+    function getAllPayloads() {
+        return payloads
+    }
+
     function getDevices(deviceID) {
         if (deviceID === "") {
             return devices[0]

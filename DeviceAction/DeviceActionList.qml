@@ -230,17 +230,15 @@ ListView {
                 root.actions.push(resData)
                 root.model.append({"name": resData.actions.name})
             }
-
-
         }
     }
 
     // 导出
     function saveActionInfo(path) {
         var data = root.actions
-        console.log("root.actions = ", JSON.stringify(root.actions))
+        //console.log("导出数据 = ", JSON.stringify(root.actions))
         var dataList = []
-        // TODO 按设备划分, 同设备下的action放在一个actions里
+        //  同设备下的action放在一个actions里
         for (var i in data) {
             var deviceID = data[i].device.device_id
 
@@ -251,49 +249,33 @@ ListView {
             var keyList = actions.keyList
 
             var condition = []
-            var v = {}
+            var value = {}
             for (var j in keyList) {
+                //console.log("value = ", JSON.stringify(value))
+                //console.log("keyList = ", JSON.stringify(keyList))
                 var id = keyList[j].bind_output_icd
-                console.log("id = ", id)
-                if (v.hasOwnProperty(id)) {
-                    v[id].push({
-                                        "in_index": keyList[j].in_index,
-                                        "out_index": keyList[j].out_index,
-                                        "difference": keyList[j].difference,
-                                        "desc": keyList[j].desc
-                                    })
+                if (!value.hasOwnProperty(id)) {
+                    value[id] = []
                 }
-                else {
-                    v[id] = []
-                }
-            }
-            console.log("v", JSON.stringify(v))
 
-            for (var k in v) {
-                condition.push({
-                                   "id": k,
-                                   "keys": v[k]
+                value[id].push({
+                                   "in_index": keyList[j].in_index,
+                                   "out_index": keyList[j].out_index,
+                                   "difference": keyList[j].difference,
+                                   "desc": keyList[j].desc
                                })
             }
+            //console.log("value", JSON.stringify(value))
+            for (var k in value) {
+                condition.push({ "id": k, "keys": value[k] })
+            }
 
+            actionList.push({ "id": inputICD, "name": name, "condition": condition })
 
-            actionList.push({
-                                "id": inputICD,
-                                "name": name,
-                                "condition": condition
-                            })
+            dataList.push({ "id": deviceID, "actions": actionList })
         }
 
-        dataList.push({
-                          "id": deviceID,
-                          "actions": actionList
-                      })
-
-
-
-
-        Excutor.query({"command": "write",
-                          content: Excutor.formatJSON(JSON.stringify(dataList)),
-                          path: path})
+        Excutor.query({"command": "write", content: Excutor.formatJSON(JSON.stringify(dataList)), path: path})
     }
+
 }

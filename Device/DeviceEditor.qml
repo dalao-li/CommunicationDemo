@@ -90,10 +90,8 @@ ColumnLayout {
                             root.devices[curIndex].output_icd = data["icd"]
                             listComponent.model.set(curIndex, {"output_icd": data["icd"]})
                         }
-                        return
                     }
-
-                    listComponent.model.set(curIndex, {id: value})
+                    mainWindow.signalUpdateDeviceInfo(devices)
                 }
             }
         }
