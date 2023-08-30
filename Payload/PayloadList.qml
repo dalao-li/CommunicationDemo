@@ -20,6 +20,10 @@ ListView {
     property var busType
     property var payloads: []
 
+    // signal clickAdd
+
+    signal addValue
+
     focus: true
     implicitWidth: 200
 
@@ -54,6 +58,7 @@ ListView {
             console.log("Canceled")
         }
     }
+
     header: Rectangle {
         height: 32
         width: root.width
@@ -88,6 +93,7 @@ ListView {
 
             onClicked: {
                 addData()
+                //emit: clickAdd()
             }
         } // BatchAddButton end
     } // header end
@@ -201,6 +207,9 @@ ListView {
             "values": []
         }
         root.payloads.push(info)
+
+        //console.log("==>", JSON.stringify(root.payloads))
         root.model.append({"name": info.name})
+        root.currentIndex = root.payloads.length -1
     }
 }

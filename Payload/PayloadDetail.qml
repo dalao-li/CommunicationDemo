@@ -158,6 +158,10 @@ Item {
     } // end flow
 
     function load(value) {
+        if (value === undefined) {
+            return
+        }
+
         _payload = value
 
         nameField.text = value.name

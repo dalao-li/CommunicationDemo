@@ -82,6 +82,7 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
 
                 onClicked: {
+                    // console.log("==>", table.rowCount)
                     addSegment(table.rowCount - 1)
                 }
             }
@@ -505,7 +506,7 @@ Item {
     // 加载列表数据
     function load(values) {
         batchAdd.enabled = true
-
+        // console.log("调用", JSON.stringify(values))
         table.model.clear()
         // 按共享传递
         segments = values
@@ -537,7 +538,7 @@ Item {
         }
 
         var info = {
-            "name": "工程值" + String(row + 1),
+            "name": "工程值" + String(root.segments.length + 1),
             "offset": offset,
             "size": 4,
             "mask": getMask(4),
@@ -547,7 +548,7 @@ Item {
             "dim": 1,
             "amp": 0,
             "meaning": {},
-            "index": String(row + 1),
+            //"index": String(row + 1),
         }
         root.segments.splice(row + 1, 0, info)
         table.model.insert(row + 1, info)
@@ -573,7 +574,7 @@ Item {
     }
 
     function getEnumdata(meaning) {
-        console.log("meaning", JSON.stringify(meaning))
+        // console.log("meaning", JSON.stringify(meaning))
         segments[table.currentRow].meaning = meaning
         updateValue(table.currentRow, _MEANING_COLUMN, meaning)
     }
@@ -694,5 +695,9 @@ Item {
     function clear() {
         table.model.clear()
         root.segments = []
+    }
+
+    function setButton() {
+        batchAdd.enabled = true
     }
 }

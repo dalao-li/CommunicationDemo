@@ -36,22 +36,35 @@ ColumnLayout {
                 Layout.fillHeight: true
 
                 payloads: root.payloads
+                currentIndex: -1
 
                 onCurrentIndexChanged: {
+                    // console.log("==>", listComponent.currentIndex)
                     if (listComponent.currentIndex < 0) {
                         return
                     }
                     var data = root.payloads[listComponent.currentIndex]
+                    // console.log("data = ", JSON.stringify(data))
+                    if (data === undefined) {
+                        return
+                    }
+
+                    // console.log("data = ", JSON.stringify(data))
                     detailComponent.load(data)
                     segmentComponent.load(data.values)
                 }
 
-                onCountChanged: {
-                    if (listComponent.count <= 0) {
-                        detailComponent.clear()
-                        segmentComponent.clear()
-                    }
-                }
+//                onCountChanged: {
+//                    if (listComponent.count <= 0) {
+//                        detailComponent.clear()
+//                        segmentComponent.clear()
+//                    }
+//                }
+
+                // 点击后解除按钮限制
+//                onClickAdd: {
+//                    segmentComponent.setButton()
+//                }
             } // PayloadList end
         }
 

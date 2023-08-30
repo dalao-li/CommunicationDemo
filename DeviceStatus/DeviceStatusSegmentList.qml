@@ -127,7 +127,7 @@ Item {
                         }
 
                         if (styleData.column === _BIND_ICD_COLUMN) {
-                            var icd = table.model.get(styleData.row).bind_icd
+                            var icd = segments[styleData.row].bind_icd
                             for (var i in _OUTPUT_ICD_INFO) {
                                 if (icd === _OUTPUT_ICD_INFO[i].value) {
                                     return _OUTPUT_ICD_INFO[i].text
@@ -137,7 +137,7 @@ Item {
                         }
 
                         if (styleData.column === _FIELD_INDEX_COLUMN) {
-                            var index = table.model.get(styleData.row).field_index
+                            var index = segments[styleData.row].field_index
                             if (index < 0 || index > _OUTPU_ICD_INDEX_INFO.length) {
                                 return ""
                             }
@@ -184,7 +184,7 @@ Item {
                         if (!visible || styleData.row === undefined) {
                             return
                         }
-                        root.setValue(styleData.row, styleData.column, field.text)
+                        root.updateValue(styleData.row, styleData.column, field.text)
                     }
                 } // TextField end
             }
@@ -228,7 +228,7 @@ Item {
                             return
                         }
                         // 更新当前bind_icd
-                        root.setValue(styleData.row, styleData.column, _OUTPUT_ICD_INFO[currentIndex].value)
+                        root.updateValue(styleData.row, styleData.column, _OUTPUT_ICD_INFO[currentIndex].value)
                         ouputICDChanged()
                     }
                 }
@@ -248,14 +248,6 @@ Item {
 
                     visible: styleData.selected && styleData.column === _FIELD_INDEX_COLUMN
 
-                    // field 列表
-                    property var fieldList: {
-                        if (styleData.row === undefined || segments[styleData.row] === undefined || segments[styleData.row].bind_icd === undefined) {
-                            return []
-                        }
-                        return getFieldList(segments[styleData.row].bind_icd)
-                    }
-
                     property var curIndex: {
                         if (styleData.row < 0 || segments[styleData.row] === undefined) {
                             return -1
@@ -273,13 +265,13 @@ Item {
                         if (!visible || styleData.row < 0) {
                             return
                         }
-                        root.setValue(styleData.row, styleData.column, currentIndex)
+                        root.updateValue(styleData.row, styleData.column, currentIndex)
                     }
 
                     Connections {
                         target: root
                         onOuputICDChanged: {
-                            root.setValue(styleData.row, styleData.column, -1)
+                            root.updateValue(styleData.row, styleData.column, -1)
                             fieldCombox.currentIndex = -1
                         }
                     }
@@ -414,9 +406,9 @@ Item {
                                    "desc": segments[i].desc,
                                    "status_list": segments[i].status_list,
                                    // output_icd id列表
-                                   "icd_list": getICDList(),
+                                   //"icd_list": getICDList(),
                                    // ICD下field的index
-                                   "field_list": getFieldList(segments[i].bind_icd)
+                                   //field_list": getFieldList(segments[i].bind_icd)
                                })
         }
     }
@@ -436,9 +428,9 @@ Item {
             "desc": "",
             "status_list": [],
             // 额外增加 output_icd id列表
-            "icd_list": getICDList(),
+            //"icd_list": getICDList(),
             // 额外增加 ICD下field的index
-            "field_list": getFieldList(_device.output_icd[0])
+            //"field_list": getFieldList(_device.output_icd[0])
         }
         root.segments.splice(row + 1, 0, info)
         table.model.insert(row + 1, info)
@@ -455,7 +447,7 @@ Item {
     }
 
     // 修改某行某列的值
-    function setValue(index, column, value) {
+    function updateValue(index, column, value) {
         if (index < 0 || column < 0) {
             return
         }
@@ -470,10 +462,10 @@ Item {
             segment.bind_icd = value
             table.model.setProperty(index, "bind_icd", value)
             // 同步修改该行的field_list
-            segment.field_index = 0
-            table.model.setProperty(index, "field_index", 0)
-            segment.field_list = getFieldList(value)
-            table.model.setProperty(index, "field_list", segment.field_list)
+//            segment.field_index = 0
+//            table.model.setProperty(index, "field_index", 0)
+//            segment.field_list = getFieldList(value)
+//            table.model.setProperty(index, "field_list", segment.field_list)
             break
         case _FIELD_INDEX_COLUMN:
             segment.field_index = value
@@ -505,49 +497,49 @@ Item {
         root.segments = []
     }
 
-    function getICDList() {
-        if (_device.output_icd === undefined) {
-            return []
-        }
+//    function getICDList() {
+//        if (_device.output_icd === undefined) {
+//            return []
+//        }
 
-        if (_device.output_icd === []) {
-            return []
-        }
+//        if (_device.output_icd === []) {
+//            return []
+//        }
 
-        var icd = []
-        for (var i in _device.output_icd) {
-            for (var j in payloads) {
-                if (String(_device.output_icd[i]) === String(payloads[j].id)) {
-                    var info = {
-                        text: payloads[j].name,
-                        value: payloads[j].id
-                    }
-                    icd.push(info)
-                }
-            }
-        }
-        return icd
-    }
+//        var icd = []
+//        for (var i in _device.output_icd) {
+//            for (var j in payloads) {
+//                if (String(_device.output_icd[i]) === String(payloads[j].id)) {
+//                    var info = {
+//                        text: payloads[j].name,
+//                        value: payloads[j].id
+//                    }
+//                    icd.push(info)
+//                }
+//            }
+//        }
+//        return icd
+//    }
 
-    function getFieldList(bind_icd) {
-        var values = (()=>{
-                          for (var i in payloads) {
-                              if (String(bind_icd) === String(payloads[i].id)) {
-                                  return payloads[i].values
-                              }
-                          }
-                      })()
+//    function getFieldList(bind_icd) {
+//        var values = (()=>{
+//                          for (var i in payloads) {
+//                              if (String(bind_icd) === String(payloads[i].id)) {
+//                                  return payloads[i].values
+//                              }
+//                          }
+//                      })()
 
-        var res = []
-        for (var i in values) {
-            var info = {
-                text: values[i].name,
-                value: i
-            }
-            res.push(info)
-        }
-        return res
-    }
+//        var res = []
+//        for (var i in values) {
+//            var info = {
+//                text: values[i].name,
+//                value: i
+//            }
+//            res.push(info)
+//        }
+//        return res
+//    }
 
     // 根据ICD获取field
     function getFieldInfo(bindICD) {

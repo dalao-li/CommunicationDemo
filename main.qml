@@ -202,7 +202,7 @@ ApplicationWindow {
         content = Excutor.query({ "payloads": path })
         //getTabItem(0).load()
         //getTabItem(1).stopListen()
-        getTabItem(2).load(content)
+        //getTabItem(2).load(content)
     }
 
     FileDialog {

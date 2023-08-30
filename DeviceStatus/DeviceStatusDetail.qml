@@ -153,7 +153,7 @@ Item {
         _status = value
         _DEVICE_INFO = getDeiveInfo(mainWindow.getAllDevices())
 
-        console.log("_DEVICE_INFO = ", JSON.stringify(_DEVICE_INFO))
+        //console.log("_DEVICE_INFO = ", JSON.stringify(_DEVICE_INFO))
 
         typeNameField.text = value.type_name
         descField.text = value.desc
