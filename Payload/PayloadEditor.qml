@@ -49,7 +49,7 @@ ColumnLayout {
                         return
                     }
 
-                    // console.log("data = ", JSON.stringify(data))
+                    console.log("data = ", JSON.stringify(data))
                     detailComponent.load(data)
                     segmentComponent.load(data.values)
                 }

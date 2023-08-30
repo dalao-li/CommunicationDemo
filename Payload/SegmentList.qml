@@ -336,7 +336,7 @@ Item {
                         root.updateValue(styleData.row, styleData.column, value)
 
                         if (styleData.column === _SIZE_COLUMN) {
-                            root.updateValue(styleData.row, 4, getMask(value))
+                            // root.updateValue(styleData.row, 4, getMask(value))
                             root.updateValue(styleData.row, 9, value * 8)
                         }
                         root.updateOffset(styleData.row)
@@ -610,9 +610,9 @@ Item {
             table.model.setProperty(index, "type", Number(value))
             // 修改mask
             if ([_UINT_TYPE, _ENUM_TYPE, _INT_TYPE, _CHAR_TYPE].includes(segment.type)) {
-                segment.mask = getMask(segment.size)
+                // segment.mask = getMask(segment.size)
             } else {
-                segment.mask = ""
+                // segment.mask = ""
             }
 
             table.model.setProperty(index, "mask", segment.mask)
